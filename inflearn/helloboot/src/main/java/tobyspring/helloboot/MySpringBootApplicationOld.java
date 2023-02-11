@@ -4,7 +4,7 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-public class MySpringBootApplication {
+public class MySpringBootApplicationOld {
     public static void run(Class<?> clazz, String ... args) {
         AnnotationConfigWebApplicationContext ac = new AnnotationConfigWebApplicationContext() {
             @Override
