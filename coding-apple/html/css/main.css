@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+}
+.black-form {
+  width: 100vw;
+  height: 100vh;
+  background-color: grey;
+  padding: 1px;
+}
+
+.white-form {
+  background-color: #eeeeee;
+  width: 70%;
+  padding: 20px;
+  margin: auto;
+}
+
+.w-100 {
+  width: 100%;
+  padding: 10px;
+}
+.w-50 {
+  width: 50%;
+  float: left;
+  padding: 10px;
+}
+
+input, textarea, div {
+  box-sizing: border-box;
+}
+.input-form {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+}
+
+button {
+  display: block;
+  margin-left: auto;
+}
