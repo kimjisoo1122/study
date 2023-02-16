@@ -1,0 +1,20 @@
+.container {
+  background-color: #f7f9fc;
+
+}
+
+.btn {
+  color: #ffffff;
+  background-color: #6fbaf8 ;
+  padding: 5px 10px;
+  margin-top: 5px;
+}
+
+.profile-title-address {
+  color: #6fbaf8;
+}
+
+.profile-bar {
+  color: #6fbaf8 ;
+  border-bottom: 2px solid #6fbaf8;
+}
