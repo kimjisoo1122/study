@@ -1,0 +1,168 @@
+@use "reset";
+
+.container {
+  width: 100%;
+  display: flex;
+}
+
+.aside-container {
+  width: 1%;
+  height: 100vh;
+  padding: 20px;
+  background-color: cornflowerblue;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+.aside-container:hover {
+    width: 15%;
+}
+
+.aside-list-item {
+  margin: 20px;
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+.aside-list-icon {
+  margin-right: 10px;
+}
+
+.main-container {
+  width: 99%;
+  background-color: #eee;
+}
+
+.header-container {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid grey;
+  box-shadow: 1px 1px 2px grey;
+  background-color: #fff;
+}
+
+.header-search {
+  width: 200px;
+  height: 30px;
+  display: flex;
+  margin-left: 20px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  overflow: hidden;
+
+  .header-search-box {
+    width: 85%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    color: grey;
+  }
+
+  .header-search-icon {
+    justify-content: center;
+    align-items: center;
+    width: 15%;
+    padding: 10px;
+    display: flex;
+    color: white;
+    background-color: black;
+  }
+}
+
+.header-notice {
+  margin-right: 50px;
+  color: grey;
+
+  * {
+    margin: 0 10px;
+  }
+}
+
+.header-notice-icon {
+  position: relative;
+
+  .header-notice-icon-num {
+    font-size: 0.7em;
+    color: white;
+    background-color: red;
+    position: absolute;
+    padding: 2px;
+    border-radius: 3px;
+    top: -10px;
+    left: 3px;
+  }
+}
+
+.section-container {
+  padding: 20px;
+
+
+}
+
+.article-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .section-title {
+    font-size: 30px;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 12px;
+
+  }
+  .article-card {
+    width: 25%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+}
+
+.article-item {
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 1px 1px 2px #eee;
+  border-left: 3px solid red;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+
+  .article-content {
+    width: 80%;
+
+    .article-title {
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: grey;
+    }
+
+    .article-content {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+  }
+  .article-icon {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: grey;
+  }
+}
+//
+//@media screen and (max-width: 768px) {
+//  .aside-container {
+//    width: 15%;
+//  }
+//  .main-container {
+//    width: 85%;
+//  }
+//}
+
+
