@@ -6,33 +6,42 @@
   <title>Bootstrap demo</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="main.css">
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+          integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<div class="black-bg">
-  <div class="white-bg">
-    <h4>로그인하세요</h4>
-    <form action="success.html">
-      <div class="my-3">
-        <input type="text" class="form-control">
-      </div>
-      <div class="my-3">
-        <input type="password" class="form-control">
-      </div>
-      <button type="submit" class="btn btn-primary">전송</button>
-      <button type="button" class="btn btn-danger" id="close">닫기</button>
-    </form>
-  </div>
-</div>
-
 <nav class="navbar navbar-light bg-light">
   <div class="container-fluid">
-    <span class="navbar-brand">Navbar</span>
+    <span class="navbar-brand">JSShop</span>
     <button class="navbar-toggler" type="button">
       <span class="navbar-toggler-icon"></span>
     </button>
   </div>
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+
 </nav>
+
+<script>
+	window.addEventListener('scroll', () => {
+		let scrollTop = window.scrollY;
+		let scorolled = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+		let progress = scrollTop / scorolled * 100;
+
+		console.log(scrollTop, scorolled, scrollTop / scorolled * 100);
+		if (progress > 15) {
+			document.querySelector('.navbar-brand').style.fontSize = '20px';
+		} else {
+			document.querySelector('.navbar-brand').style.fontSize = '30px';
+		}
+
+		document.querySelector('.progress-bar').style.width = progress + '%';
+
+	})
+</script>
+
 <ul class="list-group">
   <li class="list-group-item">An item</li>
   <li class="list-group-item">A second item</li>
@@ -40,26 +49,69 @@
   <li class="list-group-item">A fourth item</li>
   <li class="list-group-item">And a fifth one</li>
 </ul>
-
 <button class="btn">버튼</button>
 
-<div class="main-bg">
+
+<div class="main-bg" style="margin-top: 50px">
   <h4>Shirts on Sale</h4>
   <button id="login" class="btn btn-danger">로그인</button>
 </div>
 
+<div class="lorem" style="width: 200px; height: 100px; overflow-y: scroll; margin: 0 auto">
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda incidunt laudantium non quasi soluta. Expedita
+  inventore iure nihil. Aliquid dolores ipsam nam nulla perferendis praesentium quaerat quidem rem ullam voluptas!
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+<script !src="">
+	let scrollFlag = true;
+	$('.lorem').on('scroll', e => {
+		let scrollTop = document.querySelector('.lorem').scrollTop;
+		let scrollHeight = document.querySelector('.lorem').scrollHeight;
+		let clientHeight = document.querySelector('.lorem').clientHeight;
+		if (scrollTop + clientHeight > scrollHeight * 0.9) {
+			if (scrollFlag) {
+				alert('동의하세용?');
+				scrollFlag = false;
+			}
+		}
+	})
+</script>
+
+<div style="height: 1000px"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"
         integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
 <script>
-  $('.btn').click(() => {
-	  $('.black-bg').toggleClass('show-modal');
-  })
+	$('.btn').click(() => {
+		$('.black-bg').toggleClass('show-modal');
+	})
 
-  $('.navbar-toggler').click(() => {
-	  $('.list-group').toggleClass('show-list');
-  })
+	$('.navbar-toggler').click(() => {
+		$('.list-group').toggleClass('show-list');
+	})
+	// let submitBtn = document.querySelector('button[type="submit"]');
+	// submitBtn.addEventListener('click', e => {
+	//   let emailValue = document.querySelector('.email').value;
+	//   let b = /\S+@\S+\.\S+/.test(emailValue);
+	//   console.log(b);
+	//   if (!/\S+@\S+\.\S+/.test(emailValue)) {
+	// 	  e.preventDefault();
+	// 	  alert('이메일 에러');
+	//   }
+	// 	let pwdValue = document.querySelector('.pwd').value;
+	//   let p = /[A-Z]/.test(pwdValue);
+	//   console.log(b);
+	//   if (!/[A-Z]/.test(pwdValue)) {
+	// 	  e.preventDefault();
+	// 	  alert('비밀번호');
+	//   }
+	// })
+
+
 </script>
 </body>
 </html>

@@ -32,9 +32,10 @@
 <button class="prev">이전</button>
 
 <script>
+
 	let nowSlide = 0;
 
-	let slideBtns = document.querySelectorAll('.slide-btn');
+	const slideBtns = document.querySelectorAll('.slide-btn');
 	for (let i = 0; i < slideBtns.length; i++) {
 		slideBtns[i].addEventListener('click', () => {
 			document.querySelector('.slide-container').style.transform = 'translateX(' + -(i * 100) + 'vw)';
@@ -42,8 +43,7 @@
 		})
 	}
 
-	let slideBoxs = document.querySelectorAll('.slide-box');
-
+	const slideBoxs = document.querySelectorAll('.slide-box');
 	document.querySelector('.next').addEventListener('click', () => {
 		let nextSlide = nowSlide - 100;
 		if (nextSlide === -(slideBoxs.length * 100)) nextSlide = 0;
