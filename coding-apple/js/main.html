@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<div style="overflow:hidden;">
+  <div class="slide-container">
+    <div class="slide-box">
+      <img src="car1.png">
+    </div>
+    <div class="slide-box">
+      <img src="car2.png">
+    </div>
+    <div class="slide-box">
+      <img src="car3.png">
+    </div>
+    <div class="slide-box">
+      <img src="car3.png">
+    </div>
+  </div>
+</div>
+
+<button class="slide-btn">1</button>
+<button class="slide-btn">2</button>
+<button class="slide-btn">3</button>
+<button class="slide-btn">4</button>
+<button class="next">다음</button>
+<button class="prev">이전</button>
+
+<script>
+	let nowSlide = 0;
+
+	let slideBtns = document.querySelectorAll('.slide-btn');
+	for (let i = 0; i < slideBtns.length; i++) {
+		slideBtns[i].addEventListener('click', () => {
+			document.querySelector('.slide-container').style.transform = 'translateX(' + -(i * 100) + 'vw)';
+			nowSlide = -(i * 100);
+		})
+	}
+
+	let slideBoxs = document.querySelectorAll('.slide-box');
+
+	document.querySelector('.next').addEventListener('click', () => {
+		let nextSlide = nowSlide - 100;
+		if (nextSlide === -(slideBoxs.length * 100)) nextSlide = 0;
+		document.querySelector('.slide-container').style.transform = 'translateX(' + nextSlide + 'vw)';
+		nowSlide = nextSlide;
+	})
+
+	document.querySelector('.prev').addEventListener('click', () => {
+		let prevSlide = nowSlide + 100;
+		if (prevSlide === 100) prevSlide = -((slideBoxs.length - 1) * 100);
+		document.querySelector('.slide-container').style.transform = 'translateX(' + prevSlide + 'vw)';
+		nowSlide = prevSlide;
+	})
+
+</script>
+</body>
+
+</html>
