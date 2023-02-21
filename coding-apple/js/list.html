@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" type="text/css" href="main.css"/>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+          crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+          integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+  <style>
+    .container {
+      margin: 20px auto;
+      width: 60vw;
+    }
+
+    .card-container {
+
+      border: 1px solid #eee;
+      display: flex;
+      justify-content: center;
+    }
+    .card-section {
+      width: 33%;
+      padding: 1px;
+    }
+    .card-content {
+      padding: 10px;
+    }
+    .card-title {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+    .card-price {
+      font-size: 0.8em;
+    }
+    .order-btn {
+      border: none;
+      background-color: tomato;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 0.8em;
+      color: white;
+    }
+
+    .select-shirts {
+      display: none;
+    }
+    .show-select {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="card-container">
+      <div class="card-section">
+        <div class="card-img">
+          <img style="display: block; width: 100%" src="https://via.placeholder.com/600" alt="">
+        </div>
+        <div class="card-content">
+          <h4 class="card-title">Card Title</h4>
+          <p class="card-price">가격 : 50000</p>
+          <button class="order-btn">주문하기</button>
+        </div>
+      </div>
+      <div class="card-section">
+        <div class="card-img">
+          <img style="display: block; width: 100%" src="https://via.placeholder.com/600" alt="">
+        </div>
+        <div class="card-content">
+          <h4 class="card-title">Card Title</h4>
+          <p class="card-price">가격 : 50000</p>
+          <button class="order-btn">주문하기</button>
+        </div>
+      </div>
+      <div class="card-section">
+        <div class="card-img">
+          <img style="display: block; width: 100%" src="https://via.placeholder.com/600" alt="">
+        </div>
+        <div class="card-content">
+          <h4 class="card-title">Card Title</h4>
+          <p class="card-price">가격 : 50000</p>
+          <button class=" order-btn">주문하기</button>
+        </div>
+        </div>
+      </div>
+    </div>
+
+  <form class="container my-5 form-group">
+
+    <p>상품선택</p>
+    <select class="form-select mt-2">
+      <option>모자</option>
+      <option>셔츠</option>
+      <option>바지</option>
+    </select>
+
+    <div class="select-shirts" style="margin-top: 10px;">
+      <p>셔츠사이즈 선택</p>
+      <select class="form-select mt-2">
+      </select>
+    </div>
+
+  </form>
+  <script>
+
+	  // $.get('https://codingapple1.github.io/hello.txt')
+		// 	  .done(function (data) {
+		// 		  console.log(data)
+		// 	  });
+
+		$.get('https://codingapple1.github.io/price.json')
+        .done((data) => {
+	        console.log(data);
+        })
+        .fail((data) => {
+	        console.log(data);
+        })
+
+	  fetch('https://codingapple1.github.io/price.json')
+        .then(res => res.json())
+        .then(data => console.log(data))
+        .catch(error => {
+	        console.log(error);
+        })
+
+
+
+
+	  let shirtsSize = [95, 80];
+	  let pantsSize = [28, 30];
+
+
+	  document.querySelector('.form-select').addEventListener('input', function(e) {
+      let value = this.value;
+		  let options = "";
+		  if (value === '셔츠') {
+			  shirtsSize.forEach(size => {
+				  options += `<option>${size}</option>`;
+        })
+			  document.querySelector('.select-shirts').classList.add('show-select');
+		  }
+			else if (value === '바지') {
+				pantsSize.forEach(size => {
+					options += `<option>${size}</option>`;
+        })
+
+			  document.querySelector('.select-shirts').classList.add('show-select');
+		  }
+			else {
+			  document.querySelector('.select-shirts').classList.remove('show-select');
+      }
+		  document.querySelectorAll('.form-select')[1].innerHTML = options;
+	  })
+  </script>
+
+<script>
+	let products = [
+		{ id : 0, price : 70000, title : 'Blossom Dress' },
+		{ id : 1, price : 50000, title : 'Springfield Shirt' },
+		{ id : 2, price : 60000, title : 'Black Monastery' }
+	];
+
+	for (let i = 0; i < products.length; i++) {
+		const cardTitleElements = document.querySelectorAll('.card-title');
+		const cardPricesElements = document.querySelectorAll('.card-price');
+		cardTitleElements[i].innerHTML = products[i].title;
+		cardPricesElements[i].innerHTML = `가격 : ${products[i].price} 원`;
+	}
+</script>
+</body>
+</html>
