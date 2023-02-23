@@ -10,7 +10,7 @@
 <div style="overflow:hidden;">
   <div class="slide-container">
     <div class="slide-box">
-      <img src="car1.png">
+      <img src="car1.png" draggable="false">
     </div>
     <div class="slide-box">
       <img src="car2.png">
@@ -23,6 +23,65 @@
     </div>
   </div>
 </div>
+<script>
+	let startX = 0;
+	let moveX = 0;
+	let mouseDownFlag = false;
+	document.querySelector('.slide-box').addEventListener('mousedown', function (e) {
+		startX = e.clientX;
+		mouseDownFlag = true;
+	});
+	document.querySelector('.slide-box').addEventListener('mousemove', function (e) {
+		if (mouseDownFlag) {
+			moveX = e.clientX - startX
+			document.querySelector('.slide-container').style.transform = `translateX(${moveX}px)`;
+		}
+	});
+	document.querySelector('.slide-box').addEventListener('mouseup', function (e) {
+		document.querySelector('.slide-container').style.transition = 'all 0.5s';
+		if (moveX < -100) {
+			document.querySelector('.slide-container').style.transform = `translateX(-100vw)`;
+		}
+		else if (moveX > -100 || moveX < 100) {
+			document.querySelector('.slide-container').style.transform = `translateX(0)`;
+		}
+		mouseDownFlag = false;
+		setTimeout(() => {
+			document.querySelector('.slide-container').style.transition = 'none';
+		}, 500);
+	});
+	window.addEventListener('touchdown', function(e) {
+		console.log('test');
+	})
+
+	// 모바일 터치 이벤트
+	document.querySelector('.slide-box').addEventListener('touchstart', function (e) {
+		console.log('touch')
+		startX = e.touches[0].clientX;
+		mouseDownFlag = true;
+	});
+	document.querySelector('.slide-box').addEventListener('touchmove', function (e) {
+		if (mouseDownFlag) {
+			moveX = e.touches[0].clientX; - startX
+			document.querySelector('.slide-container').style.transform = `translateX(${moveX}px)`;
+		}
+	});
+	document.querySelector('.slide-box').addEventListener('touchend', function (e) {
+		document.querySelector('.slide-container').style.transition = 'all 0.5s';
+		if (moveX < -100) {
+			document.querySelector('.slide-container').style.transform = `translateX(-100vw)`;
+		}
+		else if (moveX > -100 || moveX < 100) {
+			document.querySelector('.slide-container').style.transform = `translateX(0)`;
+		}
+		mouseDownFlag = false;
+		setTimeout(() => {
+			document.querySelector('.slide-container').style.transition = 'none';
+		}, 500);
+	});
+
+
+</script>
 
 <button class="slide-btn">1</button>
 <button class="slide-btn">2</button>
