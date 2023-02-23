@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div class="container">
+  <ul class="cart-list">
+  </ul>
+</div>
+
+
+<script !src="">
+	let cart = JSON.parse(localStorage.getItem('cart'));
+	cart.sort();
+	console.log(cart);
+	cart.forEach(e => {
+		document.querySelector('.cart-list').insertAdjacentHTML('beforeend',
+      `<li>${e.title} : ${e.quantity}</li>`)
+  })
+</script>
+</body>
+</html>
