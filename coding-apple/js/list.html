@@ -128,9 +128,6 @@
 	        console.log(error);
         })
 
-
-
-
 	  let shirtsSize = [95, 80];
 	  let pantsSize = [28, 30];
 
@@ -169,7 +166,8 @@
 		const cardTitleElements = document.querySelectorAll('.card-title');
 		const cardPricesElements = document.querySelectorAll('.card-price');
 		cardTitleElements[i].innerHTML = products[i].title;
-		cardPricesElements[i].innerHTML = `가격 : ${products[i].price} 원`;
+		cardPricesElements[i].innerHTML = `가격 : ${products[i].price} 원
+		<button>구매하기</button>  `;
 	}
 </script>
 </body>
