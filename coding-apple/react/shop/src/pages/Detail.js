@@ -1,5 +1,4 @@
 import {useParams} from "react-router-dom";
-import styled from "styled-components";
 import {useEffect, useState} from "react";
 import {Nav} from "react-bootstrap";
 
@@ -43,9 +42,6 @@ function Detail(props) {
 	let find = props.shoes.find(e => e.id == id);
 	return (
 			<div className="container">
-				{
-					discount ? <Discount></Discount> : null
-				}
 
 				<input type="text" className="input-group-text" onChange={(e) => {
 					setNum(e.target.value);
