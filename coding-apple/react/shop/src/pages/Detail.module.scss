@@ -1,0 +1,19 @@
+
+@mixin tab($bc) {
+  color: white;
+  background-color: $bc;
+}
+.tab1 {
+  @include tab(red);
+}
+.tab2 {
+  @include tab(blue);
+}
+.tab3 {
+  @include tab(green);
+}
+
+.content {
+  background-color: #eee;
+  height: 300px;
+}

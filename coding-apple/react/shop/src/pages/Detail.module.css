@@ -1,0 +1,21 @@
+.tab1 {
+  color: white;
+  background-color: red;
+}
+
+.tab2 {
+  color: white;
+  background-color: blue;
+}
+
+.tab3 {
+  color: white;
+  background-color: green;
+}
+
+.content {
+  background-color: #eee;
+  height: 300px;
+}
+
+/*# sourceMappingURL=Detail.module.css.map */
