@@ -98,7 +98,7 @@ function App() {
 															let items = checkedDuplicate(res, shoes);
 															setShoes(items);
 														})
-												hideAddBtn(true);
+													hideAddBtn(true);
 											}
 										}
 										}>상품더보기</button>
