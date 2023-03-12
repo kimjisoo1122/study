@@ -47,10 +47,10 @@ function CartRow({item}) {
 				<td>{item.id}</td>
 				<td>{item.name}</td>
 				<td>{item.count}</td>
-				<td><button onClick={(e) => {
+				<td><button onClick={e => {
 					dispatch(setCount(item.id))
 				}}>+</button></td>
-				<td><button onClick={(e) => {
+				<td><button onClick={e => {
 					dispatch(removeCart(item.id))
 				}}>X</button></td>
 			</tr>

@@ -42,8 +42,8 @@ function App() {
 	// axios.get('https://codingapple1.github.io/userdata.json')
 	// 		.then(res => res.data)
 	let result = useQuery(['작명'], () =>
-		axios.get('https://codingapple1.github.io/userdata.json')
-				.then(res => res.data)
+			axios.get('https://codingapple1.github.io/userdata.json')
+					.then(res => res.data)
 	);
 	// console.log(result.data, result.isLoading);
 
