@@ -12,6 +12,7 @@ public class FieldLogTrace implements LogTrace{
     private static final String EX_PREFIX = "<X-";
 
     private final ThreadLocal<TraceId> traceIdHolder = new ThreadLocal<>();
+
     @Override
     public TraceStatus begin(String message) {
         syncTraceId();
