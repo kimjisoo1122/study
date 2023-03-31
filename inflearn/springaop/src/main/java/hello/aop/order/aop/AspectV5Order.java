@@ -9,6 +9,9 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 public class AspectV5Order {
 
+    private AspectV5Order() {
+    }
+
     @Order(2)
     @Aspect
     public static class LogAop {
@@ -29,6 +32,7 @@ public class AspectV5Order {
                 log.info("[트랜잭션 시작] {}", joinPoint.getSignature());
                 Object result = joinPoint.proceed();
                 log.info("[트랜잭션 종료] {}", joinPoint.getSignature());
+                return result;
             } catch (Exception ex) {
                 log.info("[트랜잭션 롤백] {}", joinPoint.getSignature());
             } finally {
