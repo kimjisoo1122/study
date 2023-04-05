@@ -9,8 +9,7 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 public class AspectV5Order {
 
-    private AspectV5Order() {
-    }
+    private AspectV5Order() {}
 
     @Order(2)
     @Aspect
