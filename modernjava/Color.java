@@ -1,9 +1,8 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Color{
 
@@ -24,12 +23,16 @@ public class Color{
     }
 
     public static void main(String[] args) {
-        Color color = new Color("1", "2");
-        List<Color> list = new ArrayList<>();
-        list.add(color);
-        list.sort(Comparator.comparing(Color::getBlue).reversed().thenComparing(Color::getRed));
 
-        Function<Color, String> f = Color::getBlue;
+
+        List<Integer> list1 = List.of(1, 2, 3);
+        List<Integer> list2 = List.of(3, 4);
+
+        list1.stream().flatMap(e -> list2.stream().map(j -> new int[]{e, j})).collect(Collectors.toList());
+        // flatmap은 스트림의 요소를 다른 스트림으로 평면화시키는것
+
+
+
 
     }
 
