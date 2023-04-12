@@ -1,6 +1,11 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class TestThread {
 
     public static void main(String[] args) throws InterruptedException {
+
+        Map<String, String> map = new HashMap<>();
 
         System.out.println("Thread : " + Thread.currentThread().getName());
 

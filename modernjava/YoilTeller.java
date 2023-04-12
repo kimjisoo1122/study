@@ -8,6 +8,7 @@ public class YoilTeller {
 
     public static void main(String[] args) {
 
+
         int inputYear = getIntFromScannerWithRange(1900, 2000);
         int inputMonth = Integer.parseInt(String.format("%02d", getIntFromScannerWithRange(1, 12)));
         int inputDay = getIntFromScannerWithRange(1, 31);
