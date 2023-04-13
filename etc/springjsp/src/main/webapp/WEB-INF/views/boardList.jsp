@@ -10,7 +10,7 @@
 </head>
 <body>
 <%@ include file="./header.jsp"%>
-</div><div style="text-align:center">
+<div style="text-align:center">
   <h1>This is BOARD</h1>
   <h1>This is BOARD</h1>
   <h1>This is BOARD</h1>
