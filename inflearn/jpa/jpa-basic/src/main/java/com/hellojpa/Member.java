@@ -1,30 +1,45 @@
 package com.hellojpa;
 
+import com.hellojpa.inheritance.BaseEntity;
+
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
-public class Member {
+public class Member extends BaseEntity {
 
-    @Id
+    @Id @GeneratedValue
+    @Column(name = "MEMBER_ID")
     private Long id;
-    @Column(name = "name")
+
     private String username;
-    private Integer age;
 
-    @Enumerated(EnumType.STRING)
-    private RoleType roleType;
+    // 다대일 관계에서 연관관계의 주인은 fk 외래키가 있는곳으로 설정해야 한다.
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
+    public Long getId() {
+        return id;
+    }
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastModifiedDate;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @Lob
-    private String description;
+    public String getUsername() {
+        return username;
+    }
 
-    //  em이 관리안하는 필드
-    @Transient
-    private int teml;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void changeTeam(Team team) {
+        this.team = team;
+//        team.getMembers().add(this);
+    }
 }
