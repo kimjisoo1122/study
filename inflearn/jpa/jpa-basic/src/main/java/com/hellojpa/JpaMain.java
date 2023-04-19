@@ -7,7 +7,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
 
@@ -26,32 +28,51 @@ public class JpaMain {
 
         try {
 
+            Member member = new Member();
+            member.setUsername("memberA") ;
+            member.setHomeAddress(new Address("seoul", "sangam", "8888"));
+            member.setWorkPeriod(new Period(LocalDateTime.now().minusMonths(1), LocalDateTime.now()));
+            member.setFavoriteFoods(Set.of("족발", "피자", "햄버거"));
+            em.persist(member);
+
+            member.getAddresseHistories().add(new Address("old1", "old1", "232"));
+
+            member.getAddresseHistories().remove(new Address("old1", "old1", "232"));
+
+            em.detach(member);
+
+//            member.get
+            tx.commit();
+
+
+
+
             // 저장
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
+//            Team team = new Team();
+//            team.setName("TeamA");
+//            em.persist(team);
             // Team객체를 1차캐시에 저장하고 sql 쓰기 지연 저장소에 sql문 저장
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.changeTeam(team);
-            em.persist(member);
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.changeTeam(team);
+//            em.persist(member);
             // Member 객체를 1차캐시에 저장하고 sql 쓰기 지연 저장소에 sql문 저장
 
-            Member findMember = em.find(Member.class, member.getId());
+//            Member findMember = em.find(Member.class, member.getId());
             // 1차캐시에 저장된 member객체를 pk값으로 가져온다
             // 이때 db에 저장된 상태가아님 영속성컨텍스트에서 가져오기때문에 sql문을 날리지 않음
 
-            em.flush();
+//            em.flush();
             // 영속성 컨텍스트에 변경사항이 발생한 경우 데이터베이스에 반영한다.
             // sql 쓰기 지연 저장소에 저장된 sql문이 비워진다
-            em.clear();
+//            em.clear();
             // 영속성 컨텍스트에서 관리하는 모든 엔티티들을 초기화 한다
             // 1차 캐시 초기화
 
-            List<Member> members = findMember.getTeam().getMembers();
-            int size = members.size();
-            System.out.println("members size = " + size);
+//            List<Member> members = findMember.getTeam().getMembers();
+//            int size = members.size();
+//            System.out.println("members size = " + size);
             // 저장된 team객체의 mebers list를 가져왔으나 아직 db에 반영이 안되었기에
             // 말그대로 그냥 빈 list객체만 있는상태 그래서 size도 0으로 나온다
 
@@ -73,10 +94,11 @@ public class JpaMain {
 
             // 객체 설계는 단방향으로 연관관계 설정 추가기능 제공시에 양방향 매핑 단방향으로도 충분할수도?
             // 엔티티는 수정해도 테이블은 변경되지 않음 양방향 : mappedBy
-            tx.commit();
+//            tx.commit();
 
         } catch (Exception ex) {
             tx.rollback();
+            ex.printStackTrace();
         } finally {
             em.close();
         }
