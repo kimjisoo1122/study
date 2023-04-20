@@ -1,8 +1,6 @@
-package jpabook.jpaspringshop;
+package jpabook.jpaspringshop.domain;
 
-import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.Embeddable;
 
@@ -14,7 +12,9 @@ public class Address {
     private String street;
     private String zipcode;
 
-    public Address() {}
+    // 객체의 값이 이뮤터블하게(불변) 유도해야함
+    protected Address() {}
+
     public Address(String city, String street, String zipcode) {
         this.city = city;
         this.street = street;

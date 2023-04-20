@@ -1,6 +1,6 @@
-package jpabook.jpaspringshop;
+package jpabook.jpaspringshop.domain;
 
-import jpabook.jpaspringshop.item.Item;
+import jpabook.jpaspringshop.domain.item.Item;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,4 +33,9 @@ public class Category {
 
     @OneToMany(mappedBy = "parent")
     private List<Category> child = new ArrayList<>();
+
+    public void addChildCategory(Category child) {
+        this.child.add(child);
+        child.setParent(this);
+    }
 }

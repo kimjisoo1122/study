@@ -1,4 +1,4 @@
-package jpabook.jpaspringshop;
+package jpabook.jpaspringshop.domain;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +16,14 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    private String username;
+    @Column(unique = true)
+    private String name;
 
     @Embedded
     private Address address;
 
     @OneToMany(mappedBy = "member") // readonly
     private List<Order> orders = new ArrayList<>();
+
+
 }
