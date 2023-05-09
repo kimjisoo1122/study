@@ -71,7 +71,6 @@ public class ItemController {
     @PostMapping(value = "/items/{itemId}/edit")
     public String updateItem(BookForm form) {
 
-
         Book book = new Book();
         book.setId(form.getId());
         book.setName(form.getName());

@@ -4,19 +4,22 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 // getter는 필수 setter는 지양
 public class Member {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "member_id")
     private Long id;
 
-    @Column(unique = true)
+    @NotEmpty
     private String name;
 
     @Embedded
@@ -24,6 +27,4 @@ public class Member {
 
     @OneToMany(mappedBy = "member") // readonly
     private List<Order> orders = new ArrayList<>();
-
-
 }
