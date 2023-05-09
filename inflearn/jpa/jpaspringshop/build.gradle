@@ -20,6 +20,7 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
     implementation 'com.h2database:h2:1.4.200'
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 

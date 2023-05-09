@@ -24,7 +24,7 @@ public class OrderSimpleApiController {
     2. 필요하면 fecth join으로 성능을 최적화 -> 대부분의 성능 이슈는 여기서 해결(V2)
     3. 그래도 안되면 DTO로 직접 조회하는 방법을 사용한다.(V4)
     4. 최후의 방법은 JPA가 제공하는 네이티브SQL이나 스프링JDBC Template를 사용하여 SQL직접 사용
-     */
+    */
 
     private final OrderService orderService;
 
