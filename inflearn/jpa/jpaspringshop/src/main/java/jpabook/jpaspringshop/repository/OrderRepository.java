@@ -69,7 +69,7 @@ public class OrderRepository {
                         "join fetch oi.item i", Order.class)
                 .getResultList();
         // OneToMany의 컬렉션을 join으로 가져올시 데이터가 뻥튀기 대는데
-        // pk가 같은 엔티티는 distincit로 중복을 거를수있다.
+        // pk가 같은 엔티티는 distinct로 중복을 거를수있다.
         // 기본적으로 쿼리에 distinct를 넣고 추가로 애플리케이션 로직에서 중복을 걸러줌
         // 단!!! 페이징처리불가능
         // 결국 페이징처리를하려면 sql쿼리로 limit offset이 나가야하는데
@@ -77,5 +77,17 @@ public class OrderRepository {
         // 그래서 페이징처리를 in memory단에서 진행하게됨 -> 바로 서버장애
         // 그니까 되긴되는데 서버 메모리에서 진행해서 sql쿼리가 수천건이면 바로 에러터지는거임
         // 컬렉션 페치 조인은 단 1개만 사용
+        // 해결방법은 many로 설정된 관계는 fetch join을 백날해봐도 row가 안늘어남
+        // fetch join할건 하고 컬렉션 one관계는 배치사이즈를 설정하여 lazy조회
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                        "select o from Order o " +
+                                "join fetch o.member m " +
+                                "join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }

@@ -10,8 +10,9 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+#        show_sql: true # 하이버네이트가 실행한 sql을 보여줍니다.
+        format_sql: true # 하이버네이트가 실행한 sql은 보기쉽게 formating합니다
+        default_batch_fetch_size: 100 # 웬만하면 옵션 키셈
 
 
 logging:
