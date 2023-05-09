@@ -5,6 +5,7 @@ import jpabook.jpaspringshop.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,7 +40,7 @@ public class MemberApiController {
     }
 
     @Data
-    static class Result<T extends List<?>> {
+    static class Result<T extends List> {
         private int count;
         private T data;
 

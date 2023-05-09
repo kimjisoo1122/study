@@ -1,5 +1,6 @@
 package jpabook.jpaspringshop.repository;
 
+import jpabook.jpaspringshop.repository.order.simplequery.OrderSimpleQueryDTO;
 import jpabook.jpaspringshop.domain.Order;
 import jpabook.jpaspringshop.domain.OrderSearch;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -49,6 +49,14 @@ public class OrderRepository {
             jpql += " m.name like :name";
         }
         return em.createQuery(jpql, Order.class)
+                .getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                        "select o from Order o " +
+                                "join fetch o.member m " +
+                                "join fetch o.delivery d", Order.class)
                 .getResultList();
     }
 }
