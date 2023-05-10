@@ -1,19 +1,27 @@
 package jpabook.jpaspringshop.repository;
 
-import jpabook.jpaspringshop.domain.Order;
-import jpabook.jpaspringshop.domain.OrderSearch;
-import lombok.RequiredArgsConstructor;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jpabook.jpaspringshop.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static jpabook.jpaspringshop.domain.QMember.*;
+import static jpabook.jpaspringshop.domain.QOrder.*;
+
 @Repository
-@RequiredArgsConstructor
 public class OrderRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory query;
+
+    public OrderRepository(EntityManager em) {
+        this.em = em;
+        this.query = new JPAQueryFactory(em);
+    }
 
     public void save(Order order) {
         em.persist(order);
@@ -25,30 +33,52 @@ public class OrderRepository {
 
     public List<Order> findAll(OrderSearch orderSearch) {
 
-        String jpql = "select o from Order o join o.member m";
-        boolean isFirstCondition = true;
+        return query.select(order)
+                .from(order)
+                .join(order.member, member)
+                .where(statusEq(orderSearch.getOrderStatus()), nameLike(orderSearch.getMemberName()))
+                .limit(1000)
+                .fetch();
 
-        if (orderSearch.getOrderStatus() != null) {
-            if (isFirstCondition) {
-                jpql += " where";
-                isFirstCondition = false;
-            } else {
-                jpql += " and";
-            }
-            jpql += " o.status =:status";
-        }
 
-        if (StringUtils.hasText(orderSearch.getMemberName())) {
-            if (isFirstCondition) {
-                jpql += " where";
-                isFirstCondition = false;
-            } else {
-                jpql += " and";
-            }
-            jpql += " m.name like :name";
+//        String jpql = "select o from Order o join o.member m";
+//        boolean isFirstCondition = true;
+//
+//        if (orderSearch.getOrderStatus() != null) {
+//            if (isFirstCondition) {
+//                jpql += " where";
+//                isFirstCondition = false;
+//            } else {
+//                jpql += " and";
+//            }
+//            jpql += " o.status =:status";
+//        }
+//
+//        if (StringUtils.hasText(orderSearch.getMemberName())) {
+//            if (isFirstCondition) {
+//                jpql += " where";
+//                isFirstCondition = false;
+//            } else {
+//                jpql += " and";
+//            }
+//            jpql += " m.name like :name";
+//        }
+//        return em.createQuery(jpql, Order.class)
+//                .getResultList();
+    }
+
+    private BooleanExpression statusEq(OrderStatus orderStatus) {
+        if (orderStatus == null) {
+            return null;
         }
-        return em.createQuery(jpql, Order.class)
-                .getResultList();
+        return order.status.eq(OrderStatus.ORDER);
+    }
+
+    private BooleanExpression nameLike(String name) {
+        if (!StringUtils.hasText(name)) {
+            return null;
+        }
+        return member.name.eq(name);
     }
 
     public List<Order> findAllWithMemberDelivery() {

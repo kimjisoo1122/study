@@ -44,7 +44,7 @@ public class MemberService {
      * 회원단건조회
      */
     public Member findOne(Long memberId) {
-        return memberRepository.findOne(memberId);
+        return memberRepository.findById(memberId).get();
     }
 
     @Transactional(readOnly = false)
