@@ -12,7 +12,7 @@ import javax.persistence.*;
         name = "Member.findMember",
         query = "select m from Member m"
 )
-public class Member {
+public class Member extends BaseEntity{
 
     @Id
     @GeneratedValue
@@ -36,6 +36,13 @@ public class Member {
         member.username = username;
         member.age = age;
         member.changeTeam(team);
+        return member;
+    }
+
+    public static Member createMember(String username, int age) {
+        Member member = new Member();
+        member.username = username;
+        member.age = age;
         return member;
     }
 
