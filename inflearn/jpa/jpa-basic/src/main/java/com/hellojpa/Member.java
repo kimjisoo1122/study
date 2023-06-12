@@ -62,17 +62,16 @@ public class Member {
     @Column(name = "FOOD_NAME")
     private Set<String> favoriteFoods = new HashSet<>();
 
-//    @ElementCollection
-//    @CollectionTable(name = "ADDRESS", joinColumns = @JoinColumn(name =     "MEMBER_ID"))
-//    private List<Address> addresseHistories = new ArrayList<>();
-    private List<>
+    @ElementCollection
+    @CollectionTable(name = "ADDRESS", joinColumns = @JoinColumn(name =     "MEMBER_ID"))
+    private List<Address> addresseHistories = new ArrayList<>();
 
 //    @Embedded
 //    @AttributeOverrides({
 //            @AttributeOverride(name = "city", column = @Column(name = "work_city")),
 //            @AttributeOverride(name = "street", column = @Column(name = "work_street")),
 //            @AttributeOverride(name = "zipcode", column = @Column(name = "work_zipcode"))})
-//    private Address workAddress;
+    private Address workAddress;
 
 
     public Long getId() {
