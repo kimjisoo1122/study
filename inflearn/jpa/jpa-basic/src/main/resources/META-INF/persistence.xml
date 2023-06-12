@@ -3,20 +3,32 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
                       http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
-    <!--    데이터베이스 이름 -->
+    <!--  Persistence클래스가 persistene.xml의 설정정보를 조회하여 엔티티매니저팩토리 생성 -->
     <persistence-unit name="hello">
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
+            <!-- 배치사이즈 기본 1000정도 잡음 . insert update delete문을 value값만큼 batch로 날림-->
+            <!-- 배치 말고는 사실 여러개를 갱신하는 경우는 실시간 작업에선 거의 없긴함-->
+            <property name="hibernate.default_batch_fetch_size" value="1000"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <!-- Dialect = 방언 데이터베이스만의 문법 -->
+            <!-- jpa는 java의 인터페이스임. hibernate가 구현체-->
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
+
             <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <!--create 항상 새로 테이블 생성-->
+            <!--create drop 항상 새로 테이블 생성후 서버종료시 삭제 -->
+            <!--update 변경사항만 반영 단 지우거나 수정 불가 추가만 가능-->
+            <!--위의 3가지는 운영사항에서 절대 사용 X -->
+            <!--validate 엔티티와 테이블이 정상 매핑되었는지만 확인-->
+            <!--그냥 안쓰는게 좋겠네 사고날 위험 다소 운영에선 db계정의 alter drop을 분리해야함-->
         </properties>
     </persistence-unit>
 </persistence>

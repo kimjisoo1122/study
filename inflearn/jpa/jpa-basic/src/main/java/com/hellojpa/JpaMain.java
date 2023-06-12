@@ -1,51 +1,77 @@
 package com.hellojpa;
 
-import com.hellojpa.inheritance.Movie;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class JpaMain {
 
     public static void main(String[] args) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
         // 개발자가 설정한 persistence unit(xml)을 바탕으로 엔티티매니저팩토리 생성
-        // 엔티티매니저팩토리로부터 엔티티매니저생성 -> 엔티티트랜잭션가져오기
+        // 엔티티 매니저는 서버에 하나만 존재한다.
+
+        EntityManager em = emf.createEntityManager();
+        // emf에서 em생성
+        // 서버의 요청마다 em 할당 (쓰레드 공유 절대 금지) 쓰고 항상 닫아야함 em.close
+
+        EntityTransaction tx = em.getTransaction();
         // JPA의 모든 변경은 트랜젝션 안에서만 가능하다
+
         // 엔티티매니저는 객체를 저장해주는 컬렉션같은 느낌 업데이트의 경우 찾아온 엔티티에 값만 변경하면됨
         // LIST에서 객체를 가져온뒤 수정하면 LIST값이 바뀌듯이
 
         tx.begin();
+        // 스프링에선 @Transactional
 
         try {
 
+            // 비영속
             Member member = new Member();
             member.setUsername("memberA") ;
+
+            // JPA는 엔티티 객체를 중심으로 개발
+            // 문제는 검색 쿼리
+            // em.find는 단순 엔티티 조회 검색하거나 list로 가져오려면 jpql을 사용해야함
+            // em.createQuery("select m from Member m where m.username =: username");
+
+            // 영속성 컨텐스트
+            // 엔티티매니저를 생성하면 영속성컨텐스트가 1:1로 생성 PersistenceContext
+            // J2EE, 스프링 환경에선 여러개의 엔티티매니저가 하나의 영속성컨테스트에 매핑 된다 N : 1
+
+
             member.setHomeAddress(new Address("seoul", "sangam", "8888"));
             member.setWorkPeriod(new Period(LocalDateTime.now().minusMonths(1), LocalDateTime.now()));
             member.setFavoriteFoods(Set.of("족발", "피자", "햄버거"));
+            // 영속성컨텍스트에 엔티티를 영속시킴
+            // 1차 캐시에 PK값으로 엔티티를 저장
+            // sql 쓰기 지연 저장소에 insert sql문 저장
+            // em.flush를 사용하면 쓰기 지연 저장소가 비워짐 -> db에 쿼리가 날라감
+            // em.commit을 사용하면 내부적으로 em.flush가 실행됨 db에 쿼리가 날라감
+            em.flush();
+            // commit, jpql 실행시에 내부적으로 flush가 실행됨
+            em.setFlushMode(FlushModeType.COMMIT); // 굳이 필요없음 commit에만 flush실행하게함(jpql 실행x)
+
+            em.clear(); // 1차 캐시가 비워짐
             em.persist(member);
 
-            member.getAddresseHistories().add(new Address("old1", "old1", "232"));
+            // 우선 1차 캐시에서 조회 -> 없으면 DB에서 조회하여 1차 캐시에 저장 후 반환
+            // 이후 조회시 1차 캐시에서 조회함
+            // 그러나 엔티티매니저는 클라이언트의 요청마다 생성되고 닫힘
+            // 영속성컨텍스트는 엔티티매니저 내부에 존재하기에 영속성컨텍스트도 사라짐
+            // 조회된 엔티티는 항상 동일성을 보장함 -> 데이터베이스의 repeatable read를 애플리케이션단에서 설정
+            em.find(Member.class, member.getId());
+            // 1차 캐시에 저장된 엔티티들은 내부적으로 스냅샷이 찍힘
+            // 커밋시점에 변경을 감지하여 업데이트 쿼리가 날라감
+            // 변경은 항상 변경감지로 할 것
 
-            member.getAddresseHistories().remove(new Address("old1", "old1", "232"));
 
+            // 준영속 상태로 변경 영속성컨텍스트에서 분리
             em.detach(member);
 
-//            member.get
+            // 커밋 시점에 영속성컨테스트의 변경사항을 반영
             tx.commit();
-
-
-
 
             // 저장
 //            Team team = new Team();
