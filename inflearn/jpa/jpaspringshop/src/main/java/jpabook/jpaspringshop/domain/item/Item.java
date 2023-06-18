@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+// 기본 전략은JOIN으로 가져가는데 단순한 테이블일 경우 싱글 TABLE PER CLASS는 비추
 @DiscriminatorColumn(name = "dtype")
 public abstract class Item {
 

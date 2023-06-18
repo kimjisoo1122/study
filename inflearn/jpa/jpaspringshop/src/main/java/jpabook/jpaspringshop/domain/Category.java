@@ -20,6 +20,11 @@ public class Category {
 
     private String name;
 
+    /**
+     * 실무에선 다대다 매핑을 사용하지 않는데
+     * 다대다에 사용되는 조인테이블에 칼럼을 추가할 수 없어서 추가적인 audit정보를 추가할수가 없다
+     * 굳이 써야 한다면 조인테이블을 엔티티로 변경하여 다대일 일대다 관계로 매핑
+     */
     @ManyToMany
     @JoinTable(
             name = "category_item",

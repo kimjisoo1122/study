@@ -24,8 +24,13 @@ public class Order {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "delivery_id")
+    // OneToOne의 주인(외래키를 가지는 쪽)은 자주쓰이는 주동테이블로 설정
+    // 외래키가 있는 쪽에서 cascade type사용 가능
+    // CascadeType.ALL은 부모엔티티가 삭제될떄 자식도 삭제
+    // orphanRemoval = true은 OneToMany같은 컬렉션 양방향관계에서
+    // 컬렉션 데이터를 삭제하면 자식 엔티티를 삭제하는 개념
     private Delivery delivery;
 
     @BatchSize(size = 100)
