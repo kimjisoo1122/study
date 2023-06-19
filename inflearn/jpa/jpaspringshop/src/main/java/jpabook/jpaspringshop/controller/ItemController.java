@@ -3,11 +3,13 @@ package jpabook.jpaspringshop.controller;
 import jpabook.jpaspringshop.domain.item.Book;
 import jpabook.jpaspringshop.domain.item.Item;
 import jpabook.jpaspringshop.service.ItemService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -78,6 +80,8 @@ public class ItemController {
         book.setStockQuantity(form.getStockQuantity());
         book.setAuthor(form.getAuthor());
         book.setIsbn(form.getIsbn());
+        // 컨트롤러에서 엔티티 생성하지 말것 , setter 쓰지말것
+        // 식별자 id를 넘겨서
         itemService.saveItem(book);
         return "redirect:/items";
     }

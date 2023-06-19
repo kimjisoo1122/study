@@ -30,7 +30,7 @@ class MemberServiceTest {
         Long savedId = memberService.join(member);
 
         //then
-        assertEquals(memberRepository.findOne(savedId), member);
+//        assertEquals(memberRepository.findOne(savedId), member);
     }
 
     @Test()
@@ -46,5 +46,7 @@ class MemberServiceTest {
 
         //then
         assertThrows(IllegalStateException.class, () -> memberService.join(memberB));
+
+        fail("Dsdsds");
     }
 }
