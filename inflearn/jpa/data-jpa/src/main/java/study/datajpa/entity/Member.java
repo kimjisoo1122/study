@@ -1,6 +1,7 @@
 package study.datajpa.entity;
 
 import lombok.*;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 
@@ -13,7 +14,7 @@ import javax.persistence.*;
         query = "select m from Member m"
 )
 @NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
-public class Member extends BaseEntity{
+public class Member extends BaseEntity implements Persistable<String> {
 
     @Id
     @GeneratedValue
@@ -50,5 +51,18 @@ public class Member extends BaseEntity{
     public void changeTeam(Team team) {
         this.team = team;
         team.getMembers().add(this);
+    }
+
+    @Override
+    public boolean isNew() {
+        /**
+         * spring data jpa의 save 메커니즘은 엔티티의 식별자가 객체면 null 프리미티브면 0으로 판단
+         * @generatevalue를 사용해서 인조식별자를 만드는 경우는 상관없는데
+         * String 식별자를 사용해서 직접 식별자를 주입하는 경우에는
+         * save할때 isNew가 식별자 String을 확인해서 null이 아니기에 merge해버림
+         * 그래서 genereavalue를 사용하지 않을때는 Persistable<String>을 구현하여 isNew 오버라이딩필수
+         */
+
+        return getCreatedDate() == null;
     }
 }
