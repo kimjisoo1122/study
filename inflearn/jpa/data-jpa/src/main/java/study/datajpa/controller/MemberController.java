@@ -24,6 +24,9 @@ public class MemberController {
 
     @GetMapping("/members/{id}")
     public String findMemberById(@PathVariable("id") Member member) {
+        // 스프링인 엔티티를 파라미터로 받으면 저절로 엔티티매니저로 조회해서 주입해줌
+        // 단 트랜잭션범위가 아닌 곳에서 조회한거기 때문에
+        // 조회용으로만 사용할 것 변경감지 불가
         return member.getUsername();
     }
 

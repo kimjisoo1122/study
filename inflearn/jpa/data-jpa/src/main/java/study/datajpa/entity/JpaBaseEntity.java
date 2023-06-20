@@ -10,7 +10,7 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter @Setter
-public class JpaBaseEntity {
+public abstract class JpaBaseEntity {
 
     @Column(updatable = false)
     private LocalDateTime createDate;
