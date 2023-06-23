@@ -24,6 +24,11 @@ import static study.querydsl.entity.QTeam.team;
 @RequiredArgsConstructor
 public class MemberRepositoryCustomImpl implements MemberRepositoryCustom{
 
+    /**
+     * Spring data jpa에 커스텀을 추가하는 방식보다는 새롭게 쿼리리포지토리를 만들어서
+     * 서비스가 별도의 리포지토리를 의존받아 사용하는것도 좋은방법
+     */
+
     private final JPAQueryFactory query;
     @Override
     public List<MemberTeamDTO> search(MemberSearchCondition searchCondition) {

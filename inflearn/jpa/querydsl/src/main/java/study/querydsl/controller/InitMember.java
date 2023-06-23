@@ -19,14 +19,14 @@ public class InitMember {
     private final InitMemberService initMemberService;
 
     @PostConstruct
-    // 초기화할때 @trancationl을 사용못해서 분리해야됨.
+    // 초기화할때 @PostConstruct 와 @trancationl을 같이 사용 못해서 분리해야됨.
     public void init() {
         initMemberService.init();
     }
 
 
     @Component
-    static class InitMemberService {
+    class InitMemberService {
 
         @PersistenceContext
         private EntityManager em;

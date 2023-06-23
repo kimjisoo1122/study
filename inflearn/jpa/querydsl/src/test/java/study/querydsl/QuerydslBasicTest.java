@@ -2,15 +2,18 @@ package study.querydsl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.assertj.core.api.Assertions;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDTO;
@@ -19,6 +22,7 @@ import study.querydsl.dto.UserDTO;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
+import study.querydsl.repositroy.MemberRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -35,6 +39,9 @@ import static study.querydsl.entity.QTeam.team;
 @SpringBootTest
 @Transactional
 public class QuerydslBasicTest {
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @PersistenceContext
     EntityManager em;
@@ -139,6 +146,7 @@ public class QuerydslBasicTest {
 
         System.out.println("tuple = " + tuple);
         System.out.println("tuple = " + tuple.get(member.age.count()));
+        System.out.println("tuple = " + member.age.count());
         // 보통 DTO로 뽑아옴
     }
 
@@ -160,12 +168,22 @@ public class QuerydslBasicTest {
     @Test
     void join() throws Exception {
         // given
-        query
-                .selectFrom(member)
+        List<Member> teamA = query
+                .select(member)
+                .from(member)
                 .join(member.team, team)
                 .where(team.name.eq("teamA"))
                 .fetch();
+
+        List<Member> fetch = query
+                .selectFrom(member)
+                .leftJoin(team)
+                .on(member.team.name.eq(team.name))
+                .fetch();
         // when
+        Assertions.assertThat(teamA)
+                .extracting("username")
+                .containsExactly("member1", "member2");
 
         // then
     }
@@ -200,13 +218,15 @@ public class QuerydslBasicTest {
 
     @Test
     void subQuery() throws Exception {
+
+        QMember subMember = new QMember("subMember");
         // given
         List<Member> fetch = query
                 .selectFrom(member)
                 .where(member.age.eq(
                         JPAExpressions
-                                .select(member.age.max())
-                                .from(member)
+                                .select(subMember.age.max())
+                                .from(subMember)
                 )).fetch();
         System.out.println("fetch = " + fetch);
         // when
@@ -269,7 +289,8 @@ public class QuerydslBasicTest {
 
     @Test
     void constant() throws Exception {
-        // given 
+        // given
+        // 상수표시
         query.select(member.username, Expressions.constant("A")).from(member).fetch();
         // when
 
@@ -317,12 +338,17 @@ public class QuerydslBasicTest {
 
     @Test
     void findDtoByField() throws Exception {
+
+        QMember subMember = new QMember("subMember");
         // given
         List<MemberDTO> fetch =
                 query
-                        .select(Projections.fields(MemberDTO.class, // getter setter필요
-                                member.username,
-                                member.age))
+                        .select(Projections.fields(MemberDTO.class, // private이여도 상관없음
+                                        member.username,
+                                        member.age,
+                                ExpressionUtils.as(JPAExpressions
+                                        .select(subMember.age.avg())
+                                        .from(subMember), "avg")))
                         .from(member)
                         .fetch();
         System.out.println("fetch = " + fetch);
@@ -335,7 +361,7 @@ public class QuerydslBasicTest {
     void findUserDTO() throws Exception {
         // given
         List<UserDTO> name = query
-                .select(Projections.fields(UserDTO.class, // getter setter필요
+                .select(Projections.constructor(UserDTO.class, // 생성자필요
                         member.username.as("name"),
                         member.age))
                 .from(member)
@@ -354,12 +380,15 @@ public class QuerydslBasicTest {
                 .from(member)
                 .fetch();
         System.out.println("fetch = " + fetch);
-        // 대신 dto는 컨트롤러나 서비스레이어에서도 사용하는대ㅔ
+        // 대신 dto는 컨트롤러나 서비스레이어에서도 사용하는데
         // @QueryProjection 어노테이션이 querydsl에 의존적이다
+        // dto도 querydsl전용으로 생성된다
+        // query projection과 Projection.constructor의 차이점은 projection은 컴파일에서 못잡는다
+
     }
 
     @Test
-    void dynamicQuery_BolleanBuilder() throws Exception {
+    void dynamicQuery_BooleanBuilder() throws Exception {
         // given
         String username = "member1";
         Integer age = 10;
@@ -372,6 +401,7 @@ public class QuerydslBasicTest {
 //        List<Member> fetch = query.selectFrom(member)
 //                .where(usernameEq(username), ageEq(age))
 //                .fetch();
+
         List<Member> fetch = query.selectFrom(member)
                 .where(allEq(username, age))
                 .fetch();
@@ -379,6 +409,17 @@ public class QuerydslBasicTest {
 
         System.out.println("fetch = " + fetch);
         // then
+    }
+
+    @Test
+    void dynamic_where_param() throws Exception {
+        /*
+            querydsl은 where의 booleanexpresion이 null이면 skip한다
+         */
+        List<Member> name = query
+                .selectFrom(member)
+                .where(usernameEq("name").or(ageEq(20)))
+                .fetch();
     }
 
     private BooleanExpression usernameEq(String username) {
@@ -428,21 +469,32 @@ public class QuerydslBasicTest {
         List<Member> fetch = query.selectFrom(member).fetch();
         System.out.println("fetch = " + fetch);
         // 업데이트 이후엔 항상 flush clear해줘야함
-        // 스프링 데이터 jpq의 @query 에 @modifing 을 사용하면 위의 플러쉬 클리어를 저절로해줌
+        // 스프링 데이터 jpa의 @query 에 @modifing  을 사용하면 위의 플러쉬 클리어를 저절로해줌
+        // clear , flush auto를 true로 해야 저절로해줌 거의 기본옵션으로 가져가야겠내
         // 참고로 모든 jpql실행전에 flush는 자동으로 진행됨
     }
 
     @Test
+    void bulkAdd() throws Exception {
+        query.update(member)
+                .set(member.age, member.age.add(-1))
+                .execute();
+    }
+
+    @Test
+    void bulkDelete() throws Exception {
+        query.delete(member)
+                .where(member.age.lt(20));
+    }
+
+    @Test
     void sqlFunction() throws Exception {
-        // given
         List<String> fetch = query.select(Expressions.stringTemplate(
                         "function('replace', {0}, {1}, {2})",
                         member.username, "member", "M"))
                 .from(member).fetch();
-        // when
         System.out.println("fetch = " + fetch);
 
-        // then
     }
 
     @Test
@@ -452,12 +504,28 @@ public class QuerydslBasicTest {
                 .from(member)
 //                .where(member.username.eq(Expressions.stringTemplate(
 //                        "function('lower', {0})", member.username))).fetch();
-                .where(member.username.eq(member.username.lower())).fetch();
+                .where(member.username.lower().eq(member.username.lower()))
+                .fetch();
         // 대부분의 ansi표준 sql function들은 자체내장되있음
         // h2의경우 h2dialect에 등록되있는지 확인 (dialect는 해당 db의 방언? )
 
         // when
         System.out.println("fetch = " + fetch);
         // then
+    }
+
+    @Test
+    void queryDslPredicateExecutor() throws Exception {
+
+        memberRepository.findAll(member.username.eq("username"));
+
+        /**
+         * 한계점
+         * left join이 불가능 하다 기본적으로 rdb를 쓰면서 leftjoin이 불가능하면 기능에 한계가 존재
+         * 클라이언트가 querydsl에 의존하게 된다
+         * join이 하나정도만 하는 간단한 테이블에 적용가능, 복잡한 쿼리에선 적용이 힘들다
+         */
+
+
     }
 }

@@ -10,6 +10,7 @@ public class MemberDTO {
 
     private String username;
     private int age;
+    private double avg;
 
     @QueryProjection
     public MemberDTO(String username, int age) {
