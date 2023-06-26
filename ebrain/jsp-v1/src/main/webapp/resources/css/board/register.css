@@ -1,0 +1,140 @@
+.register-container {
+  border: 1px solid black;
+  font-size: 14px;
+  margin: 150px auto;
+  padding: 20px 10px;
+  width: 1000px;
+}
+
+/* 공통 부분*/
+.required-star {
+  color: tomato;
+  margin-bottom: 3px;
+}
+
+[class$="title"] {
+  align-items: center;
+  background-color: lightgray;
+  display: flex;
+  padding: 10px;
+  width: 150px;
+}
+
+input {
+  height: 30px;
+  margin-left: 10px;
+  padding: 0 5px;
+  width: 200px;
+}
+
+
+.category-container {
+  border-top: 1px solid black;
+  display: flex;
+}
+
+.category-select-container {
+  align-items: center;
+  display: flex;
+}
+
+.category-select {
+  height: 30px;
+  margin-left: 10px;
+  padding: 0 5px;
+  width: 200px;
+}
+.category-select option {
+
+}
+
+.writer-container {
+  border-top: 1px solid black;
+  display: flex;
+}
+
+.writer-input-container {
+  align-items: center;
+  display: flex;
+}
+
+.password-container {
+  border-top: 1px solid black;
+  display: flex;
+}
+
+.password-input-container {
+  align-items: center;
+  display: flex;
+}
+
+.title-container {
+  border-top: 1px solid black;
+  display: flex;
+}
+
+.title-input-container {
+  align-items: center;
+  display: flex;
+}
+
+.content-container {
+  border-top: 1px solid black;
+  display: flex;
+}
+
+.content-text {
+  height: 150px;
+  margin: 5px 0 5px 10px;
+  padding: 10px;
+  resize: none;
+  width: 800px;
+}
+
+.file-container {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  display: flex;
+}
+
+.file-input-container {
+  display: flex;
+  gap: 5px;
+  margin: 5px 0;
+  flex-direction: column;
+}
+
+.file-input-container input:disabled {
+  background-color: white;
+  border: 1px solid black;
+}
+
+
+.file-input-container label {
+  border: 1px solid black;
+  background-color: lightgray;
+  cursor: pointer;
+  padding: 4px 5px;
+}
+
+.file-input-container input[type="file"] {
+  display: none;
+}
+
+.button-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.button-container button {
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  width: 70px;
+}
+
+.button-save {
+  background-color: lightgray;
+}

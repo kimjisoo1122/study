@@ -1,7 +1,7 @@
-<%@ page import="com.study.connection.ConnectionTest" %>
 <%@ page import="java.sql.Connection" %>
 <%@ page import="java.sql.PreparedStatement" %>
 <%@ page import="java.sql.ResultSet" %>
+<%@ page import="com.study.util.ConnectionUtil" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
@@ -12,12 +12,11 @@
 <h1><%= "Hello World!" %>
 </h1>
 <br/>
-<a href="hello-servlet">Hello Servlet</a>
+<a href="hello-servlet">HelloDDD</a>
 
 
 <%
-    ConnectionTest connectionTest = new ConnectionTest();
-    Connection connection = connectionTest.getConnection();
+    Connection connection = ConnectionUtil.getConnection();
     PreparedStatement preparedStatement = connection.prepareStatement("select 1");
     ResultSet resultSet = preparedStatement.executeQuery();
     String queryResult = "";
