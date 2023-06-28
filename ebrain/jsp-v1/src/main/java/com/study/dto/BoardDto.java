@@ -6,24 +6,16 @@ public class BoardDto {
 
     private Long boardId;
     private Long categoryId;
+    private String categoryName;
     private String title;
     private String writer;
     private String content;
     private String password;
     private int viewCnt;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
     public BoardDto() {
-    }
-
-    public BoardDto(Long categoryId, String title,
-                    String writer, String content, String password) {
-        this.categoryId = categoryId;
-        this.title = title;
-        this.writer = writer;
-        this.content = content;
-        this.password = password;
     }
 
     public Long getBoardId() {
@@ -82,19 +74,27 @@ public class BoardDto {
         this.viewCnt = viewCnt;
     }
 
-    public LocalDateTime getCreate_date() {
-        return create_date;
+    public LocalDateTime getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(LocalDateTime create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
     }
 
-    public LocalDateTime getUpdate_date() {
-        return update_date;
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 
-    public void setUpdate_date(LocalDateTime update_date) {
-        this.update_date = update_date;
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

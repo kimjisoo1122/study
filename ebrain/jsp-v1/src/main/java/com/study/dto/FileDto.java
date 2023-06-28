@@ -8,13 +8,16 @@ public class FileDto {
     private Long boardId;
     private String name;
     private String path;
-    private LocalDateTime create_date;
-    private LocalDateTime update_date;
+    private String originalName;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
-    public FileDto(Long boardId, String name, String path) {
-        this.boardId = boardId;
-        this.name = name;
-        this.path = path;
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    public void setOriginalName(String originalName) {
+        this.originalName = originalName;
     }
 
     public Long getFileId() {
@@ -49,19 +52,19 @@ public class FileDto {
         this.path = path;
     }
 
-    public LocalDateTime getCreate_date() {
-        return create_date;
+    public LocalDateTime getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(LocalDateTime create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
     }
 
-    public LocalDateTime getUpdate_date() {
-        return update_date;
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
     }
 
-    public void setUpdate_date(LocalDateTime update_date) {
-        this.update_date = update_date;
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
     }
 }

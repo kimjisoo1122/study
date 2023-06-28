@@ -10,6 +10,7 @@
 <%@ page import="com.study.validation.BoardValidationUtil" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.io.File" %>
 <%@ page contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -19,11 +20,17 @@
 
     // multipart 설정
     String encType = "UTF-8";
-    String filePath = "C:\\upload";
+    String filePath = "C:\\Users\\kimji\\IdeaProjects\\study\\ebrain\\jsp-v1\\src\\main\\webapp\\WEB-INF\\upload";
+    File file = new File(filePath);
+    if (!file.exists()) {
+      file.mkdirs();
+    }
+
     int fileMaxSize = 1024 * 1024 * 10;
     MultipartRequest multi = null;
     try {
-      multi = new MultipartRequest(request, filePath, fileMaxSize, encType, new DefaultFileRenamePolicy());
+      multi = new MultipartRequest(request, filePath, fileMaxSize, encType,
+                new DefaultFileRenamePolicy());
     } catch (IOException e) {
         // 파일사이즈 초과
         session.setAttribute("fileError", "10MB를 넘을 수 없습니다.");
@@ -37,7 +44,13 @@
     String password = multi.getParameter("password");
     String title = multi.getParameter("title");
     String content = multi.getParameter("content");
-    BoardDto boardDto = new BoardDto(categoryId, title, writer, content, password);
+
+    BoardDto boardDto = new BoardDto();
+    boardDto.setCategoryId(categoryId);
+    boardDto.setTitle(title);
+    boardDto.setWriter(writer);
+    boardDto.setContent(content);
+    boardDto.setPassword(password);
 
     // 게시글 유효성 검증
     if (!BoardValidationUtil.validBoard(boardDto)) {
@@ -54,8 +67,13 @@
     while (fileInputs.hasMoreElements()) {
       String fileInput = (String) fileInputs.nextElement();
       String fileName = multi.getFilesystemName(fileInput);
+      String originalFileName = multi.getOriginalFileName(fileInput);
       if (fileName != null) {
-        FileDto fileDto = new FileDto(boardId, fileName, filePath);
+        FileDto fileDto = new FileDto();
+        fileDto.setBoardId(boardId);
+        fileDto.setName(fileName);
+        fileDto.setPath(filePath);
+        fileDto.setOriginalName(originalFileName);
         FileDao fileDao = new FileDao();
         fileDao.save(fileDto);
       }
@@ -104,13 +122,6 @@
             </div>
           </div>
 
-          <%-- 유효성 검증 실패한 경우 session에 기존 입력자료 저장--%>
-          <%
-            BoardDto board = (BoardDto) session.getAttribute("board");
-            String fileError = (String) session.getAttribute("fileError");
-
-          %>
-
           <div class="writer-container">
             <div class="writer-title">작성자
               <span class="required-star">*</span>
@@ -119,7 +130,7 @@
               <input type="text"
                      name="writer"
                      class="writer-input"
-                     value="<%=board == null ? "" : board.getWriter()%>"
+                     value="${board == null ? "" : board.writer}"
                      onchange="validWriter()">
               <span class="writer-input-error">작성자 에러</span>
             </div>
@@ -149,7 +160,7 @@
               <input type="text"
                      name="title"
                      class="title-input"
-                     value="<%=board == null ? "" : board.getTitle()%>"
+                     value="${board == null ? "" : board.title}"
                      onchange="validTitle()">
               <span class="title-input-error">제목 에러</span>
             </div>
@@ -162,7 +173,7 @@
             <div class="content-text-container">
               <textarea name="content"
                         class="content-text"
-                        onchange="validContent()"><%=board == null ? "" : board.getContent()%></textarea>
+                        onchange="validContent()">${board == null ? "" : board.content}</textarea>
               <span class="content-text-error">내용 에러</span>
             </div>
           </div>
@@ -173,8 +184,8 @@
               <div class="file-input-container-first">
                 <input type="text"
                        class="file-input-first"
-                       value="<%=fileError == null ? "" : fileError%>"
-                       style="<%=fileError == null ? "color : black" : "color : red"%>"
+                       value="${fileError == null ? "" : fileError}"
+                       style="${fileError == null ? "color : black" : "color : red"}"
                        disabled>
                 <label for="file-input-first">파일 찾기</label>
                 <input type="file"

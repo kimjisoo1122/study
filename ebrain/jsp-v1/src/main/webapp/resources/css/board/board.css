@@ -1,0 +1,108 @@
+.board-container {
+  border: 1px solid black;
+  font-size: 14px;
+  margin: 150px auto;
+  padding: 20px;
+  width: 1000px;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100px;
+  border-bottom: 2px solid black;
+}
+
+.header-top-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-title-container {
+  align-items: center;
+  display: flex;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: normal;
+  margin-left: 20px;
+}
+
+.header-date-container {
+  display: flex;
+  gap: 10px;
+}
+
+.header-bottom-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-container {
+  margin: 10px 0;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.file-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.reply-container {
+  background-color: antiquewhite;
+  padding: 10px;
+}
+
+.reply {
+  border-bottom: 1px solid black;
+  padding: 10px 0;
+}
+
+.reply-date {
+  font-size: 12px;
+}
+
+.reply-register-container {
+  height: 100px;
+}
+
+.reply-register-input {
+  height: 50px;
+  margin-top: 10px;
+  width: 91%;
+}
+
+.reply-register-button {
+  background-color: white;
+  border: 1px solid black;
+  cursor: pointer;
+  height: 50px;
+  margin-left: 10px;
+  width: 70px;
+}
+
+.button-container {
+  border-top: 1px solid black;
+  padding-top: 10px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.button-container button {
+  cursor: pointer;
+  width: 70px;
+}
+
+.button-list {
+  background-color: grey;
+  border: 1px solid black;
+  color: white;
+}

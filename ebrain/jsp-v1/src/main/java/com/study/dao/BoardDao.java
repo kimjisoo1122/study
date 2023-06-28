@@ -49,4 +49,41 @@ public class BoardDao {
         }
         return deletedRowCnt;
     }
+
+    public BoardDto findById(Long boardId) {
+        String sql =
+                "select b.board_id, b.category_id, c.name as category_name," +
+                        "b.writer, b.title, b.content, b.password," +
+                        "b.view_cnt, b.create_date, b.update_date " +
+                "from board b " +
+                "join category c on b.category_id = c.category_id " +
+                "where board_id = ?";
+
+        BoardDto boardDto = new BoardDto();
+
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, boardId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    boardDto.setBoardId(rs.getLong("board_id"));
+                    boardDto.setCategoryId(rs.getLong("category_id"));
+                    boardDto.setCategoryName(rs.getString("category_name"));
+                    boardDto.setWriter(rs.getString("writer"));
+                    boardDto.setTitle(rs.getString("title"));
+                    boardDto.setContent(rs.getString("content"));
+                    boardDto.setPassword(rs.getString("password"));
+                    boardDto.setViewCnt(rs.getInt("view_cnt"));
+                    boardDto.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
+                    boardDto.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return boardDto;
+    }
 }

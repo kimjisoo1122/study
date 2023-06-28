@@ -18,7 +18,7 @@ public interface BoardValidationUtil {
             return false;
         } else if (password == null
                 || (password.length() < 4 || password.length() > 15)
-                || !password.matches("^(?=.*[a-zA-Z])(?=.*\\\\d)(?=.*[@#$%^&+=!]).*$") ){
+                || !password.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$") ){
             return false;
         } else if (title == null || (title.length() < 4 || title.length() > 99)) {
             return false;
