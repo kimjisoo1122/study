@@ -4,6 +4,8 @@ import com.study.dto.BoardDto;
 import com.study.util.ConnectionUtil;
 
 import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class BoardDao {
 
@@ -85,5 +87,65 @@ public class BoardDao {
             e.printStackTrace();
         }
         return boardDto;
+    }
+
+    public int update(Map<String, String> paramMap, Long boardId) {
+        if (paramMap.isEmpty()) {
+            return 0;
+        }
+
+        // 동적쿼리 생성
+        StringBuilder sb = new StringBuilder("update board set ");
+        LinkedHashMap<String, String> linkedHashMap = new LinkedHashMap<>();
+
+        // 맵으로 순회하며 컬럼이 존재하면 추가
+        for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+            String updateSql = entry.getKey() + " = ? ";
+            sb.append(updateSql).append(", ");
+            // pstmt로 값 넣어주기 위한 세팅
+            linkedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        // 업데이트 날짜 추가하며 최종쿼리 완성
+        String sql = sb + "update_date = now() where board_id = ?";
+
+        int updatedCnt = 0;
+
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int idx = 1;
+            for (Map.Entry<String, String> entry : linkedHashMap.entrySet()) {
+                String column = entry.getKey();
+                String value = entry.getValue();
+
+                switch (column) {
+                    case "view_cnt":
+                        pstmt.setInt(idx++, Integer.parseInt(value));
+                        break;
+                    case "category_id":
+                        pstmt.setLong(idx++, Long.parseLong(value));
+                        break;
+                    default:
+                        pstmt.setString(idx++, value);
+                }
+            }
+
+            pstmt.setLong(idx, boardId);
+            updatedCnt = pstmt.executeUpdate();
+        } catch (SQLException  | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return updatedCnt;
+    }
+
+    public void addViewCnt() {
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("update board set view_cnt = view_cnt + 1")) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

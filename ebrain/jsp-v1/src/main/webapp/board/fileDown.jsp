@@ -6,9 +6,9 @@
 <%@ page import="java.io.OutputStream" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-
 <%
   request.setCharacterEncoding("UTF-8");
+
   // 파일dto 조회
   Long fileId = Long.parseLong(request.getParameter("fileId"));
   FileDao fileDao = new FileDao();
@@ -38,12 +38,3 @@
     e.printStackTrace();
   }
 %>
-
-<html>
-<head>
-  <title>파일 다운로드</title>
-</head>
-<body>
-
-</body>
-</html>

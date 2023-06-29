@@ -5,20 +5,31 @@
 <%@ page import="com.study.dao.FileDao" %>
 <%@ page import="com.study.dto.FileDto" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.study.dao.ReplyDao" %>
+<%@ page import="com.study.dto.ReplyDto" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" %>
 
 <%
-  // 게시글 조회
   Long boardId = Long.parseLong(request.getParameter("boardId"));
   BoardDao boardDao = new BoardDao();
+
+  // 게시글 조회수 증가
+  boardDao.addViewCnt();
+
+  // 게시글 조회
   BoardDto board = boardDao.findById(boardId);
-  String createDate = board.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-  String updateDate = board.getUpdateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+  String createDate = board.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+  String updateDate = board.getUpdateDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
   // 첨부파일 조회
   FileDao fileDao = new FileDao();
   List<FileDto> files = fileDao.findByBoardId(boardId);
 
+  // 댓글 조회
+  ReplyDao replyDao = new ReplyDao();
+  List<ReplyDto> replies = replyDao.findByBoardId(boardId);
 %>
 
 <html>
@@ -63,17 +74,23 @@
       </div>
 
       <div class="reply-container">
-        <div class="reply">
-          <div class="reply-date">댓글등록일시</div>
-          <div class="reply-content">댓글 내용</div>
+        <div class="reply-list-container">
+          <c:forEach items="<%=replies%>" var="reply">
+            <div class="reply">
+              <div class="reply-date">${reply.formattedCreateDate}</div>
+              <div class="reply-content">${reply.content}</div>
+            </div>
+          </c:forEach>
         </div>
         <div class="reply-register-container">
-          <form action="">
-            <input type="text" name="content" class="reply-register-input">
-            <button type="submit" class="reply-register-button">등록</button>
-          </form>
+            <input type="text" name="content" class="reply-register-input" placeholder="댓글을 입력해 주세요.">
+            <button
+                    type="submit"
+                    class="reply-register-button"
+                    onclick="replyRegister(<c:out value="<%=boardId%>"/>)">등록
+            </button>
         </div>
-      </div>
+
 
       <div class="button-container">
         <button class="button-list">목록</button>
