@@ -107,8 +107,13 @@
   width: 70px;
 }
 
+.button-container button a {
+  text-decoration: none;
+  color: black;
+}
+
 .button-list {
   background-color: grey;
   border: 1px solid black;
-  color: white;
 }
+

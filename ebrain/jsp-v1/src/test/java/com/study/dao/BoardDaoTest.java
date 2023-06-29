@@ -1,13 +1,18 @@
 package com.study.dao;
 
 import com.study.dto.BoardDto;
+import com.study.dto.BoardSearchCondition;
+import com.study.util.PageHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 class BoardDaoTest {
 
     @Test
@@ -91,6 +96,29 @@ class BoardDaoTest {
         // 게시글 롤백
         int deletedRowCnt = boardDao.delete(boardId);
         assertEquals(1, deletedRowCnt);
+    }
 
+    @Test
+    void findAll() {
+        // 게시글 등록
+        BoardDto boardDto = new BoardDto();
+        boardDto.setCategoryId(1L);
+        boardDto.setTitle("제목");
+        boardDto.setWriter("작성자");
+        boardDto.setContent("내용");
+        boardDto.setPassword("비밀번호");
+        BoardDao boardDao = new BoardDao();
+        long boardId = boardDao.register(boardDto);
+
+        // 게시글 조회
+        BoardSearchCondition condition = new BoardSearchCondition();
+        condition.setCategoryId(1L);
+        condition.setSearch("작성자");
+        List<BoardDto> all = boardDao.findAll(condition, new PageHandler(1, 10));
+        assertNotEquals(0, all.size());
+
+        // 게시글 롤백
+        int deletedRowCnt = boardDao.delete(boardId);
+        assertEquals(1, deletedRowCnt);
     }
 }

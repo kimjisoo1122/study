@@ -7,8 +7,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.study.dao.ReplyDao" %>
 <%@ page import="com.study.dto.ReplyDto" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" %>
 
 <%
@@ -16,7 +14,7 @@
   BoardDao boardDao = new BoardDao();
 
   // 게시글 조회수 증가
-  boardDao.addViewCnt();
+  boardDao.addViewCnt(boardId);
 
   // 게시글 조회
   BoardDto board = boardDao.findById(boardId);
@@ -30,9 +28,17 @@
   // 댓글 조회
   ReplyDao replyDao = new ReplyDao();
   List<ReplyDto> replies = replyDao.findByBoardId(boardId);
+
+  // 게시글 검색 조건 (조건 유지하며 페이지 이동)
+  String pageStr = request.getParameter("page");
+  String search = request.getParameter("search");
+  String categoryId = request.getParameter("categoryId");
+  String fromDate = request.getParameter("fromDate");
+  String toDate = request.getParameter("toDate");
 %>
 
 <html>
+
   <head>
     <title>게시글</title>
     <link rel="stylesheet" href="/resources/css/board/board.css">
@@ -45,7 +51,6 @@
 
       <div class="header-container">
         <div class="header-top-container">
-
           <p class="header-name"><c:out value="<%=board.getWriter()%>"/></p>
           <div class="header-date-container">
             <p class="header-date-create">등록일시 <c:out value="<%=createDate%>"/></p>
@@ -70,7 +75,6 @@
         <c:forEach items="<%=files%>" var="file">
           <a href="fileDown.jsp?fileId=${file.fileId}">${file.name}</a>
         </c:forEach>
-
       </div>
 
       <div class="reply-container">
@@ -90,17 +94,43 @@
                     onclick="replyRegister(<c:out value="<%=boardId%>"/>)">등록
             </button>
         </div>
-
+      </div>
 
       <div class="button-container">
-        <button class="button-list">목록</button>
-        <button class="button-update">수정</button>
-        <button class="button-remove">삭제</button>
+        <button class="button-list">
+          <c:url value="boardList.jsp" var="boardList">
+            <c:param name="page" value="<%=pageStr%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
+          </c:url>
+          <a href="${boardList}" class="button-list-a">목록</a>
+        </button>
+        <button class="button-update">
+          <c:url value="boardList.jsp" var="boardList">
+            <c:param name="page" value="<%=pageStr%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
+          </c:url>
+          <a href="${boardList}" class="button-update-a">수정</a>
+        </button>
+        <button class="button-remove">
+          <c:url value="boardList.jsp" var="boardList">
+            <c:param name="page" value="<%=pageStr%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
+          </c:url>
+          <a href="${boardList}" class="button-remove-a">삭제</a>
+        </button>
       </div>
+
     </div>
 
-
-
-
   </body>
+
 </html>

@@ -79,6 +79,13 @@
       }
     }
   }
+
+  // 게시글 검색 조건 (조건 유지하며 페이지 이동)
+  String pageStr = request.getParameter("page");
+  String search = request.getParameter("search");
+  String categoryId = request.getParameter("categoryId");
+  String fromDate = request.getParameter("fromDate");
+  String toDate = request.getParameter("toDate");
 %>
 
 <html>
@@ -103,13 +110,12 @@
               <span class="required-star">*</span>
             </div>
             <div class="category-select-container">
+              <%-- 카테고리 조회 --%>
+              <%
+                CategoryDao categoryDao = new CategoryDao();
+                Set<Map.Entry<String, List<CategoryDto>>> categories = categoryDao.findAll().entrySet();
+              %>
               <select name="categoryId" class="category-select">
-
-                <%
-                  CategoryDao categoryDao = new CategoryDao();
-                  Set<Map.Entry<String, List<CategoryDto>>> categories = categoryDao.findAll().entrySet();
-                %>
-
                 <c:forEach items="<%=categories%>" var="categoryMap">
                   <optgroup label="${categoryMap.key}">
                     <c:forEach items="${categoryMap.value}" var="category">
@@ -215,9 +221,19 @@
           </div>
 
           <div class="button-container">
-            <button class="button-cancel">취소</button>
+            <button type="button" class="button-cancel">
+              <c:url value="boardList.jsp" var="boardList">
+                <c:param name="page" value="<%=pageStr%>"/>
+                <c:param name="search" value="<%=search%>"/>
+                <c:param name="categoryId" value="<%=categoryId%>"/>
+                <c:param name="fromDate" value="<%=fromDate%>"/>
+                <c:param name="toDate" value="<%=toDate%>"/>
+              </c:url>
+              <a href="${boardList}" class="button-cancel-a">취소</a>
+            </button>
             <button type="submit" class="button-save">저장</button>
           </div>
+
         </div>
 
       </form>

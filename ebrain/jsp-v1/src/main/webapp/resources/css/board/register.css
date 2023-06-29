@@ -193,6 +193,11 @@ input {
   width: 70px;
 }
 
+.button-cancel-a {
+  text-decoration: none;
+  color: black;
+}
+
 .button-save {
   background-color: lightgray;
 }

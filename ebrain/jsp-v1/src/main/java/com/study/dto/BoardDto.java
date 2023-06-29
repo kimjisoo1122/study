@@ -1,6 +1,7 @@
 package com.study.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BoardDto {
 
@@ -14,8 +15,13 @@ public class BoardDto {
     private int viewCnt;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private boolean hasFile;
 
-    public BoardDto() {
+    public String getFormattedCreateDate() {
+        return createDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    }
+    public String getFormattedUpdateDate() {
+        return updateDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
     }
 
     public Long getBoardId() {
@@ -96,5 +102,29 @@ public class BoardDto {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public boolean isHasFile() {
+        return hasFile;
+    }
+
+    public void setHasFile(boolean hasFile) {
+        this.hasFile = hasFile;
+    }
+
+    @Override
+    public String toString() {
+        return "BoardDto{" +
+                "boardId=" + boardId +
+                ", categoryId=" + categoryId +
+                ", categoryName='" + categoryName + '\'' +
+                ", title='" + title + '\'' +
+                ", writer='" + writer + '\'' +
+                ", content='" + content + '\'' +
+                ", password='" + password + '\'' +
+                ", viewCnt=" + viewCnt +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                '}';
     }
 }
