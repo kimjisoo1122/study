@@ -4,8 +4,11 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%
-  // 댓글 등록
   request.setCharacterEncoding("utf-8");
+
+  if (request.getParameter("boardId") == null) {
+      return;
+  }
   Long boardId = Long.parseLong(request.getParameter("boardId"));
   String content = request.getParameter("content");
   ReplyDto replyDto = new ReplyDto();

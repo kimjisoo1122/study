@@ -1,59 +1,59 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.study.dao.BoardDao" %>
 <%@ page import="com.study.dto.BoardDto" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.study.dao.FileDao" %>
 <%@ page import="com.study.dto.FileDto" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.study.dao.ReplyDao" %>
-<%@ page import="com.study.dto.ReplyDto" %>
 <%@ page import="com.study.util.StringUtil" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.io.File" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="com.study.dao.ReplyDao" %>
+<%@ page import="com.study.dto.ReplyDto" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" %>
 
 <%
+  // 검색 조건
+  String search = StringUtil.nvl(request.getParameter("search"));
+  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
+  String toDate = StringUtil.nvl(request.getParameter("toDate"));
+  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
+  String pageStr = StringUtil.nvl(request.getParameter("page"));
+  String queryString = "?search=" + URLEncoder.encode(search) +
+          "&categoryId=" + categoryId + "&fromDate=" + fromDate +
+          "&toDate=" + toDate + "&page=" + pageStr;
+
+
   if (request.getMethod().equalsIgnoreCase("post")) {
     request.setCharacterEncoding("utf-8");
 
-    Long boardId = Long.parseLong(request.getParameter("boardId"));
+    if (request.getParameter("boardId") == null) {
+        response.sendRedirect("/board/boardList.jsp" + queryString);
+        return;
+    }
     String password = StringUtil.nvl(request.getParameter("removePassword"));
-    String pageStr = StringUtil.nvl(request.getParameter("page"));
-    String search = StringUtil.nvl(request.getParameter("search"));
-    String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
-    String toDate = StringUtil.nvl(request.getParameter("toDate"));
-    String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
-
+    Long boardId = Long.parseLong(request.getParameter("boardId"));
 
     // 게시글 조회
     BoardDao boardDao = new BoardDao();
     BoardDto board = boardDao.findById(boardId);
 
-    String queryString = "?search=" + URLEncoder.encode(search) + "&categoryId=" + categoryId +
-            "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
-
     // 비밀번호 검증
-    if (board.getPassword().equals(password)) {
-        // 파일 삭제
-        FileDao fileDao = new FileDao();
-        List<FileDto> fileList = fileDao.findByBoardId(boardId);
-        for (FileDto fileDto : fileList) {
-          File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
-          if (regisetdFile.exists()) {
-            if (regisetdFile.delete()) {
-              fileDao.delete(fileDto.getFileId());
-            }
+    if (password.equals(board.getPassword())) {
+      // 파일 삭제
+      FileDao fileDao = new FileDao();
+      List<FileDto> fileList = fileDao.findByBoardId(boardId);
+      for (FileDto fileDto : fileList) {
+        File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
+        if (regisetdFile.exists()) {
+          if (regisetdFile.delete()) {
+            fileDao.delete(fileDto.getFileId());
           }
         }
-
-      // 댓글 삭제
-      ReplyDao replyDao = new ReplyDao();
-      replyDao.deleteByBoardId(boardId);
-
-      // 게시글 삭제
-      int deletedRowCnt = boardDao.delete(boardId);
+      }
+      // 댓글, 파일db, 게시글을 트랜잭션 내에서 삭제
+      int deletedRowCnt = boardDao.deleteBoardAll(boardId);
       if (deletedRowCnt > 0) {
-
         session.setAttribute("removeMsg", "게시글을 삭제하였습니다.");
         response.sendRedirect("/board/boardList.jsp" + queryString);
         return;
@@ -65,8 +65,13 @@
     response.sendRedirect("/board/board.jsp" + queryString);
 
     return;
-  }
+  } // 게시글 삭제 로직 종료
 
+  // 게시글 조회 로직
+  if (request.getParameter("boardId") == null) {
+    response.sendRedirect("/board/boardList.jsp" + queryString);
+    return;
+  }
   Long boardId = Long.parseLong(request.getParameter("boardId"));
   BoardDao boardDao = new BoardDao();
 
@@ -75,8 +80,6 @@
 
   // 게시글 조회
   BoardDto board = boardDao.findById(boardId);
-  String createDate = board.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-  String updateDate = board.getUpdateDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
   // 첨부파일 조회
   FileDao fileDao = new FileDao();
@@ -85,13 +88,6 @@
   // 댓글 조회
   ReplyDao replyDao = new ReplyDao();
   List<ReplyDto> replies = replyDao.findByBoardId(boardId);
-
-  // 게시글 검색 조건 (조건 유지하며 페이지 이동)
-  String pageStr = StringUtil.nvl(request.getParameter("page"));
-  String search = StringUtil.nvl(request.getParameter("search"));
-  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
-  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
-  String toDate = StringUtil.nvl(request.getParameter("toDate"));
 %>
 
 <html>
@@ -110,8 +106,8 @@
         <div class="header-top-container">
           <p class="header-name"><c:out value="<%=board.getWriter()%>"/></p>
           <div class="header-date-container">
-            <p class="header-date-create">등록일시 <c:out value="<%=createDate%>"/></p>
-            <p class="header-date-update">수정일시 <c:out value="<%=updateDate%>"/></p>
+            <p class="header-date-create">등록일시 <c:out value="<%=board.getFormattedCreateDate()%>"/></p>
+            <p class="header-date-update">수정일시 <c:out value="<%=board.getFormattedUpdateDate()%>"/></p>
           </div>
         </div>
 
@@ -220,7 +216,7 @@
             </button>
           </div>
 
-          <%--검색조건 유지--%>
+          <%--검색조건--%>
           <input type="hidden" name="boardId" value="<c:out value="<%=board.getBoardId()%>"/>">
           <input type="hidden" name="search" value="<c:out value="<%=search%>"/>">
           <input type="hidden" name="fromDate" value="<c:out value="<%=fromDate%>"/>">

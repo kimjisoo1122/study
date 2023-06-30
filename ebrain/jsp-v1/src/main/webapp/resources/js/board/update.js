@@ -1,7 +1,4 @@
-/**
- * 업로드할 파일의 사이즈를 검사하고 결과반환
- * @param thisElm
- */
+
 function uploadFile(thisElm) {
   const fileName = thisElm.value.split('/').pop().split('\\').pop();
   const disabledElm = thisElm.parentElement.querySelector('input[disabled]');
@@ -21,11 +18,6 @@ function uploadFile(thisElm) {
   }
 }
 
-/**
- * 해당 파일 태그를 지우고 히든필드로 삭제대상 fileId추가
- * @param thisElm
- * @param fileId
- */
 function deleteFile(thisElm, fileId) {
   const fileListElm = document.querySelector('.file-list-container');
   const hiddenInput = document.createElement('input');

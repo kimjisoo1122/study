@@ -21,12 +21,12 @@ public class BoardDao {
      * @param boardDto
      * @return boardId
      */
-    public long register(BoardDto boardDto) {
+    public Long register(BoardDto boardDto) {
         String sql = "insert into board" +
                 "(category_id, title, writer, content, password) " +
                 "values(?, ?, ?, ?, ?)";
 
-        long boardId = 0L;
+        Long boardId = null;
 
         try (
                 Connection conn = ConnectionUtil.getConnection();
@@ -50,7 +50,7 @@ public class BoardDao {
     }
 
     /**
-     * 게시글 삭제
+     * 게시글과 관련한 댓글, 파일 삭제 후 게시글 삭제
      *
      * @param boardId
      * @return deletedRowCnt
@@ -283,22 +283,62 @@ public class BoardDao {
     }
 
     /**
-     * 게시글의 총 갯수
+     * 댓글, 파일db, 게시글 트랜잭션 내에서 삭제
+     * @param boardId
      * @return
      */
-    public int totalCnt() {
-        int totalCnt = 0;
-        try (
-                Connection conn = ConnectionUtil.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement("select count(*) from board")) {
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    totalCnt = rs.getInt(1);
-                }
-            }
+    public int deleteBoardAll(Long boardId) {
+        // 댓글 삭제
+        String replySql = "delete from reply where board_id = ?";
+        String fileSql = "delete from file where board_id = ?";
+        String boardSql = "delete from board where board_id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        int deletedRowCnt = 0;
+
+        try  {
+            conn = ConnectionUtil.getConnection();
+            conn.setAutoCommit(false);
+            // 댓글 삭제
+            pstmt = conn.prepareStatement(replySql);
+            pstmt.setLong(1, boardId);
+            pstmt.executeUpdate();
+            pstmt.close();
+            // 파일 db 삭제
+            pstmt = conn.prepareStatement(fileSql);
+            pstmt.setLong(1, boardId);
+            pstmt.executeUpdate();
+            pstmt.close();
+            // 게시글 삭제
+            pstmt = conn.prepareStatement(boardSql);
+            pstmt.setLong(1, boardId);
+            deletedRowCnt = pstmt.executeUpdate();
+
+            conn.commit();
+            conn.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return totalCnt;
+
+        return deletedRowCnt;
     }
 }

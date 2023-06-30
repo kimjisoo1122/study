@@ -148,7 +148,6 @@ input {
   margin: 5px 0;
 }
 
-
 .file-container {
   border-top: 1px solid black;
   border-bottom: 1px solid black;
@@ -159,14 +158,17 @@ input {
   display: flex;
   gap: 5px;
   margin: 5px 0 5px 10px;
-  flex-direction: column;
 }
 
-.file-input-container input:disabled {
+.file-input {
+  width: 300px;
   background-color: white;
   border: 1px solid black;
 }
 
+.file-error {
+  margin-left: 10px;
+}
 
 .file-input-container label {
   border: 1px solid black;
@@ -177,6 +179,11 @@ input {
 
 .file-input-container input[type="file"] {
   display: none;
+}
+
+.file-error {
+  color: red;
+  font-size: 12px;
 }
 
 .button-container {

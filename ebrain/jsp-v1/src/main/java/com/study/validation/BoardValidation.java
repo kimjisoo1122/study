@@ -2,7 +2,7 @@ package com.study.validation;
 
 import com.study.dto.BoardDto;
 
-public interface BoardValidationUtil {
+public interface BoardValidation {
 
     static boolean validBoard(BoardDto boardDto) {
         if (boardDto == null) {

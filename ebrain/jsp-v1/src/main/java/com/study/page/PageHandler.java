@@ -1,4 +1,4 @@
-package com.study.util;
+package com.study.page;
 
 public class PageHandler {
 

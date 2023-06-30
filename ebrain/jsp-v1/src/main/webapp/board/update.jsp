@@ -10,33 +10,30 @@
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.Enumeration" %>
-<%@ page import="com.study.validation.BoardValidationUtil" %>
+<%@ page import="com.study.validation.BoardValidation" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="com.study.util.FileUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%
   if (request.getMethod().equalsIgnoreCase("post")) {
     request.setCharacterEncoding("UTF-8");
 
-    // multipart 설정
-    String encType = "UTF-8";
-    String filePath = "C:\\Users\\kimji\\IdeaProjects\\study\\ebrain\\jsp-v1\\src\\main\\webapp\\WEB-INF\\upload";
-    File file = new File(filePath);
-    if (!file.exists()) {
-      file.mkdirs();
+    // MULTIPART 설정
+    File uploadFolder = new File(FileUtil.FILE_PATH);
+    if (!uploadFolder.exists()) {
+      uploadFolder.mkdirs();
     }
-
-    int fileMaxSize = 1024 * 1024 * 10;
     MultipartRequest multi = null;
     try {
-      multi = new MultipartRequest(request, filePath, fileMaxSize, encType,
+      multi = new MultipartRequest(request, FileUtil.FILE_PATH, FileUtil.BOARD_FILE_MAX_SIZE, FileUtil.ENC_TYPE,
               new DefaultFileRenamePolicy());
     } catch (IOException e) {
       e.printStackTrace();
       // 파일사이즈 초과
-      session.setAttribute("fileError", "10MB를 넘을 수 없습니다.");
+      session.setAttribute("fileError", "파일사이즈는 10MB를 넘을 수 없습니다.");
       response.sendRedirect("/board/update.jsp");
       return;
     }
@@ -54,6 +51,8 @@
     String categoryId = multi.getParameter("categoryId");
     String search = multi.getParameter("search");
     String pageStr = multi.getParameter("page");
+    String queryString = "?boardId=" + boardId + "&search=" + URLEncoder.encode(search)
+            + "&categoryId=" + categoryId + "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
 
     // 원글 조회
     BoardDao boardDao = new BoardDao();
@@ -63,17 +62,11 @@
     findBoard.setContent(content);
 
     // 게시글 유효성 검증
-    String queryString = "?boardId=" + boardId + "&search=" + URLEncoder.encode(search)
-            + "&categoryId=" + categoryId + "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
     if (!password.equals(findBoard.getPassword())
-            || !BoardValidationUtil.validBoard(findBoard) ) {
+            || !BoardValidation.validBoard(findBoard) ) {
       session.setAttribute("board", findBoard);
       response.sendRedirect("/board/update.jsp" + queryString);
       return;
-    }
-
-    if (password.equals(findBoard.getPassword())) {
-
     }
 
     // 게시글 업데이트
@@ -93,7 +86,7 @@
         FileDto fileDto = new FileDto();
         fileDto.setBoardId(boardId);
         fileDto.setName(fileName);
-        fileDto.setPath(filePath);
+        fileDto.setPath(FileUtil.FILE_PATH);
         fileDto.setOriginalName(originalFileName);
         FileDao fileDao = new FileDao();
         fileDao.save(fileDto);
@@ -109,20 +102,21 @@
         FileDto fileDto = fileDao.findById(fileId);
 
         // 실제 파일 삭제
-        File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
-        if (regisetdFile.exists()) {
-          if (regisetdFile.delete()) {
+        File uploadedFile = FileUtil.uploadedFile(fileDto.getName());
+        if (uploadedFile.exists()) {
+          if (uploadedFile.delete()) {
             // 파일 db 삭제
             fileDao.delete(fileId);
           }
         }
       }
     }
+
     response.sendRedirect("/board/boardList.jsp" + queryString);
     return;
   }
 
-  // 게시글 조회
+  // 게시글 조회 (세션에 값이 있으면 유효성 검증 실패)
   BoardDto board = (BoardDto) session.getAttribute("board");
   if (board == null) {
     Long boardId = Long.parseLong(request.getParameter("boardId"));
