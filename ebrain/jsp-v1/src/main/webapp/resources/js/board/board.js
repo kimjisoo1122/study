@@ -44,3 +44,27 @@ function formatDate(localDateTime) {
 
   return year + '.' + month + '.' + day + ' ' + hours + ':' + minute;
 }
+
+function removeCancel() {
+  const modalElm = document.querySelector('.remove-modal-bg');
+  modalElm.style.display = 'none';
+}
+
+function removeOpen() {
+  const modalElm = document.querySelector('.remove-modal-bg');
+  modalElm.style.display = 'block';
+}
+
+function validRemovePassword() {
+  const inputElm = document.querySelector('.remove-password-input');
+  const errElm = document.querySelector('.remove-password-input-error');
+  if (inputElm.value === '') {
+    errElm.style.display = 'block';
+    inputElm.style.border = '1px solid red';
+    return false;
+  } else {
+    errElm.style.display = 'none';
+    inputElm.style.border = '1px solid black';
+    return true;
+  }
+}

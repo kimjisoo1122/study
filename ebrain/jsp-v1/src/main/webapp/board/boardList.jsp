@@ -8,6 +8,8 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="com.study.util.PageHandler" %>
 <%@ page import="com.study.dao.FileDao" %>
+<%@ page import="com.study.util.StringUtil" %>
+<%@ page import="java.util.stream.Collectors" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -18,28 +20,38 @@
 
   // 검색조건 파싱
   BoardSearchCondition condition = new BoardSearchCondition();
-  String fromDate = request.getParameter("fromDate");
-  String toDate = request.getParameter("toDate");
-  String search = request.getParameter("search");
-  String categoryId = request.getParameter("categoryId");
-  if (categoryId != null && !categoryId.isEmpty()) {
+  String fromDate = StringUtil.nvl(request.getParameter("fromDate")) ;
+  String toDate = StringUtil.nvl(request.getParameter("toDate"));
+  String search = StringUtil.nvl(request.getParameter("search"));
+  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
+  String pageNumStr = request.getParameter("page");
+
+
+  // 검색조건 설정
+  if (!categoryId.isEmpty()) {
     condition.setCategoryId(Long.parseLong(categoryId));
   }
   condition.setFromDate(fromDate);
   condition.setToDate(toDate);
   condition.setSearch(search);
 
-  // 게시글 총 갯수 조회
-  BoardDao boardDao = new BoardDao();
-  int totalCnt = boardDao.totalCnt();
-
-  // 페이징 처리
-  String pageNumStr = request.getParameter("page");
-  int pageNum = pageNumStr == null ? 1 : Integer.parseInt(pageNumStr);
-  PageHandler pageHandler = new PageHandler(pageNum, totalCnt);
-
   // 게시글 조회
-  List<BoardDto> boards = boardDao.findAll(condition, pageHandler);
+  BoardDao boardDao = new BoardDao();
+  List<BoardDto> boards = boardDao.findAll(condition);
+
+  // 게시글 총 갯수 조회
+  int totalCnt = boards.size();
+  int pageNum = pageNumStr == null ? 1 : Integer.parseInt(pageNumStr);
+  int pageSize = 10;
+
+
+  // 게시글 페이징 처리
+  int offset = (pageNum - 1) * pageSize;
+  boards = boards.stream()
+              .skip(offset)
+              .limit(pageSize)
+              .collect(Collectors.toList());
+  PageHandler pageHandler = new PageHandler(pageNum, totalCnt);
 
   // 첨부파일 여부 조회
   FileDao fileDao = new FileDao();
@@ -65,9 +77,15 @@
       <div class="search-container">
         <div class="date-container">
           <p class="date-register">등록일</p>
-          <input type="date" class="date-from" name="fromDate">
+          <input type="date"
+                 class="date-from"
+                 name="fromDate"
+                 value="<c:out value="<%=fromDate%>"/>">
           <span class="date-between"> ~ </span>
-          <input type="date" class="date-to" name="toDate">
+          <input type="date"
+                 class="date-to"
+                 name="toDate"
+                 value="<c:out value="<%=toDate%>"/>">
         </div>
         <div class="condition-container">
 
@@ -78,11 +96,14 @@
           %>
 
           <select name="categoryId" class="condition-category">
-            <option value="" selected>전체 카테고리</option>
+            <option value="">전체 카테고리</option>
             <c:forEach items="<%=categories%>" var="categoryMap">
               <optgroup label="${categoryMap.key}">
                 <c:forEach items="${categoryMap.value}" var="category">
-                  <option value="${category.categoryId}">${category.name}</option>
+                <option value="${category.categoryId}"
+                  <c:if test="${category.categoryId == param.get('categoryId')}">selected</c:if>>
+                  ${category.name}
+                </option>
                 </c:forEach>
               </optgroup>
             </c:forEach>
@@ -90,6 +111,7 @@
           <input type="text"
                  name="search"
                  class="condition-search"
+                 value="<c:out value="<%=search%>"/>"
                  placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)">
           <button type="submit" class="condition-submit">검색</button>
         </div>
@@ -136,40 +158,52 @@
     </div>
 
     <div class="paging-container" >
-      <c:if test="<%=pageHandler.isPrevious()%>">
-        <c:url value="boardList.jsp" var="prevTotalPage">
-          <c:param name="page" value="<%=String.valueOf(pageHandler.getBeginPage() - 1)%>"/>
-        </c:url>
-        <a href="${prevTotalPage}" class="paging-prev-total"><<</a>
-      </c:if>
+      <div class="paging-prev-total-container">
+        <c:if test="<%=pageHandler.isPrevious()%>">
+          <c:url value="boardList.jsp" var="prevTotalPage">
+            <c:param name="page" value="<%=String.valueOf(pageHandler.getBeginPage() - 1)%>"/>
+          </c:url>
+          <a href="${prevTotalPage}" class="paging-prev-total"><<</a>
+        </c:if>
+      </div>
 
-      <c:if test="<%=pageHandler.getPage() != pageHandler.getBeginPage()%>">
-        <c:url value="boardList.jsp" var="prevPage">
-          <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() - 1)%>"/>
-        </c:url>
-        <a href="${prevPage}" class="paging-prev"><</a>
-      </c:if>
+      <div class="paging-prev-container">
+        <c:if test="<%=pageHandler.getPage() != pageHandler.getBeginPage()%>">
+          <c:url value="boardList.jsp" var="prevPage">
+            <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() - 1)%>"/>
+          </c:url>
+          <a href="${prevPage}" class="paging-prev"><</a>
+        </c:if>
+      </div>
 
-      <c:forEach begin="<%=pageHandler.getBeginPage()%>" end="<%=pageHandler.getMaxPage()%>" varStatus="status">
-        <c:url value="boardList.jsp" var="nowPage">
-          <c:param name="page" value="<%=String.valueOf(pageHandler.getPage())%>"/>
-        </c:url>
-        <a href="${nowPage}" class="paging-page">${status.index}</a>
-      </c:forEach>
+      <div class="paging-index-container">
+        <c:forEach begin="<%=pageHandler.getBeginPage()%>" end="<%=pageHandler.getMaxPage()%>" varStatus="status">
+          <c:url value="boardList.jsp" var="nowPage">
+            <c:param name="page" value="${status.index}"/>
+          </c:url>
+          <a href="${nowPage}" class="paging-page">${status.index}</a>
+        </c:forEach>
+      </div>
 
-      <c:if test="<%=pageHandler.getPage() != pageHandler.getEndPage()%>">
-        <c:url value="boardList.jsp" var="nextPage">
-          <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() + 1)%>"/>
-        </c:url>
-        <a href="${nextPage}" class="paging-next">></a>
-      </c:if>
+      <div class="paging-next-container">
+        <c:if test="<%=pageHandler.getPage() != pageHandler.getEndPage()%>">
+          <c:url value="boardList.jsp" var="nextPage">
+            <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() + 1)%>"/>
+          </c:url>
+          <a href="${nextPage}" class="paging-next">></a>
+        </c:if>
+      </div>
 
-      <c:if test="<%=pageHandler.isNext()%>">
-        <c:url value="boardList.jsp" var="nextTotalPage">
-          <c:param name="page" value="<%=String.valueOf(pageHandler.getMaxPage() + 1)%>"/>
-        </c:url>
-        <a href="${nextTotalPage}" class="paging-next-total">>></a>
-      </c:if>
+      <div class="paging-next-total-container">
+        <c:if test="<%=pageHandler.isNext()%>">
+          <c:url value="boardList.jsp" var="nextTotalPage">
+            <c:param name="page" value="<%=String.valueOf(pageHandler.getMaxPage() + 1)%>"/>
+          </c:url>
+          <a href="${nextTotalPage}" class="paging-next-total">>></a>
+        </c:if>
+      </div>
+
+
     </div>
 
     <div class="board-register-container">
@@ -186,6 +220,16 @@
     </div>
 
   </div>
+
+  <%-- 게시글 삭제시 alert 호출 --%>
+  <c:if test="${removeMsg != null}">
+    <script>
+      alert('${removeMsg}');
+    </script>
+    <%
+      session.removeAttribute("removeMsg");
+    %>
+  </c:if>
 
   </body>
 

@@ -14,7 +14,6 @@ class PageHandlerTest {
         assertEquals(10, pageHandler.getEndPage());
         assertFalse(pageHandler.isPrevious());
         assertTrue(pageHandler.isNext());
-        assertEquals(10, pageHandler.getOffset());
 
         PageHandler pageHandler2 = new PageHandler(12, 125);
         assertEquals(11, pageHandler2.getBeginPage());
@@ -22,6 +21,5 @@ class PageHandlerTest {
         assertEquals(13, pageHandler2.getEndPage());
         assertTrue(pageHandler2.isPrevious());
         assertFalse(pageHandler2.isNext());
-        assertEquals(110, pageHandler2.getOffset());
     }
 }

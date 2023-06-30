@@ -11,6 +11,8 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.io.File" %>
+<%@ page import="com.study.util.StringUtil" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ page contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -37,8 +39,6 @@
         response.sendRedirect("/board/register.jsp");
         return;
     }
-
-    // 게시글 등록
     Long categoryId = Long.parseLong(multi.getParameter("categoryId"));
     String writer = multi.getParameter("writer");
     String password = multi.getParameter("password");
@@ -52,13 +52,21 @@
     boardDto.setContent(content);
     boardDto.setPassword(password);
 
+    String pageStr = StringUtil.nvl(request.getParameter("page"));
+    String search = StringUtil.nvl(request.getParameter("search"));
+    String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
+    String toDate = StringUtil.nvl(request.getParameter("toDate"));
+
     // 게시글 유효성 검증
+    String queryString = "?search=" + URLEncoder.encode(search) + "&categoryId=" + categoryId +
+            "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
     if (!BoardValidationUtil.validBoard(boardDto)) {
       session.setAttribute("board", boardDto);
-      response.sendRedirect("/board/register.jsp");
+      response.sendRedirect("/board/register.jsp" + queryString);
       return;
     }
 
+    // 게시글 등록
     BoardDao boardDao = new BoardDao();
     long boardId = boardDao.register(boardDto);
 
@@ -78,22 +86,26 @@
         fileDao.save(fileDto);
       }
     }
+
+    response.sendRedirect("/board/boardList.jsp" + queryString);
+    return;
   }
 
   // 게시글 검색 조건 (조건 유지하며 페이지 이동)
-  String pageStr = request.getParameter("page");
-  String search = request.getParameter("search");
-  String categoryId = request.getParameter("categoryId");
-  String fromDate = request.getParameter("fromDate");
-  String toDate = request.getParameter("toDate");
+  String pageStr = StringUtil.nvl(request.getParameter("page"));
+  String search = StringUtil.nvl(request.getParameter("search"));
+  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
+  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
+  String toDate = StringUtil.nvl(request.getParameter("toDate"));
 %>
 
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>글 작성</title>
-    <link rel="stylesheet" href="/resources/css/board/register.css">
-    <script src="/resources/js/board/register.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board/register.css">
+    <script src="${pageContext.request.contextPath}/resources/js/board/register.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/board/boardValidation.js"></script>
   </head>
 
     <body>
@@ -235,6 +247,12 @@
           </div>
 
         </div>
+
+        <%--검색조건 유지--%>
+        <input type="hidden" name="search" value="<c:out value="<%=search%>"/>">
+        <input type="hidden" name="fromDate" value="<c:out value="<%=fromDate%>"/>">
+        <input type="hidden" name="toDate" value="<c:out value="<%=toDate%>"/>">
+        <input type="hidden" name="page" value="<c:out value="<%=pageStr%>"/>">
 
       </form>
 

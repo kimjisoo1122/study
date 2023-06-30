@@ -37,14 +37,30 @@ public class FileDao {
         return fileId;
     }
 
-    public int delete(long fileId) {
+    public int delete(Long fileId) {
         String sql = "delete from file where file_id = ?";
 
         int deletedRowCnt = 0;
         try (
                 Connection conn = ConnectionUtil.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setLong(1, fileId);
+            deletedRowCnt = pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return deletedRowCnt;
+    }
+
+    public int deleteByBoardId(Long boardId) {
+        String sql = "delete from file where board_id = ?";
+
+        int deletedRowCnt = 0;
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, boardId);
             deletedRowCnt = pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -3,7 +3,6 @@ package com.study.dao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.util.ConnectionUtil;
-import com.study.util.PageHandler;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -196,11 +195,7 @@ public class BoardDao {
      * @param condition
      * @return
      */
-    public List<BoardDto> findAll(BoardSearchCondition condition, PageHandler pageHandler) {
-        if (condition == null) {
-            condition = new BoardSearchCondition();
-        }
-
+    public List<BoardDto> findAll(BoardSearchCondition condition) {
         StringBuilder sb = new StringBuilder();
         sb.append(
                 "select b.board_id, b.category_id, c.name as category_name," +
@@ -213,7 +208,8 @@ public class BoardDao {
         List<String> pstmtList = new ArrayList<>();
 
         // 기간검색 조건 없을시 기본 1년간 체크
-        if (condition.getFromDate().isEmpty() && condition.getToDate().isEmpty()) {
+        if ((condition.getFromDate() == null || condition.getFromDate().isEmpty())
+                && (condition.getToDate() == null || condition.getToDate().isEmpty())) {
             LocalDate now = LocalDate.now();
             LocalDate oneYearAgo = now.minusYears(1);
             condition.setFromDate(oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
@@ -231,7 +227,7 @@ public class BoardDao {
         }
 
         // 검색어 조건
-        if (!condition.getSearch().isEmpty()) {
+        if (condition.getSearch() != null || !condition.getSearch().isEmpty()) {
             sb.append(" (b.writer like ? or b.title like ? or b.content like ?) and");
             String search = "%" + condition.getSearch() + "%";
             linkedHashMap.put("search", search);
@@ -239,8 +235,9 @@ public class BoardDao {
 
         // 마지막 and를 제거한다
         String sql = sb.substring(0, sb.length() - 3) + " order by b.create_date desc";
-        // 페이징 처리로 sql 완료
-        sql += " limit " + pageHandler.getLimit() + " offset " + pageHandler.getOffset();
+//        // 페이징 처리로 sql 완료
+//        int offset = condition.getOffset() == 0 ? 10 : condition.getOffset();
+//        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
 
         try (
                 Connection conn = ConnectionUtil.getConnection();

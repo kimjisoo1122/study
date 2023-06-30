@@ -117,3 +117,81 @@
   border: 1px solid black;
 }
 
+.remove-modal-bg {
+  background-color: rgba(0,0,0,0.4);
+  display: none;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 1;
+  width: 100%;
+}
+
+.remove-modal-bg .required-star {
+  color: red;
+  margin-bottom: 5px;
+}
+
+.remove-modal {
+  background: white;
+  width: 500px;
+  border: 1px solid black;
+  margin: 15% auto;
+  padding: 20px;
+}
+
+.remove-password-container {
+  display: flex;
+  border: 1px solid black;
+}
+
+.remove-password-title {
+  align-items: center;
+  background: lightgray;
+  display: flex;
+  font-size: 13px;
+  padding-left: 10px;
+  width: 100px;
+}
+.remove-password-input-container {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  margin: 5px 0;
+}
+
+.remove-password-input {
+  margin-left: 5px;
+  width: 80%;
+  padding: 5px;
+}
+
+.remove-password-input-error {
+  color: red;
+  display: none;
+  font-size: 12px;
+  flex-basis: 100%;
+  margin-left: 5px;
+}
+
+.remove-button-container {
+  align-items: center;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.remove-button-container button {
+  border: 1px solid black;
+  cursor: pointer;
+  width: 70px;
+}
+
+.remove-button-submit {
+  background-color: grey;
+  color: white;
+}

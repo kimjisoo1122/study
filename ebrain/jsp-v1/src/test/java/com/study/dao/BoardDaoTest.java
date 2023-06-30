@@ -2,7 +2,6 @@ package com.study.dao;
 
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
-import com.study.util.PageHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -114,7 +113,9 @@ class BoardDaoTest {
         BoardSearchCondition condition = new BoardSearchCondition();
         condition.setCategoryId(1L);
         condition.setSearch("작성자");
-        List<BoardDto> all = boardDao.findAll(condition, new PageHandler(1, 10));
+        condition.setOffset(0);
+        condition.setLimit(10);
+        List<BoardDto> all = boardDao.findAll(condition);
         assertNotEquals(0, all.size());
 
         // 게시글 롤백

@@ -7,9 +7,66 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.study.dao.ReplyDao" %>
 <%@ page import="com.study.dto.ReplyDto" %>
+<%@ page import="com.study.util.StringUtil" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" %>
 
 <%
+  if (request.getMethod().equalsIgnoreCase("post")) {
+    request.setCharacterEncoding("utf-8");
+
+    Long boardId = Long.parseLong(request.getParameter("boardId"));
+    String password = StringUtil.nvl(request.getParameter("removePassword"));
+    String pageStr = StringUtil.nvl(request.getParameter("page"));
+    String search = StringUtil.nvl(request.getParameter("search"));
+    String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
+    String toDate = StringUtil.nvl(request.getParameter("toDate"));
+    String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
+
+
+    // 게시글 조회
+    BoardDao boardDao = new BoardDao();
+    BoardDto board = boardDao.findById(boardId);
+
+    String queryString = "?search=" + URLEncoder.encode(search) + "&categoryId=" + categoryId +
+            "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
+
+    // 비밀번호 검증
+    if (board.getPassword().equals(password)) {
+        // 파일 삭제
+        FileDao fileDao = new FileDao();
+        List<FileDto> fileList = fileDao.findByBoardId(boardId);
+        for (FileDto fileDto : fileList) {
+          File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
+          if (regisetdFile.exists()) {
+            if (regisetdFile.delete()) {
+              fileDao.delete(fileDto.getFileId());
+            }
+          }
+        }
+
+      // 댓글 삭제
+      ReplyDao replyDao = new ReplyDao();
+      replyDao.deleteByBoardId(boardId);
+
+      // 게시글 삭제
+      int deletedRowCnt = boardDao.delete(boardId);
+      if (deletedRowCnt > 0) {
+
+        session.setAttribute("removeMsg", "게시글을 삭제하였습니다.");
+        response.sendRedirect("/board/boardList.jsp" + queryString);
+        return;
+      }
+    }
+    session.setAttribute("removeErrMsg", "게시글 삭제에 실패하였습니다.");
+    String addQueryString = "&boardId=" + boardId;
+    queryString += addQueryString;
+    response.sendRedirect("/board/board.jsp" + queryString);
+
+    return;
+  }
+
   Long boardId = Long.parseLong(request.getParameter("boardId"));
   BoardDao boardDao = new BoardDao();
 
@@ -30,11 +87,11 @@
   List<ReplyDto> replies = replyDao.findByBoardId(boardId);
 
   // 게시글 검색 조건 (조건 유지하며 페이지 이동)
-  String pageStr = request.getParameter("page");
-  String search = request.getParameter("search");
-  String categoryId = request.getParameter("categoryId");
-  String fromDate = request.getParameter("fromDate");
-  String toDate = request.getParameter("toDate");
+  String pageStr = StringUtil.nvl(request.getParameter("page"));
+  String search = StringUtil.nvl(request.getParameter("search"));
+  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
+  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
+  String toDate = StringUtil.nvl(request.getParameter("toDate"));
 %>
 
 <html>
@@ -108,27 +165,71 @@
           <a href="${boardList}" class="button-list-a">목록</a>
         </button>
         <button class="button-update">
-          <c:url value="boardList.jsp" var="boardList">
+          <c:url value="update.jsp" var="update">
             <c:param name="page" value="<%=pageStr%>"/>
             <c:param name="search" value="<%=search%>"/>
             <c:param name="categoryId" value="<%=categoryId%>"/>
             <c:param name="fromDate" value="<%=fromDate%>"/>
             <c:param name="toDate" value="<%=toDate%>"/>
+            <c:param name="boardId" value="<%=String.valueOf(boardId)%>"/>
           </c:url>
-          <a href="${boardList}" class="button-update-a">수정</a>
+          <a href="${update}" class="button-update-a">수정</a>
         </button>
-        <button class="button-remove">
-          <c:url value="boardList.jsp" var="boardList">
-            <c:param name="page" value="<%=pageStr%>"/>
-            <c:param name="search" value="<%=search%>"/>
-            <c:param name="categoryId" value="<%=categoryId%>"/>
-            <c:param name="fromDate" value="<%=fromDate%>"/>
-            <c:param name="toDate" value="<%=toDate%>"/>
-          </c:url>
-          <a href="${boardList}" class="button-remove-a">삭제</a>
+        <button type="button"
+                class="button-remove"
+                onclick="removeOpen()">삭제
         </button>
       </div>
 
+    </div>
+
+    <%-- 게시글 삭제실패시 alert 호출 --%>
+    <c:if test="${removeErrMsg != null}">
+      <script>
+        alert('${removeErrMsg}');
+      </script>
+      <%
+        session.removeAttribute("removeErrMsg");
+      %>
+    </c:if>
+
+    <%-- 게시글 삭제 모달 --%>
+    <div class="remove-modal-bg">
+      <div class="remove-modal">
+        <form method="post"
+              onsubmit="return validRemovePassword()">
+          <div class="remove-password-container">
+            <div class="remove-password-title">비밀번호
+              <span class="required-star">*</span>
+            </div>
+            <div class="remove-password-input-container">
+              <input type="password"
+                     name="removePassword"
+                     class="remove-password-input"
+                     onchange="validRemovePassword()">
+              <span class="remove-password-input-error">비밀번호를 입력해주세요.</span>
+            </div>
+          </div>
+          <div class="remove-button-container">
+            <button type="button"
+                    class="remove-button-cancel"
+                    onclick="removeCancel()">취소
+            </button>
+            <button type="submit"
+                    class="remove-button-submit">확인
+            </button>
+          </div>
+
+          <%--검색조건 유지--%>
+          <input type="hidden" name="boardId" value="<c:out value="<%=board.getBoardId()%>"/>">
+          <input type="hidden" name="search" value="<c:out value="<%=search%>"/>">
+          <input type="hidden" name="fromDate" value="<c:out value="<%=fromDate%>"/>">
+          <input type="hidden" name="toDate" value="<c:out value="<%=toDate%>"/>">
+          <input type="hidden" name="categoryId" value="<c:out value="<%=categoryId%>"/>">
+          <input type="hidden" name="page" value="<c:out value="<%=pageStr%>"/>">
+
+        </form>
+      </div>
     </div>
 
   </body>

@@ -129,16 +129,23 @@
   margin-right: 20px;
 }
 
-.paging-prev {
+.paging-prev, .paging-next {
   margin-right: 15px;
-}
-
-.paging-next {
-  margin-left: 15px;
 }
 
 .paging-next-total {
   margin-left: 20px;
+}
+
+.paging-prev-total-container,.paging-prev-container,
+.paging-next-container, .paging-next-total-container {
+  width: 30px;
+}
+
+.paging-index-container {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
 }
 
 .board-register-container {

@@ -53,6 +53,22 @@ public class ReplyDao {
         return deletedRowCnt;
     }
 
+    public int deleteByBoardId(Long boardId) {
+        String sql = "delete from reply where board_id = ?";
+        int deletedRowCnt = 0;
+
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, boardId);
+            deletedRowCnt = pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return deletedRowCnt;
+    }
+
     public ReplyDto findById(Long replyId) {
         String sql =
                 "select reply_id, board_id, content, " +

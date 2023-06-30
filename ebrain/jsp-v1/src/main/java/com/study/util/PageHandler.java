@@ -8,8 +8,6 @@ public class PageHandler {
     private int beginPage;
     private int endPage;
     private int maxPage;
-    private int offset;
-    private int limit;
     private boolean isPrevious;
     private boolean isNext;
 
@@ -26,9 +24,6 @@ public class PageHandler {
         endPage = Math.min((beginPage + pageSize - 1), maxPage);
         isPrevious = beginPage > 1;
         isNext = maxPage != endPage;
-
-        limit = pageSize;
-        offset = (page - 1) * pageSize;
     }
 
     public int getPage() {
@@ -61,13 +56,5 @@ public class PageHandler {
 
     public boolean isNext() {
         return isNext;
-    }
-
-    public int getOffset() {
-        return offset;
-    }
-
-    public int getLimit() {
-        return limit;
     }
 }

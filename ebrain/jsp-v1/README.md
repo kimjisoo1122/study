@@ -13,4 +13,3 @@ https://tomcat.apache.org/download-90.cgi
 ``` 
 cd help
 docker-compose up -d
-```
