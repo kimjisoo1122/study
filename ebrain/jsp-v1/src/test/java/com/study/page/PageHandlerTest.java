@@ -1,6 +1,5 @@
-package com.study.util;
+package com.study.page;
 
-import com.study.page.PageHandler;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
