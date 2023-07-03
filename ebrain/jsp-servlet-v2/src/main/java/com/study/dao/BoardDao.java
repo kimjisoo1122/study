@@ -198,10 +198,17 @@ public class BoardDao {
     public List<BoardDto> findAll(BoardSearchCondition condition) {
         StringBuilder sb = new StringBuilder();
         sb.append(
-                "select b.board_id, b.category_id, c.name as category_name," +
-                        " b.title, b.writer, b.content, b.view_cnt, b.create_date, b.update_date " +
-                "from board b join category c " +
-                "on b.category_id = c.category_id ");
+                "SELECT b.board_id, b.category_id, c.name as category_name, " +
+                        "b.title, b.writer, b.content, b.view_cnt, b.create_date, b.update_date, " +
+                        "CASE " +
+                          "WHEN f.file_id IS NOT NULL THEN true " +
+                          "ELSE false " +
+                        "END as has_file "  +
+                "FROM board b " +
+                        "JOIN category c " +
+                        "ON b.category_id = c.category_id " +
+                        "LEFT JOIN file f " +
+                        "ON b.board_id = f.board_id ");
 
         List<BoardDto> boards = new ArrayList<>();
         LinkedHashMap<String, String> linkedHashMap = new LinkedHashMap<>();
@@ -220,13 +227,13 @@ public class BoardDao {
         linkedHashMap.put("toDate", condition.getToDate());
 
         // 카테고리 조건 (기본 : all)
-        if (condition.getCategoryId() != null) {
+        if (!condition.getCategoryId().isEmpty()) {
             sb.append(" b.category_id = ? and");
             linkedHashMap.put("categoryId", String.valueOf(condition.getCategoryId()));
         }
 
         // 검색어 조건
-        if (condition.getSearch() != null || !condition.getSearch().isEmpty()) {
+        if (!condition.getSearch().isEmpty()) {
             sb.append(" (b.writer like ? or b.title like ? or b.content like ?) and");
             String search = "%" + condition.getSearch() + "%";
             linkedHashMap.put("search", search);
@@ -235,8 +242,7 @@ public class BoardDao {
         // 마지막 and를 제거한다
         String sql = sb.substring(0, sb.length() - 3) + " order by b.create_date desc";
         // 페이징 처리로 sql 완료
-        int offset = condition.getOffset() == 0 ? 10 : condition.getOffset();
-//        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
+        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
 
         try (
                 Connection conn = ConnectionUtil.getConnection();
@@ -270,15 +276,92 @@ public class BoardDao {
                     boardDto.setViewCnt(rs.getInt("view_cnt"));
                     boardDto.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
                     boardDto.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
+                    boardDto.setHasFile(rs.getBoolean("has_file"));
 
                     boards.add(boardDto);
+                }
+            }
+        } catch (SQLException e) {
+           e.printStackTrace();
+        }
+
+        return boards;
+    }
+
+    /**
+     * 게시글을 조건(카테고리,검색어,페이징)에 따라 조회한다
+     * @param condition
+     * @return
+     */
+    public int count(BoardSearchCondition condition) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select count(*) from board ");
+
+        LinkedHashMap<String, String> linkedHashMap = new LinkedHashMap<>();
+
+        // 기간검색 조건 없을시 기본 1년간 체크
+        if ((condition.getFromDate() == null || condition.getFromDate().isEmpty())
+                && (condition.getToDate() == null || condition.getToDate().isEmpty())) {
+            LocalDate now = LocalDate.now();
+            LocalDate oneYearAgo = now.minusYears(1);
+            condition.setFromDate(oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            condition.setToDate(now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+        sb.append("where ");
+        sb.append("date_format(create_date, '%Y-%m-%d') between ? and ? and");
+        linkedHashMap.put("fromDate", condition.getFromDate());
+        linkedHashMap.put("toDate", condition.getToDate());
+
+        // 카테고리 조건 (기본 : all)
+        if (!condition.getCategoryId().isEmpty()) {
+            sb.append(" category_id = ? and");
+            linkedHashMap.put("categoryId", String.valueOf(condition.getCategoryId()));
+        }
+
+        // 검색어 조건
+        if (!condition.getSearch().isEmpty()) {
+            sb.append(" (writer like ? or title like ? or content like ?) and");
+            String search = "%" + condition.getSearch() + "%";
+            linkedHashMap.put("search", search);
+        }
+
+        // 마지막 and를 제거한다
+        String sql = sb.substring(0, sb.length() - 3) + " order by create_date desc";
+        // 페이징 처리로 sql 완료
+        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
+
+        int count = 0;
+
+        try (
+                Connection conn = ConnectionUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int idx = 1;
+            for (Map.Entry<String, String> entry : linkedHashMap.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+
+                if ("search".equals(key)) {
+                    for (int i = 0; i < 3; i++) {
+                        pstmt.setString(idx++, value);
+                    }
+                } else if ("categoryId".equals(key)) {
+                    pstmt.setLong(idx++, Long.parseLong(value));
+                } else {
+                    pstmt.setString(idx++, value);
+                }
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return boards;
+        return count;
     }
 
     /**
