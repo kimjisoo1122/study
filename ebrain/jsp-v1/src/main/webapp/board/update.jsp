@@ -102,7 +102,7 @@
         FileDto fileDto = fileDao.findById(fileId);
 
         // 실제 파일 삭제
-        File uploadedFile = FileUtil.uploadedFile(fileDto.getName());
+        File uploadedFile = FileUtil.getUploadedFile(fileDto.getName());
         if (uploadedFile.exists()) {
           if (uploadedFile.delete()) {
             // 파일 db 삭제

@@ -236,7 +236,7 @@ public class BoardDao {
         String sql = sb.substring(0, sb.length() - 3) + " order by b.create_date desc";
         // 페이징 처리로 sql 완료
         int offset = condition.getOffset() == 0 ? 10 : condition.getOffset();
-        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
+//        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
 
         try (
                 Connection conn = ConnectionUtil.getConnection();

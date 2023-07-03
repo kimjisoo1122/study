@@ -87,7 +87,7 @@
       if (fileName != null) {
         // 게시글 등록 실패한 경우 업로드 파일 삭제
         if (boardId == null) {
-          File file = FileUtil.uploadedFile(fileName);
+          File file = FileUtil.getUploadedFile(fileName);
           if (file.exists()) {
             file.delete();
           }

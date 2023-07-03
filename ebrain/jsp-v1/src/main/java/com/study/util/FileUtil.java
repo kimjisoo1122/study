@@ -8,7 +8,7 @@ public interface FileUtil {
     String ENC_TYPE = "UTF-8";
     int BOARD_FILE_MAX_SIZE = 1024 * 1024 * 10;
 
-    static File uploadedFile(String fileName) {
+    static File getUploadedFile(String fileName) {
         return new File(FILE_PATH + File.separator + fileName);
     }
 }
