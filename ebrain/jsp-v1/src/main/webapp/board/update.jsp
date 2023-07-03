@@ -69,7 +69,7 @@
       return;
     }
 
-    // 게시글 업데이트
+    // TODO 게시글 업데이트 -> 트랜잭션 처리
     Map<String, String> updateMap = new HashMap<>();
     updateMap.put("writer", writer);
     updateMap.put("title", title);
@@ -93,7 +93,7 @@
       }
     }
 
-    // 파일 삭제 확인
+    // 파일 삭제
     String[] fileIds = multi.getParameterValues("fileId");
     if (fileIds != null) {
       FileDao fileDao = new FileDao();

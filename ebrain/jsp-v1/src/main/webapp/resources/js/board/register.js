@@ -1,5 +1,8 @@
 function uploadFile(thisElm) {
-  document.querySelector('.file-error').remove();
+  let elm = document.querySelector('.file-error');
+  if (elm) {
+    elm.remove();
+  }
 
   const fileName = thisElm.value.split('/').pop().split('\\').pop();
   const disabledElm = thisElm.parentElement.querySelector('input[disabled]');

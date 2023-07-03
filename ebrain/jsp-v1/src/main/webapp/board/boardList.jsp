@@ -162,15 +162,23 @@
         <c:if test="<%=pageHandler.isPrevious()%>">
           <c:url value="boardList.jsp" var="prevTotalPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getBeginPage() - 1)%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
           </c:url>
           <a href="${prevTotalPage}" class="paging-prev-total"><<</a>
         </c:if>
       </div>
 
       <div class="paging-prev-container">
-        <c:if test="<%=pageHandler.getPage() != pageHandler.getBeginPage()%>">
+        <c:if test="<%=totalCnt != 0 && pageHandler.getPage() != pageHandler.getBeginPage()%>">
           <c:url value="boardList.jsp" var="prevPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() - 1)%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
           </c:url>
           <a href="${prevPage}" class="paging-prev"><</a>
         </c:if>
@@ -180,15 +188,23 @@
         <c:forEach begin="<%=pageHandler.getBeginPage()%>" end="<%=pageHandler.getMaxPage()%>" varStatus="status">
           <c:url value="boardList.jsp" var="nowPage">
             <c:param name="page" value="${status.index}"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
           </c:url>
           <a href="${nowPage}" class="paging-page">${status.index}</a>
         </c:forEach>
       </div>
 
       <div class="paging-next-container">
-        <c:if test="<%=pageHandler.getPage() != pageHandler.getEndPage()%>">
+        <c:if test="<%=totalCnt != 0 && pageHandler.getPage() != pageHandler.getEndPage()%>">
           <c:url value="boardList.jsp" var="nextPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() + 1)%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
           </c:url>
           <a href="${nextPage}" class="paging-next">></a>
         </c:if>
@@ -198,6 +214,10 @@
         <c:if test="<%=pageHandler.isNext()%>">
           <c:url value="boardList.jsp" var="nextTotalPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getMaxPage() + 1)%>"/>
+            <c:param name="search" value="<%=search%>"/>
+            <c:param name="categoryId" value="<%=categoryId%>"/>
+            <c:param name="fromDate" value="<%=fromDate%>"/>
+            <c:param name="toDate" value="<%=toDate%>"/>
           </c:url>
           <a href="${nextTotalPage}" class="paging-next-total">>></a>
         </c:if>

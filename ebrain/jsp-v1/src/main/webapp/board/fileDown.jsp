@@ -28,12 +28,11 @@
 
     try (OutputStream os = response.getOutputStream()) {
       int length;
-      byte[] buffer = new byte[(int)file.length()];
+      byte[] buffer = new byte[1024];
       while ((length = is.read(buffer)) > 0) {
-        os.write(buffer, 0 ,length);
+        os.write(buffer, 0, length);
       }
     }
-
   } catch (FileNotFoundException e) {
     e.printStackTrace();
   }

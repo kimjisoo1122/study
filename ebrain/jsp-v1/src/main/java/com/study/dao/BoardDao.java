@@ -205,7 +205,6 @@ public class BoardDao {
 
         List<BoardDto> boards = new ArrayList<>();
         LinkedHashMap<String, String> linkedHashMap = new LinkedHashMap<>();
-        List<String> pstmtList = new ArrayList<>();
 
         // 기간검색 조건 없을시 기본 1년간 체크
         if ((condition.getFromDate() == null || condition.getFromDate().isEmpty())
