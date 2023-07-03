@@ -1,0 +1,166 @@
+.boardlist-container {
+  border: 1px solid black;
+  font-size: 14px;
+  margin: 150px auto;
+  padding: 20px;
+  width: 1000px;
+}
+
+.search-container {
+  align-items: center;
+  border: 1px solid black;
+  display: flex;
+  padding: 10px;
+  height: 40px;
+}
+
+.date-container {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.condition-container {
+  display: flex;
+  flex-grow: 1;
+  margin-left: 20px;
+}
+
+.condition-category {
+  padding: 0 5px;
+}
+
+.condition-search {
+  flex-basis: 70%;
+  margin: 0 10px;
+  padding: 0 5px;
+}
+
+.condition-submit {
+  background-color: grey;
+  border: 1px solid black;
+  color: white;
+  width: 50px;
+  cursor: pointer;
+}
+
+.total-board {
+  font-size: 12px;
+}
+
+.list-container {
+  margin-bottom: 30px;
+}
+
+.list-header {
+  align-items: center;
+  border-bottom: 2px solid black;
+  border-top: 1px solid #eee;
+  display: flex;
+  font-weight: bold;
+  height: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.list-category {
+  width: 15%;
+}
+
+.list-title {
+  width: 45%;
+}
+
+.list-writer {
+  width: 5%;
+  margin-right: 15px;
+}
+
+.list-view {
+  width: 5%;
+}
+
+.list-create {
+  width: 15%;
+  margin-left: 10px;
+}
+
+.list-update {
+  width: 15%;
+}
+
+.list-board-container {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-bottom: 1px solid black;
+  padding: 5px 0;
+}
+
+.list-board-container a {
+  color: black;
+}
+
+.list-board-container .list-title {
+  text-align: left;
+  margin-left: -10px;
+}
+
+.list-title-file {
+  color: cornflowerblue;
+}
+
+.paging-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.paging-container a {
+  color: black;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.paging-prev-total {
+  margin-right: 20px;
+}
+
+.paging-prev, .paging-next {
+  margin-right: 15px;
+}
+
+.paging-next-total {
+  margin-left: 20px;
+}
+
+.paging-prev-total-container,.paging-prev-container,
+.paging-next-container, .paging-next-total-container {
+  width: 30px;
+}
+
+.paging-index-container {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.board-register-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.board-register-button {
+  background-color: grey;
+  border: 1px solid black;
+  width: 50px;
+}
+
+.board-register-button a {
+  color: white;
+  text-decoration: none;
+}

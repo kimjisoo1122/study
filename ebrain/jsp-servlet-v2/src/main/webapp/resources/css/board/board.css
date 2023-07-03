@@ -1,0 +1,198 @@
+.board-container {
+  border: 1px solid black;
+  font-size: 14px;
+  margin: 150px auto;
+  padding: 20px;
+  width: 1000px;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100px;
+  border-bottom: 2px solid black;
+}
+
+.header-top-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-title-container {
+  align-items: center;
+  display: flex;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: normal;
+  margin-left: 20px;
+}
+
+.header-date-container {
+  display: flex;
+  gap: 10px;
+}
+
+.header-bottom-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-container {
+  margin: 10px 0;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.file-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.reply-container {
+  background-color: antiquewhite;
+  padding: 10px;
+}
+
+.reply {
+  border-bottom: 1px solid black;
+  padding: 10px 0;
+}
+
+.reply-date {
+  font-size: 12px;
+}
+
+.reply-register-container {
+  height: 100px;
+}
+
+.reply-register-input {
+  font-size: 12px;
+  height: 50px;
+  margin-top: 10px;
+  padding: 0 10px;
+  width: 91%;
+}
+
+.reply-register-input::placeholder {
+  color: #ccc;
+}
+
+.reply-register-button {
+  background-color: white;
+  border: 1px solid black;
+  cursor: pointer;
+  height: 50px;
+  margin-left: 10px;
+  width: 70px;
+}
+
+.button-container {
+  border-top: 1px solid black;
+  padding-top: 10px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.button-container button {
+  cursor: pointer;
+  width: 70px;
+}
+
+.button-container button a {
+  text-decoration: none;
+  color: black;
+}
+
+.button-list {
+  background-color: grey;
+  border: 1px solid black;
+}
+
+.remove-modal-bg {
+  background-color: rgba(0,0,0,0.4);
+  display: none;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 1;
+  width: 100%;
+}
+
+.remove-modal-bg .required-star {
+  color: red;
+  margin-bottom: 5px;
+}
+
+.remove-modal {
+  background: white;
+  width: 500px;
+  border: 1px solid black;
+  margin: 15% auto;
+  padding: 20px;
+}
+
+.remove-password-container {
+  display: flex;
+  border: 1px solid black;
+}
+
+.remove-password-title {
+  align-items: center;
+  background: lightgray;
+  display: flex;
+  font-size: 13px;
+  padding-left: 10px;
+  width: 100px;
+}
+
+.remove-password-input-container {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  margin: 5px 0;
+}
+
+.remove-password-input {
+  margin-left: 5px;
+  width: 80%;
+  padding: 5px;
+}
+
+.remove-password-input-error {
+  color: red;
+  display: none;
+  font-size: 12px;
+  flex-basis: 100%;
+  margin-left: 5px;
+}
+
+.remove-button-container {
+  align-items: center;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.remove-button-container button {
+  border: 1px solid black;
+  cursor: pointer;
+  width: 70px;
+}
+
+.remove-button-submit {
+  background-color: grey;
+  color: white;
+}

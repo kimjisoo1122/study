@@ -1,0 +1,6 @@
+.idea
+build
+.gradle
+
+/src/main/webapp/WEB-INF/upload/
+/src/main/webapp/WEB-INF/lib/
