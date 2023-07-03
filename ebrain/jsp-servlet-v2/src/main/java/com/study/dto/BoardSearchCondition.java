@@ -1,7 +1,9 @@
 package com.study.dto;
 
 import com.study.util.StringUtil;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
 

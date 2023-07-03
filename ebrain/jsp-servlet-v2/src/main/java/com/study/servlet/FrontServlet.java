@@ -1,7 +1,6 @@
 package com.study.servlet;
 
 import com.study.servlet.board.BoardListHandler;
-import com.study.servlet.board.Handler;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,12 +14,15 @@ import java.util.Map;
 @WebServlet("/board/*")
 public class FrontServlet extends HttpServlet {
 
-    private Map<String, Handler> requestHandlerMap;
+    private Map<String, ServletHandler> requestHandlerMap;
 
     @Override
     public void init() throws ServletException {
-        HashMap<String, Handler> map = new HashMap<>();
+        HashMap<String, ServletHandler> map = new HashMap<>();
         map.put("/board", new BoardListHandler());
+        map.put("/board/register", new BoardListHandler());
+        map.put("/board/update", new BoardListHandler());
+        map.put("/board/delete", new BoardListHandler());
 
         requestHandlerMap = map;
     }
@@ -36,8 +38,11 @@ public class FrontServlet extends HttpServlet {
 
         // TODO GET요청과 POST요청 구분
         String requestURI = request.getRequestURI();
-        Handler handler = requestHandlerMap.get(requestURI);
-        handler.handle(request, response);
+        ServletHandler handler = requestHandlerMap.get(requestURI);
+        if (handler == null) {
+            handler = new BoardListHandler();
+        }
+        handler.getHandle(request, response);
     }
 
     @Override

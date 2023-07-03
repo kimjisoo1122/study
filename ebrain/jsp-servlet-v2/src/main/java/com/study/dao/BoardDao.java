@@ -293,7 +293,7 @@ public class BoardDao {
      * @param condition
      * @return
      */
-    public int count(BoardSearchCondition condition) {
+    public int getTotalCnt(BoardSearchCondition condition) {
         StringBuilder sb = new StringBuilder();
         sb.append("select count(*) from board ");
 

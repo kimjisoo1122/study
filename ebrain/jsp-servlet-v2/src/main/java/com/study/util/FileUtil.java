@@ -11,4 +11,12 @@ public interface FileUtil {
     static File getUploadedFile(String fileName) {
         return new File(FILE_PATH + File.separator + fileName);
     }
+
+    static boolean checkUploadPath() {
+        File uploadFolder = new File(FileUtil.FILE_PATH);
+        if (!uploadFolder.exists()) {
+            return uploadFolder.mkdirs();
+        }
+        return true;
+    }
 }
