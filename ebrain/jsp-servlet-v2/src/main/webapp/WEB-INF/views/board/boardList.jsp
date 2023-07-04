@@ -1,27 +1,25 @@
-<%@ page import="com.study.dao.BoardDao" %>
 <%@ page import="com.study.dto.BoardSearchCondition" %>
 <%@ page import="com.study.dto.BoardDto" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.study.dao.CategoryDao" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.study.dto.CategoryDto" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="com.study.page.PageHandler" %>
-<%@ page import="com.study.dao.FileDao" %>
-<%@ page import="com.study.util.StringUtil" %>
-<%@ page import="java.util.stream.Collectors" %>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
   List<BoardDto> boards = (List<BoardDto>) request.getAttribute("boards");
   PageHandler pageHandler = (PageHandler) request.getAttribute("pageHandler");
   BoardSearchCondition condition = (BoardSearchCondition) request.getAttribute("condition");
+  Set<Map.Entry<String, List<CategoryDto>>> categories =
+          (Set<Map.Entry<String, List<CategoryDto>>>) request.getAttribute("categories");
 %>
-
 
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>게시글 목록</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board/boardList.css">
     <script src="${pageContext.request.contextPath}/resources/js/board/boardList.js"></script>
@@ -46,19 +44,13 @@
         </div>
         <div class="condition-container">
 
-          <%-- 카테고리 조회 --%>
-          <%
-            CategoryDao categoryDao = new CategoryDao();
-            Set<Map.Entry<String, List<CategoryDto>>> categories = categoryDao.findAll().entrySet();
-          %>
-
-          <select name="categoryId" class="condition-category">
+          <select name="searchCategory" class="condition-category">
             <option value="">전체 카테고리</option>
             <c:forEach items="<%=categories%>" var="categoryMap">
               <optgroup label="${categoryMap.key}">
                 <c:forEach items="${categoryMap.value}" var="category">
                 <option value="${category.categoryId}"
-                  <c:if test="${category.categoryId == param.get('categoryId')}">selected</c:if>>
+                  <c:if test="${category.categoryId == param.get('searchCategory')}">selected</c:if>>
                   ${category.name}
                 </option>
                 </c:forEach>
@@ -96,13 +88,10 @@
             <c:if test="${board.hasFile}">
               <span class="list-title-file">File</span>
             </c:if>
-            <c:url value="board.jsp" var="boardUrl">
+            <c:url value="/board/board" var="boardUrl">
               <c:param name="boardId" value="${board.boardId}"/>
               <c:param name="page" value="<%=String.valueOf(pageHandler.getPage())%>"/>
-              <c:param name="search" value="<%=condition.getSearch()%>"/>
-              <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-              <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-              <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+              <%@include file="condition/conditionParam.jsp"%>
             </c:url>
             <a href="${boardUrl}" class="list-title-a">${board.title}</a>
           </div>
@@ -117,66 +106,51 @@
     <div class="paging-container" >
       <div class="paging-prev-total-container">
         <c:if test="<%=pageHandler.isPrevious()%>">
-          <c:url value="boardList.jsp" var="prevTotalPage">
+          <c:url value="/board" var="prevTotalPageUrl">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getBeginPage() - 1)%>"/>
-            <c:param name="search" value="<%=condition.getSearch()%>"/>
-            <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-            <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-            <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${prevTotalPage}" class="paging-prev-total"><<</a>
+          <a href="${prevTotalPageUrl}" class="paging-prev-total"><<</a>
         </c:if>
       </div>
 
       <div class="paging-prev-container">
         <c:if test="<%=pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()%>">
-          <c:url value="/board" var="prevPage">
+          <c:url value="/board" var="prevPageUrl">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() - 1)%>"/>
-            <c:param name="search" value="<%=condition.getSearch()%>"/>
-            <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-            <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-            <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${prevPage}" class="paging-prev"><</a>
+          <a href="${prevPageUrl}" class="paging-prev"><</a>
         </c:if>
       </div>
 
       <div class="paging-index-container">
         <c:forEach begin="<%=pageHandler.getBeginPage()%>" end="<%=pageHandler.getMaxPage()%>" varStatus="status">
-          <c:url value="/board" var="nowPage">
+          <c:url value="/board" var="nowPageUrl">
             <c:param name="page" value="${status.index}"/>
-            <c:param name="search" value="<%=condition.getSearch()%>"/>
-            <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-            <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-            <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${nowPage}" class="paging-page">${status.index}</a>
+          <a href="${nowPageUrl}" class="paging-page">${status.index}</a>
         </c:forEach>
       </div>
 
       <div class="paging-next-container">
         <c:if test="<%=pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()%>">
-          <c:url value="/board" var="nextPage">
+          <c:url value="/board" var="nextPageUrl">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() + 1)%>"/>
-            <c:param name="search" value="<%=condition.getSearch()%>"/>
-            <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-            <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-            <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${nextPage}" class="paging-next">></a>
+          <a href="${nextPageUrl}" class="paging-next">></a>
         </c:if>
       </div>
 
       <div class="paging-next-total-container">
         <c:if test="<%=pageHandler.isNext()%>">
-          <c:url value="/board" var="nextTotalPage">
+          <c:url value="/board" var="nextTotalPageUrl">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getMaxPage() + 1)%>"/>
-            <c:param name="search" value="<%=condition.getSearch()%>"/>
-            <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-            <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-            <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${nextTotalPage}" class="paging-next-total">>></a>
+          <a href="${nextTotalPageUrl}" class="paging-next-total">>></a>
         </c:if>
       </div>
 
@@ -185,14 +159,11 @@
 
     <div class="board-register-container">
       <button class="board-register-button">
-        <c:url value="/board/register" var="register">
+        <c:url value="/board/register" var="registerFormUrl">
           <c:param name="page" value="<%=String.valueOf(pageHandler.getPage())%>"/>
-          <c:param name="search" value="<%=condition.getSearch()%>"/>
-          <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
-          <c:param name="fromDate" value="<%=condition.getFromDate()%>"/>
-          <c:param name="toDate" value="<%=condition.getToDate()%>"/>
+          <%@include file="condition/conditionParam.jsp"%>
         </c:url>
-        <a href="${register}">등록</a>
+        <a href="${registerFormUrl}">등록</a>
       </button>
     </div>
 

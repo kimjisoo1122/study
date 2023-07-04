@@ -1,144 +1,22 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="com.study.util.StringUtil" %>
-<%@ page import="com.study.dao.BoardDao" %>
 <%@ page import="com.study.dto.BoardDto" %>
 <%@ page import="com.study.dto.FileDto" %>
-<%@ page import="com.study.dao.FileDao" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.io.IOException" %>
-<%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
-<%@ page import="com.oreilly.servlet.MultipartRequest" %>
-<%@ page import="java.io.File" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="com.study.validation.BoardValidation" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="com.study.util.FileUtil" %>
+<%@ page import="com.study.dto.BoardSearchCondition" %>
+<%@ page import="java.util.Optional" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%
-  if (request.getMethod().equalsIgnoreCase("post")) {
-    request.setCharacterEncoding("UTF-8");
-
-    // MULTIPART 설정
-    File uploadFolder = new File(FileUtil.FILE_PATH);
-    if (!uploadFolder.exists()) {
-      uploadFolder.mkdirs();
-    }
-    MultipartRequest multi = null;
-    try {
-      multi = new MultipartRequest(request, FileUtil.FILE_PATH, FileUtil.BOARD_FILE_MAX_SIZE, FileUtil.ENC_TYPE,
-              new DefaultFileRenamePolicy());
-    } catch (IOException e) {
-      e.printStackTrace();
-      // 파일사이즈 초과
-      session.setAttribute("fileError", "파일사이즈는 10MB를 넘을 수 없습니다.");
-      response.sendRedirect("/board/update.jsp");
-      return;
-    }
-
-    // 업데이트 정보 파싱
-    String writer = multi.getParameter("writer");
-    String title = multi.getParameter("title");
-    String content = multi.getParameter("content");
-    String password = multi.getParameter("password");
-    Long boardId = Long.parseLong(multi.getParameter("boardId"));
-
-    // 검색조건 파싱
-    String fromDate = multi.getParameter("fromDate");
-    String toDate = multi.getParameter("toDate");
-    String categoryId = multi.getParameter("categoryId");
-    String search = multi.getParameter("search");
-    String pageStr = multi.getParameter("page");
-    String queryString = "?boardId=" + boardId + "&search=" + URLEncoder.encode(search)
-            + "&categoryId=" + categoryId + "&fromDate=" + fromDate + "&toDate=" + toDate + "&page=" + pageStr;
-
-    // 원글 조회
-    BoardDao boardDao = new BoardDao();
-    BoardDto findBoard = boardDao.findById(boardId);
-    findBoard.setWriter(writer);
-    findBoard.setTitle(title);
-    findBoard.setContent(content);
-
-    // 게시글 유효성 검증
-    if (!password.equals(findBoard.getPassword())
-            || !BoardValidation.validBoard(findBoard) ) {
-      session.setAttribute("board", findBoard);
-      response.sendRedirect("/board/update.jsp" + queryString);
-      return;
-    }
-
-    // TODO 게시글 업데이트 -> 트랜잭션 처리
-    Map<String, String> updateMap = new HashMap<>();
-    updateMap.put("writer", writer);
-    updateMap.put("title", title);
-    updateMap.put("content", content);
-    boardDao.update(updateMap, boardId);
-
-    // 파일 db 저장
-    Enumeration fileInputs = multi.getFileNames();
-    while (fileInputs.hasMoreElements()) {
-      String fileInput = (String) fileInputs.nextElement();
-      String fileName = multi.getFilesystemName(fileInput);
-      String originalFileName = multi.getOriginalFileName(fileInput);
-      if (fileName != null) {
-        FileDto fileDto = new FileDto();
-        fileDto.setBoardId(boardId);
-        fileDto.setName(fileName);
-        fileDto.setPath(FileUtil.FILE_PATH);
-        fileDto.setOriginalName(originalFileName);
-        FileDao fileDao = new FileDao();
-        fileDao.save(fileDto);
-      }
-    }
-
-    // 파일 삭제
-    String[] fileIds = multi.getParameterValues("fileId");
-    if (fileIds != null) {
-      FileDao fileDao = new FileDao();
-      for (String fileIdStr : fileIds) {
-        Long fileId = Long.parseLong(fileIdStr);
-        FileDto fileDto = fileDao.findById(fileId);
-
-        // 실제 파일 삭제
-        File uploadedFile = FileUtil.getUploadedFile(fileDto.getName());
-        if (uploadedFile.exists()) {
-          if (uploadedFile.delete()) {
-            // 파일 db 삭제
-            fileDao.delete(fileId);
-          }
-        }
-      }
-    }
-
-    response.sendRedirect("/board/boardList.jsp" + queryString);
-    return;
-  }
-
-  // 게시글 조회 (세션에 값이 있으면 유효성 검증 실패)
-  BoardDto board = (BoardDto) session.getAttribute("board");
-  if (board == null) {
-    Long boardId = Long.parseLong(request.getParameter("boardId"));
-    BoardDao boardDao = new BoardDao();
-    board = boardDao.findById(boardId);
-  }
-
-  // 첨부파일 조회
-  FileDao fileDao = new FileDao();
-  List<FileDto> files = fileDao.findByBoardId(board.getBoardId());
-
-  // 게시글 검색 조건 (조건 유지하며 페이지 이동)
-  String pageStr = StringUtil.nvl(request.getParameter("page"));
-  String search = StringUtil.nvl(request.getParameter("search"));
-  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
-  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
-  String toDate = StringUtil.nvl(request.getParameter("toDate"));
+  BoardDto board = (BoardDto) request.getAttribute("board");
+  List<FileDto> files = (List<FileDto>) request.getAttribute("files");
+  BoardSearchCondition condition = (BoardSearchCondition) request.getAttribute("condition");
+  String fileError = (String) Optional.ofNullable(request.getAttribute("fileError")).orElse(null);
 %>
 
 <html>
 
   <head>
+    <meta charset="UTF-8">
     <title>게시글 수정</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board/update.css">
     <script src="${pageContext.request.contextPath}/resources/js/board/update.js"></script>
@@ -174,7 +52,6 @@
             <div class="view-title">조회수</div>
             <div class="view-cnt"><c:out value="<%=board.getViewCnt()%>"/></div>
           </div>
-
 
           <div class="writer-container">
             <div class="writer-title">작성자
@@ -247,8 +124,8 @@
                 <div class="file-register-container">
                   <input type="text"
                          class="file-disabled"
-                         value="${fileError == null ? "" : fileError}"
-                         style="${fileError == null ? "color : black" : "color : red"}"
+                         value="<%=fileError == null ? "" : fileError%>"
+                         style="<%=fileError == null ? "color : black" : "color : red"%>"
                          disabled>
                   <label for="file${statue.index}" class="file-input-label">파일 찾기</label>
                   <input type="file"
@@ -263,15 +140,12 @@
 
           <div class="button-container">
             <button type="button" class="button-cancel">
-              <c:url value="board.jsp" var="board">
-                <c:param name="page" value="<%=pageStr%>"/>
-                <c:param name="search" value="<%=search%>"/>
-                <c:param name="categoryId" value="<%=categoryId%>"/>
-                <c:param name="fromDate" value="<%=fromDate%>"/>
-                <c:param name="toDate" value="<%=toDate%>"/>
+              <c:url value="/board/board" var="boardUrl">
+                <c:param name="page" value="<%=String.valueOf(condition.getPage())%>"/>
                 <c:param name="boardId" value="<%=String.valueOf(board.getBoardId())%>"/>
+                <%@include file="condition/conditionParam.jsp"%>
               </c:url>
-              <a href="${board}" class="button-cancel-a">취소</a>
+              <a href="${boardUrl}" class="button-cancel-a">취소</a>
             </button>
             <button type="submit" class="button-save">저장</button>
           </div>
@@ -280,11 +154,7 @@
 
       <%--검색조건 유지--%>
       <input type="hidden" name="boardId" value="<c:out value="<%=board.getBoardId()%>"/>">
-      <input type="hidden" name="search" value="<c:out value="<%=search%>"/>">
-      <input type="hidden" name="fromDate" value="<c:out value="<%=fromDate%>"/>">
-      <input type="hidden" name="toDate" value="<c:out value="<%=toDate%>"/>">
-      <input type="hidden" name="categoryId" value="<c:out value="<%=categoryId%>"/>">
-      <input type="hidden" name="page" value="<c:out value="<%=pageStr%>"/>">
+      <%@include file="condition/conditionHidden.jsp"%>
 
     </form>
 

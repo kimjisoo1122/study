@@ -27,7 +27,7 @@ function replyRegister(boardId) {
     }
   }
 
-  xhr.open('POST', 'replyRegister.jsp', true);
+  xhr.open('POST', '/board/replyRegister', true);
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
 
   xhr.send("boardId=" + encodeURIComponent(boardId) + "&content=" + encodeURIComponent(content));

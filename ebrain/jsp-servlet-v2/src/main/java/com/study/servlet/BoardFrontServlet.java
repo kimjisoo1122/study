@@ -1,7 +1,6 @@
 package com.study.servlet;
 
-import com.study.servlet.board.BoardListHandler;
-import com.study.servlet.board.BoardRegisterHandler;
+import com.study.servlet.board.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/board/*")
-public class FrontServlet extends HttpServlet {
+public class BoardFrontServlet extends HttpServlet {
 
     private Map<String, ServletHandler> requestHandlerMap;
 
@@ -22,8 +21,9 @@ public class FrontServlet extends HttpServlet {
         HashMap<String, ServletHandler> map = new HashMap<>();
         map.put("/board", new BoardListHandler());
         map.put("/board/register", new BoardRegisterHandler());
-        map.put("/board/update", new BoardListHandler());
-        map.put("/board/delete", new BoardListHandler());
+        map.put("/board/board", new BoardHandler());
+        map.put("/board/update", new BoardUpdateHandler());
+        map.put("/board/replyRegister", new ReplyRegisterHandler());
         requestHandlerMap = map;
     }
 
@@ -37,7 +37,7 @@ public class FrontServlet extends HttpServlet {
         // 프론트서블릿은 핸들러를 조회하고 실행하고 반환한 뷰를 반환만 할 것임.
 
         // TODO GET요청과 POST요청 구분
-        String requestURI = request.getRequestURI();
+        String requestURI = request.getRequestURI().replace(".jsp", "");
         ServletHandler handler = requestHandlerMap.get(requestURI);
         if (handler == null) {
             handler = new BoardListHandler();
@@ -47,11 +47,11 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
+        String requestURI = request.getRequestURI().replace(".jsp", "");
         ServletHandler handler = requestHandlerMap.get(requestURI);
         if (handler == null) {
             handler = new BoardListHandler();
         }
-        handler.getHandle(request, response);
+        handler.postHandle(request, response);
     }
 }

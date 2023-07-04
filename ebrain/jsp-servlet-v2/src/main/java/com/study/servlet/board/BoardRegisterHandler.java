@@ -2,8 +2,11 @@ package com.study.servlet.board;
 
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.study.dao.BoardDao;
+import com.study.dao.FileDao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
+import com.study.dto.FileDto;
 import com.study.servlet.ServletHandler;
 import com.study.util.FileUtil;
 import com.study.util.JspViewResolver;
@@ -15,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Enumeration;
 
 public class BoardRegisterHandler implements ServletHandler {
 
@@ -33,11 +38,15 @@ public class BoardRegisterHandler implements ServletHandler {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 하... 외부라이브러리 사용하면 빌드를 gradle말고 인텔리제이로 해야함...
         // 검색 조건
         BoardSearchCondition condition = new BoardSearchCondition();
         condition.setConditionByReq(request);
+        request.setAttribute("condition", condition);
 
+        // 에러 체크 (에러발생 또는 유효성 검증 실패시 다시 form으로 포워딩)
         boolean hasError = false;
+        BoardDto board = new BoardDto();
 
         // 업로드 폴더 확인
         if (FileUtil.checkUploadPath()) {
@@ -55,30 +64,51 @@ public class BoardRegisterHandler implements ServletHandler {
             }
 
             // 파라미터 파싱
-            BoardDto boardDto = new BoardDto();
-            String writer = StringUtil.nvl(request.getParameter("writer"));
-            String password = StringUtil.nvl(request.getParameter("password"));
-            String title = StringUtil.nvl(request.getParameter("title"));
-            String content = StringUtil.nvl(request.getParameter("content"));
-            String categoryId = request.getParameter("categoryId");
+            String categoryId = multi.getParameter("categoryId");
             if (StringUtil.isNumeric(categoryId)) {
-                boardDto.setCategoryId(Long.valueOf(categoryId));
+                board.setCategoryId(Long.valueOf(categoryId));
             }
-            boardDto.setWriter(writer);
-            boardDto.setPassword(password);
-            boardDto.setTitle(title);
-            boardDto.setContent(content);
+            board.setWriter(StringUtil.nvl(multi.getParameter("writer")));
+            board.setPassword(StringUtil.nvl(multi.getParameter("password")));
+            board.setTitle(StringUtil.nvl(multi.getParameter("title")));
+            board.setContent(StringUtil.nvl(multi.getParameter("content")));
 
-            if (!BoardValidation.validBoard(boardDto)) {
+            if (!BoardValidation.validBoard(board)) {
                 hasError = true;
+                request.setAttribute("board", board);
+            } else {
+                BoardDao boardDao = new BoardDao();
+                Long boardId = boardDao.register(board);
+                //TODO 게시글 생성 안될때 파일삭제처리
+
+                // 파일 db 저장
+                Enumeration fileInputs = multi.getFileNames();
+                FileDao fileDao = new FileDao();
+                while (fileInputs.hasMoreElements()) {
+                    String fileInput = (String) fileInputs.nextElement();
+                    String fileName = multi.getFilesystemName(fileInput);
+                    String originalFileName = multi.getOriginalFileName(fileInput);
+                    if (fileName != null) {
+                        FileDto fileDto = new FileDto();
+                        fileDto.setBoardId(boardId);
+                        fileDto.setName(fileName);
+                        fileDto.setPath(FileUtil.FILE_PATH);
+                        fileDto.setOriginalName(originalFileName);
+                        fileDao.save(fileDto);
+                    }
+                }
             }
         } else {
             hasError = true;
         }
 
-        String viewName = hasError ? "/board/register" : "/board";
-        String viewPath = JspViewResolver.getViewPath(viewName);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
-        requestDispatcher.forward(request, response);
+        // 에러가 있는 경우 포워딩 게시글 등록시 게시글목록으로 이동
+        String viewPath = JspViewResolver.getViewPath("/board/register");
+        if (hasError) {
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
+            requestDispatcher.forward(request, response);
+        } else {
+            response.sendRedirect("/board?" + condition.getQueryString());
+        }
     }
 }

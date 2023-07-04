@@ -9,12 +9,12 @@ import java.util.List;
 
 public class ReplyDao {
 
-    public long register(ReplyDto replyDto) {
+    public Long register(ReplyDto replyDto) {
         String sql = "insert into reply " +
                 "(board_id, content) " +
                 "values (?, ?)";
 
-        long replyId = 0L;
+        Long replyId = 0L;
 
         try (
                 Connection conn = ConnectionUtil.getConnection();

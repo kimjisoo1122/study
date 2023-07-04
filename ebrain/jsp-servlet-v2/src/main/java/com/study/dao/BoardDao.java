@@ -229,9 +229,9 @@ public class BoardDao {
 
 
         // 카테고리 조건 (기본 : all)
-        if (!condition.getCategoryId().isEmpty()) {
+        if (!condition.getSearchCategory().isEmpty()) {
             sb.append(" b.category_id = ? and");
-            linkedHashMap.put("categoryId", String.valueOf(condition.getCategoryId()));
+            linkedHashMap.put("categoryId", String.valueOf(condition.getSearchCategory()));
         }
 
         // 검색어 조건
@@ -317,9 +317,9 @@ public class BoardDao {
         sb.append("date_format(create_date, '%Y-%m-%d') between ? and ? and");
 
         // 카테고리 조건 (기본 : all)
-        if (!condition.getCategoryId().isEmpty()) {
+        if (!condition.getSearchCategory().isEmpty()) {
             sb.append(" category_id = ? and");
-            linkedHashMap.put("categoryId", String.valueOf(condition.getCategoryId()));
+            linkedHashMap.put("categoryId", String.valueOf(condition.getSearchCategory()));
         }
 
         // 검색어 조건

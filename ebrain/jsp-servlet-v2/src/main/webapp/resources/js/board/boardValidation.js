@@ -1,4 +1,3 @@
-console.log('hello');
 function validWriter() {
   const writerElm = document.querySelector('.writer-input');
   const writerLength = writerElm.value.length;
@@ -52,6 +51,8 @@ function validPassword() {
 
   pwdElm.classList.remove('input-error');
   errElm.style.display = 'none';
+
+  return true;
 }
 
 function validTitle() {
@@ -92,9 +93,10 @@ function validContent() {
 
 function validForm() {
   const validatedWriter = validWriter();
-  const validatePassword = validPassword();
-  const validateTitle = validTitle();
-  const validateContent = validContent();
+  const validatedPassword = validPassword();
+  const validatedTitle = validTitle();
+  const validatedContent = validContent();
+  console.log(validatedWriter && validatedPassword && validatedTitle && validatedContent);
 
-  return validatedWriter && validatePassword && validateTitle && validateContent;
+  return validatedWriter && validatedPassword && validatedTitle && validatedContent;
 }

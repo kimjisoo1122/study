@@ -1,101 +1,25 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="com.study.dao.BoardDao" %>
 <%@ page import="com.study.dto.BoardDto" %>
-<%@ page import="com.study.dao.FileDao" %>
 <%@ page import="com.study.dto.FileDto" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.study.util.StringUtil" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.io.File" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="com.study.dao.ReplyDao" %>
 <%@ page import="com.study.dto.ReplyDto" %>
+<%@ page import="com.study.dto.BoardSearchCondition" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="utf-8" %>
 
 <%
-  // 검색 조건
-  String search = StringUtil.nvl(request.getParameter("search"));
-  String fromDate = StringUtil.nvl(request.getParameter("fromDate"));
-  String toDate = StringUtil.nvl(request.getParameter("toDate"));
-  String categoryId = StringUtil.nvl(request.getParameter("categoryId"));
-  String pageStr = StringUtil.nvl(request.getParameter("page"));
-  String queryString = "?search=" + URLEncoder.encode(search) +
-          "&categoryId=" + categoryId + "&fromDate=" + fromDate +
-          "&toDate=" + toDate + "&page=" + pageStr;
+  BoardDto board = (BoardDto) request.getAttribute("board");
+  BoardSearchCondition condition = (BoardSearchCondition) request.getAttribute("condition");
+  List<FileDto> files = (List<FileDto>) request.getAttribute("files");
+  List<ReplyDto> replies = (List<ReplyDto>) request.getAttribute("replies");
 
-
-  if (request.getMethod().equalsIgnoreCase("post")) {
-    request.setCharacterEncoding("utf-8");
-
-    if (request.getParameter("boardId") == null) {
-        response.sendRedirect("/board/boardList.jsp" + queryString);
-        return;
-    }
-    String password = StringUtil.nvl(request.getParameter("removePassword"));
-    Long boardId = Long.parseLong(request.getParameter("boardId"));
-
-    // 게시글 조회
-    BoardDao boardDao = new BoardDao();
-    BoardDto board = boardDao.findById(boardId);
-
-    // 비밀번호 검증
-    if (password.equals(board.getPassword())) {
-      // 파일 삭제
-      FileDao fileDao = new FileDao();
-      List<FileDto> fileList = fileDao.findByBoardId(boardId);
-      for (FileDto fileDto : fileList) {
-        File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
-        if (regisetdFile.exists()) {
-          if (regisetdFile.delete()) {
-            fileDao.delete(fileDto.getFileId());
-          }
-        }
-      }
-      // 댓글, 파일db, 게시글을 트랜잭션 내에서 삭제
-      int deletedRowCnt = boardDao.deleteBoardAll(boardId);
-      if (deletedRowCnt > 0) {
-        session.setAttribute("removeMsg", "게시글을 삭제하였습니다.");
-        response.sendRedirect("/board/boardList.jsp" + queryString);
-        return;
-      }
-    }
-    session.setAttribute("removeErrMsg", "게시글 삭제에 실패하였습니다.");
-    String addQueryString = "&boardId=" + boardId;
-    queryString += addQueryString;
-    response.sendRedirect("/board/board.jsp" + queryString);
-
-    return;
-  } // 게시글 삭제 로직 종료
-
-  // 게시글 조회 로직
-  if (request.getParameter("boardId") == null) {
-    response.sendRedirect("/board/boardList.jsp" + queryString);
-    return;
-  }
-  Long boardId = Long.parseLong(request.getParameter("boardId"));
-  BoardDao boardDao = new BoardDao();
-
-  // 게시글 조회수 증가
-  boardDao.addViewCnt(boardId);
-
-  // 게시글 조회
-  BoardDto board = boardDao.findById(boardId);
-
-  // 첨부파일 조회
-  FileDao fileDao = new FileDao();
-  List<FileDto> files = fileDao.findByBoardId(boardId);
-
-  // 댓글 조회
-  ReplyDao replyDao = new ReplyDao();
-  List<ReplyDto> replies = replyDao.findByBoardId(boardId);
 %>
 
 <html>
 
   <head>
     <title>게시글</title>
-    <link rel="stylesheet" href="/resources/css/board/board.css">
-    <script src="/resources/js/board/board.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board/board.css">
+    <script src="${pageContext.request.contextPath}/resources/js/board/board.js"></script>
   </head>
 
   <body>
@@ -144,36 +68,30 @@
             <button
                     type="submit"
                     class="reply-register-button"
-                    onclick="replyRegister(<c:out value="<%=boardId%>"/>)">등록
+                    onclick="replyRegister(<c:out value="<%=board.getBoardId()%>"/>)">등록
             </button>
         </div>
       </div>
 
       <div class="button-container">
         <button class="button-list">
-          <c:url value="boardList.jsp" var="boardList">
-            <c:param name="page" value="<%=pageStr%>"/>
-            <c:param name="search" value="<%=search%>"/>
-            <c:param name="categoryId" value="<%=categoryId%>"/>
-            <c:param name="fromDate" value="<%=fromDate%>"/>
-            <c:param name="toDate" value="<%=toDate%>"/>
+          <c:url value="/board" var="boardListUrl">
+            <c:param name="page" value="<%=String.valueOf(condition.getPage())%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${boardList}" class="button-list-a">목록</a>
+          <a href="${boardListUrl}" class="button-list-a">목록</a>
         </button>
         <button class="button-update">
-          <c:url value="update.jsp" var="update">
-            <c:param name="page" value="<%=pageStr%>"/>
-            <c:param name="search" value="<%=search%>"/>
-            <c:param name="categoryId" value="<%=categoryId%>"/>
-            <c:param name="fromDate" value="<%=fromDate%>"/>
-            <c:param name="toDate" value="<%=toDate%>"/>
-            <c:param name="boardId" value="<%=String.valueOf(boardId)%>"/>
+          <c:url value="/board/update" var="updateUrl">
+            <c:param name="page" value="<%=String.valueOf(condition.getPage())%>"/>
+            <c:param name="boardId" value="<%=String.valueOf(board.getBoardId())%>"/>
+            <%@include file="condition/conditionParam.jsp"%>
           </c:url>
-          <a href="${update}" class="button-update-a">수정</a>
+          <a href="${updateUrl}" class="button-update-a">수정</a>
         </button>
         <button type="button"
-                onclick="removeOpen()">삭제
                 class="button-remove"
+                onclick="removeOpen()">삭제
         </button>
       </div>
 
@@ -218,11 +136,11 @@
 
           <%--검색조건--%>
           <input type="hidden" name="boardId" value="<c:out value="<%=board.getBoardId()%>"/>">
-          <input type="hidden" name="search" value="<c:out value="<%=search%>"/>">
-          <input type="hidden" name="fromDate" value="<c:out value="<%=fromDate%>"/>">
-          <input type="hidden" name="toDate" value="<c:out value="<%=toDate%>"/>">
-          <input type="hidden" name="categoryId" value="<c:out value="<%=categoryId%>"/>">
-          <input type="hidden" name="page" value="<c:out value="<%=pageStr%>"/>">
+          <input type="hidden" name="search" value="<c:out value="<%=condition.getSearch()%>"/>">
+          <input type="hidden" name="fromDate" value="<c:out value="<%=condition.getFromDate()%>"/>">
+          <input type="hidden" name="toDate" value="<c:out value="<%=condition.getToDate()%>"/>">
+          <input type="hidden" name="categoryId" value="<c:out value="<%=condition.getSearchCategory()%>"/>">
+          <input type="hidden" name="page" value="<c:out value="<%=String.valueOf(condition.getPage())%>"/>">
 
         </form>
       </div>
