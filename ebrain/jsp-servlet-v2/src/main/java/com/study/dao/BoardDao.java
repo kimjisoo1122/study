@@ -215,16 +215,18 @@ public class BoardDao {
 
         // 기간검색 조건 없을시 기본 1년간 체크
         if ((condition.getFromDate() == null || condition.getFromDate().isEmpty())
-                && (condition.getToDate() == null || condition.getToDate().isEmpty())) {
+                || (condition.getToDate() == null || condition.getToDate().isEmpty())) {
             LocalDate now = LocalDate.now();
             LocalDate oneYearAgo = now.minusYears(1);
-            condition.setFromDate(oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
-            condition.setToDate(now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            linkedHashMap.put("fromDate", oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            linkedHashMap.put("toDate", now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        } else {
+            linkedHashMap.put("fromDate", condition.getFromDate());
+            linkedHashMap.put("toDate", condition.getToDate());
         }
         sb.append("where ");
         sb.append("date_format(b.create_date, '%Y-%m-%d') between ? and ? and");
-        linkedHashMap.put("fromDate", condition.getFromDate());
-        linkedHashMap.put("toDate", condition.getToDate());
+
 
         // 카테고리 조건 (기본 : all)
         if (!condition.getCategoryId().isEmpty()) {
@@ -304,13 +306,15 @@ public class BoardDao {
                 && (condition.getToDate() == null || condition.getToDate().isEmpty())) {
             LocalDate now = LocalDate.now();
             LocalDate oneYearAgo = now.minusYears(1);
-            condition.setFromDate(oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
-            condition.setToDate(now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            linkedHashMap.put("fromDate", oneYearAgo.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            linkedHashMap.put("toDate", now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        } else {
+            linkedHashMap.put("fromDate", condition.getFromDate());
+            linkedHashMap.put("toDate", condition.getToDate());
+
         }
         sb.append("where ");
         sb.append("date_format(create_date, '%Y-%m-%d') between ? and ? and");
-        linkedHashMap.put("fromDate", condition.getFromDate());
-        linkedHashMap.put("toDate", condition.getToDate());
 
         // 카테고리 조건 (기본 : all)
         if (!condition.getCategoryId().isEmpty()) {
@@ -326,9 +330,8 @@ public class BoardDao {
         }
 
         // 마지막 and를 제거한다
-        String sql = sb.substring(0, sb.length() - 3) + " order by create_date desc";
+        String sql = sb.substring(0, sb.length() - 3);
         // 페이징 처리로 sql 완료
-        sql += " limit " + condition.getLimit() + " offset " + condition.getOffset();
 
         int count = 0;
 

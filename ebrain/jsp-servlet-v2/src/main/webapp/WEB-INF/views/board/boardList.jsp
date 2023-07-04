@@ -130,7 +130,7 @@
 
       <div class="paging-prev-container">
         <c:if test="<%=pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()%>">
-          <c:url value="boardList.jsp" var="prevPage">
+          <c:url value="/board" var="prevPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() - 1)%>"/>
             <c:param name="search" value="<%=condition.getSearch()%>"/>
             <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
@@ -143,7 +143,7 @@
 
       <div class="paging-index-container">
         <c:forEach begin="<%=pageHandler.getBeginPage()%>" end="<%=pageHandler.getMaxPage()%>" varStatus="status">
-          <c:url value="boardList.jsp" var="nowPage">
+          <c:url value="/board" var="nowPage">
             <c:param name="page" value="${status.index}"/>
             <c:param name="search" value="<%=condition.getSearch()%>"/>
             <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
@@ -156,7 +156,7 @@
 
       <div class="paging-next-container">
         <c:if test="<%=pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()%>">
-          <c:url value="boardList.jsp" var="nextPage">
+          <c:url value="/board" var="nextPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getPage() + 1)%>"/>
             <c:param name="search" value="<%=condition.getSearch()%>"/>
             <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
@@ -169,7 +169,7 @@
 
       <div class="paging-next-total-container">
         <c:if test="<%=pageHandler.isNext()%>">
-          <c:url value="boardList.jsp" var="nextTotalPage">
+          <c:url value="/board" var="nextTotalPage">
             <c:param name="page" value="<%=String.valueOf(pageHandler.getMaxPage() + 1)%>"/>
             <c:param name="search" value="<%=condition.getSearch()%>"/>
             <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>
@@ -185,7 +185,7 @@
 
     <div class="board-register-container">
       <button class="board-register-button">
-        <c:url value="register.jsp" var="register">
+        <c:url value="/board/register" var="register">
           <c:param name="page" value="<%=String.valueOf(pageHandler.getPage())%>"/>
           <c:param name="search" value="<%=condition.getSearch()%>"/>
           <c:param name="categoryId" value="<%=condition.getCategoryId()%>"/>

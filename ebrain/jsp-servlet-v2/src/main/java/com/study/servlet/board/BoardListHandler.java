@@ -40,7 +40,7 @@ public class BoardListHandler implements ServletHandler {
         request.setAttribute("pageHandler", pageHandler);
 
         // 포워딩
-        String path = JspViewResolver.getViewName("/board/boardList");
+        String path = JspViewResolver.getViewPath("/board/boardList");
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
         requestDispatcher.forward(request, response);
     }

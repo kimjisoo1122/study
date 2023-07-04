@@ -7,7 +7,7 @@ public interface JspViewResolver {
      * @param path
      * @return view 경로
      */
-    static String getViewName(String path) {
+    static String getViewPath(String path) {
         path = path.charAt(0) == '/' ? path : "/" + path;
         return "/WEB-INF/views" + path + ".jsp";
     }

@@ -1,6 +1,7 @@
 package com.study.servlet;
 
 import com.study.servlet.board.BoardListHandler;
+import com.study.servlet.board.BoardRegisterHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,10 +21,9 @@ public class FrontServlet extends HttpServlet {
     public void init() throws ServletException {
         HashMap<String, ServletHandler> map = new HashMap<>();
         map.put("/board", new BoardListHandler());
-        map.put("/board/register", new BoardListHandler());
+        map.put("/board/register", new BoardRegisterHandler());
         map.put("/board/update", new BoardListHandler());
         map.put("/board/delete", new BoardListHandler());
-
         requestHandlerMap = map;
     }
 
@@ -47,6 +47,11 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        String requestURI = request.getRequestURI();
+        ServletHandler handler = requestHandlerMap.get(requestURI);
+        if (handler == null) {
+            handler = new BoardListHandler();
+        }
+        handler.getHandle(request, response);
     }
 }
