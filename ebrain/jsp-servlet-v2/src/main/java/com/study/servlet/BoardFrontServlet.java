@@ -17,12 +17,18 @@ public class BoardFrontServlet extends HttpServlet {
     private Map<String, ServletHandler> requestHandlerMap;
 
     @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.service(req, resp);
+    }
+
+    @Override
     public void init() throws ServletException {
         HashMap<String, ServletHandler> map = new HashMap<>();
         map.put("/board", new BoardListHandler());
         map.put("/board/register", new BoardRegisterHandler());
         map.put("/board/board", new BoardHandler());
         map.put("/board/update", new BoardUpdateHandler());
+        map.put("/board/delete", new BoardDeleteHandler());
         map.put("/board/replyRegister", new ReplyRegisterHandler());
         requestHandlerMap = map;
     }
@@ -30,8 +36,8 @@ public class BoardFrontServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // TODO 리퀘스트URI 파싱한 후 맵에서 핸들할 수 있는 핸들러를 가져온다 없는 경우 - 에러발생
-        // 핸들러가 doget실행하면 view를 반환한다
+        // 리퀘스트URI 파싱한 후 맵에서 핸들할 수 있는 핸들러를 가져온다 없는 경우 -> 메인(리스트) 이동
+        // TODO 핸들러가 doget실행하면 view를 반환한다 -> 일단 HANDLE로 자체 처리했음
         // view를 viewresolver가 분석한후
         // 프론트서블릿이 포워딩
         // 프론트서블릿은 핸들러를 조회하고 실행하고 반환한 뷰를 반환만 할 것임.

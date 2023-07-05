@@ -5,12 +5,9 @@ import com.study.util.StringUtil;
 import lombok.Data;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.stream.events.Characters;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 @Data
 public class BoardSearchCondition {

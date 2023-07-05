@@ -8,6 +8,10 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://repo.clojars.org'
+        name 'Clojars'
+    }
 }
 
 ext {
@@ -23,19 +27,25 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
-//    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'org.mybatis:mybatis:3.5.13'
+    implementation 'hikari-cp:hikari-cp:3.0.1'
     compileOnly group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.1'
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
     implementation group: 'javax.servlet', name: 'jstl', version: '1.2'
+
+
+
+
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-
 }
 
 test {

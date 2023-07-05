@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.BoardMapper">
+
+    <select id="findAllByCondition"
+            parameterType="com.study.dto.BoardSearchCondition"
+            resultType="com.study.dto.BoardDto">
+        SELECT b.board_id,
+               b.category_id,
+               b.title,
+               b.writer,
+               b.content,
+               b.view_cnt,
+               b.create_date,
+               b.update_date,
+               c.category_name,
+               CASE
+                   WHEN f.file_id IS NOT NULL THEN true
+                   ELSE false
+               END has_file
+        FROM board b
+            JOIN category c ON c.category_id = b.category_id
+            LEFT JOIN file f ON b.board_id = f.board_id
+        <where>
+                date_format(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
+                <if test="searchCategory != null &amp;&amp; searchCategory != ''">
+                    AND b.category_id = #{searchCategory}
+                </if>
+                <if test="search != null &amp;&amp; search != ''">
+                    AND
+                    (b.writer LIKE CONCAT('%', #{search}, '%')
+                    OR
+                    b.title LIKE CONCAT('%', #{search}, '%')
+                    OR
+                    b.content LIKE CONCAT('%', #{search}, '%'))
+                </if>
+        </where>
+        ORDER BY b.create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+</mapper>

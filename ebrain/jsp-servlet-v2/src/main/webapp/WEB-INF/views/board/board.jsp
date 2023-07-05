@@ -111,6 +111,7 @@
     <div class="remove-modal-bg">
       <div class="remove-modal">
         <form method="post"
+              action="/board/delete"
               onsubmit="return validRemovePassword()">
           <div class="remove-password-container">
             <div class="remove-password-title">비밀번호

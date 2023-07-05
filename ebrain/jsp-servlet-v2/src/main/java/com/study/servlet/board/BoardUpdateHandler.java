@@ -1,6 +1,7 @@
 package com.study.servlet.board;
 
 import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.study.dao.BoardDao;
 import com.study.dao.FileDao;
 import com.study.dto.BoardDto;
@@ -59,7 +60,9 @@ public class BoardUpdateHandler implements ServletHandler {
 
 
             try {
-                multi = new MultipartRequest(request, FileUtil.FILE_PATH, FileUtil.BOARD_FILE_MAX_SIZE);
+                multi = new MultipartRequest(
+                        request, FileUtil.FILE_PATH, FileUtil.BOARD_FILE_MAX_SIZE, FileUtil.ENC_TYPE,
+                        new DefaultFileRenamePolicy());
             } catch (IOException e) {
                 e.printStackTrace();
                 request.setAttribute("fileError", "파일사이즈는 10MB를 넘을 수 없습니다.");
@@ -81,6 +84,7 @@ public class BoardUpdateHandler implements ServletHandler {
             BoardSearchCondition condition = new BoardSearchCondition();
             condition.setConditionByReq(multi);
             request.setAttribute("condition", condition);
+
 
             String writer = multi.getParameter("writer");
             String title = multi.getParameter("title");
