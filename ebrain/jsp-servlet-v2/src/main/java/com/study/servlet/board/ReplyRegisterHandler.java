@@ -29,7 +29,7 @@ public class ReplyRegisterHandler implements ServletHandler {
         // 댓글 생성
         ReplyDto replyDto = new ReplyDto();
         replyDto.setBoardId(Long.valueOf(boardIdStr));
-        replyDto.setContent(content);
+        replyDto.setReplyContent(content);
         ReplyDao replyDao = new ReplyDao();
         Long registerId = replyDao.register(replyDto);
 

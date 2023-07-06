@@ -21,7 +21,7 @@ public class ReplyDao {
                 PreparedStatement pstmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setLong(1, replyDto.getBoardId());
-            pstmt.setString(2, replyDto.getContent());
+            pstmt.setString(2, replyDto.getReplyContent());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -87,7 +87,7 @@ public class ReplyDao {
                 if (rs.next()) {
                     replyDto.setReplyId(rs.getLong("reply_id"));
                     replyDto.setBoardId(rs.getLong("board_id"));
-                    replyDto.setContent(rs.getString("content"));
+                    replyDto.setReplyContent(rs.getString("content"));
                     replyDto.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
                     replyDto.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
                 }
@@ -120,7 +120,7 @@ public class ReplyDao {
                     ReplyDto replyDto = new ReplyDto();
                     replyDto.setReplyId(rs.getLong("reply_id"));
                     replyDto.setBoardId(rs.getLong("board_id"));
-                    replyDto.setContent(rs.getString("content"));
+                    replyDto.setReplyContent(rs.getString("content"));
                     replyDto.setCreateDate(rs.getTimestamp("create_date").toLocalDateTime());
                     replyDto.setUpdateDate(rs.getTimestamp("update_date").toLocalDateTime());
 

@@ -18,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Enumeration;
 
 public class BoardRegisterHandler implements ServletHandler {
@@ -91,7 +90,7 @@ public class BoardRegisterHandler implements ServletHandler {
                     if (fileName != null) {
                         FileDto fileDto = new FileDto();
                         fileDto.setBoardId(boardId);
-                        fileDto.setName(fileName);
+                        fileDto.setPhysicalName(fileName);
                         fileDto.setPath(FileUtil.FILE_PATH);
                         fileDto.setOriginalName(originalFileName);
                         fileDao.save(fileDto);

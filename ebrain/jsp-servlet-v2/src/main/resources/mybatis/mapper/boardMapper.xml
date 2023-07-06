@@ -2,9 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.mapper.BoardMapper">
 
+    <!-- 게시글을 등록합니다. DTO의 PK(boardId)값 생성. -->
+    <insert id="insert"
+            parameterType="BoardDto"
+            useGeneratedKeys="true"
+            keyProperty="boardId">
+        INSERT INTO board
+        (category_id,
+         title,
+         writer,
+         content,
+         board.password)
+        VALUES
+            (#{categoryId},
+             #{title},
+             #{writer},
+             #{content},
+             #{password}
+            )
+    </insert>
+
+    <!-- 게시글을 검색조건, 페이징처리하여 조회합니다. -->
     <select id="findAllByCondition"
-            parameterType="com.study.dto.BoardSearchCondition"
-            resultType="com.study.dto.BoardDto">
+            parameterType="BoardSearchCondition"
+            resultType="boardDto">
         SELECT b.board_id,
                b.category_id,
                b.title,
@@ -14,28 +35,111 @@
                b.create_date,
                b.update_date,
                c.category_name,
-               CASE
-                   WHEN f.file_id IS NOT NULL THEN true
-                   ELSE false
-               END has_file
+               IF (f.file_id IS NOT NULL, TRUE, FALSE) has_file
         FROM board b
             JOIN category c ON c.category_id = b.category_id
             LEFT JOIN file f ON b.board_id = f.board_id
         <where>
-                date_format(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
-                <if test="searchCategory != null &amp;&amp; searchCategory != ''">
-                    AND b.category_id = #{searchCategory}
-                </if>
-                <if test="search != null &amp;&amp; search != ''">
-                    AND
-                    (b.writer LIKE CONCAT('%', #{search}, '%')
-                    OR
-                    b.title LIKE CONCAT('%', #{search}, '%')
-                    OR
-                    b.content LIKE CONCAT('%', #{search}, '%'))
-                </if>
+            DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
+            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
+                AND b.category_id = #{searchCategory}
+            </if>
+            <if test="search != null &amp;&amp; search != ''">
+                AND
+                (b.writer LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.title LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.content LIKE CONCAT('%', #{search}, '%'))
+            </if>
         </where>
         ORDER BY b.create_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
+
+    <!-- 검색조건에 따라 게시글 총갯수 조회 -->
+    <select id="countByCondition"
+            parameterType="BoardSearchCondition"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM board b
+        <where>
+            DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
+            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
+                AND b.category_id = #{searchCategory}
+            </if>
+            <if test="search != null &amp;&amp; search != ''">
+                AND
+                (b.writer LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.title LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.content LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <!-- 게시글번호로 조회합니다. -->
+    <select id="findById"
+            parameterType="long"
+            resultType="BoardDto">
+        SELECT b.board_id,
+               b.category_id,
+               b.title,
+               b.writer,
+               b.content,
+               b.password,
+               b.view_cnt,
+               b.create_date,
+               b.update_date,
+               c.category_name
+        FROM board b
+            JOIN category c ON c.category_id = b.category_id
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- dto 존재하는 값으로 업데이트 합니다. -->
+    <update id="update"
+            parameterType="BoardDto">
+        UPDATE board
+        <set>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="title != null &amp;&amp; title != ''">
+                title = #{title},
+            </if>
+            <if test="writer != null &amp;&amp; writer != ''">
+                writer = #{writer},
+            </if>
+            <if test="content != null &amp;&amp; content != ''">
+                content = #{content},
+            </if>
+            <if test="password != null &amp;&amp; password != ''">
+                password = #{password},
+            </if>
+            <if test="categoryId != null
+                || (writer != null &amp;&amp; writer != '')
+                || (title != null &amp;&amp; title != '')
+                || (content != null &amp;&amp; content != '')
+                || (password != null &amp;&amp; password != '')">
+                update_date = now()
+            </if>
+        </set>
+        WHERE board_id = #{boardId}
+    </update>
+
+    <!-- 게시글의 조회수를 1 증가 시킵니다. -->
+    <update id="increaseViewCnt">
+        UPDATE board
+        SET view_cnt = view_cnt + 1;
+    </update>
+
+    <!-- 게시글을 삭제합니다. -->
+    <delete id="delete"
+            parameterType="long">
+        DELETE FROM board
+        WHERE board_id = #{boardId}
+    </delete>
+
 </mapper>

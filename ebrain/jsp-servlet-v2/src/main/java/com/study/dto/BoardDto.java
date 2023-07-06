@@ -1,19 +1,13 @@
 package com.study.dto;
 
-import com.study.util.StringUtil;
 import lombok.Data;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Enumeration;
 
 @Data
 public class BoardDto {
-
-    enum BoardDtoFields{
-        boardId,
-    }
 
     private Long boardId;
     private Long categoryId;
@@ -24,6 +18,8 @@ public class BoardDto {
     private String password;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
+    private FileDto fileDto;
 
     private int viewCnt;
     private boolean hasFile;

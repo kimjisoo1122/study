@@ -120,7 +120,7 @@ public class BoardUpdateHandler implements ServletHandler {
                 if (fileName != null) {
                     FileDto fileDto = new FileDto();
                     fileDto.setBoardId(boardId);
-                    fileDto.setName(fileName);
+                    fileDto.setPhysicalName(fileName);
                     fileDto.setPath(FileUtil.FILE_PATH);
                     fileDto.setOriginalName(originalFileName);
                     fileDao.save(fileDto);
@@ -135,7 +135,7 @@ public class BoardUpdateHandler implements ServletHandler {
                     FileDto fileDto = fileDao.findById(fileId);
 
                     // 실제 파일 삭제
-                    File uploadedFile = FileUtil.getUploadedFile(fileDto.getName());
+                    File uploadedFile = FileUtil.getUploadedFile(fileDto.getPhysicalName());
                     if (uploadedFile.exists()) {
                         if (uploadedFile.delete()) {
                             // 파일 db 삭제

@@ -8,9 +8,7 @@ import com.study.dto.BoardSearchCondition;
 import com.study.dto.FileDto;
 import com.study.dto.ReplyDto;
 import com.study.servlet.ServletHandler;
-import com.study.util.JspViewResolver;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +48,7 @@ public class BoardDeleteHandler implements ServletHandler {
             FileDao fileDao = new FileDao();
             List<FileDto> fileList = fileDao.findByBoardId(boardId);
             for (FileDto fileDto : fileList) {
-                File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getName());
+                File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getPhysicalName());
                 if (regisetdFile.exists()) {
                     if (regisetdFile.delete()) {
                         fileDao.delete(fileDto.getFileId());

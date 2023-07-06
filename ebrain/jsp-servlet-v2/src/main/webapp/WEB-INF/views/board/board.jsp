@@ -59,7 +59,7 @@
           <c:forEach items="<%=replies%>" var="reply">
             <div class="reply">
               <div class="reply-date">${reply.formattedCreateDate}</div>
-              <div class="reply-content">${reply.content}</div>
+              <div class="reply-content">${reply.replyContent}</div>
             </div>
           </c:forEach>
         </div>

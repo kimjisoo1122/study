@@ -20,7 +20,7 @@ public class FileDao {
                 Connection conn = ConnectionUtil.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, fileDto.getBoardId());
-            pstmt.setString(2, fileDto.getName());
+            pstmt.setString(2, fileDto.getPhysicalName());
             pstmt.setString(3, fileDto.getPath());
             pstmt.setString(4, fileDto.getOriginalName());
             pstmt.executeUpdate();
@@ -86,7 +86,7 @@ public class FileDao {
                 while (rs.next()) {
                     FileDto fileDto = new FileDto();
                     fileDto.setFileId(rs.getLong("file_id"));
-                    fileDto.setName(rs.getString("name"));
+                    fileDto.setPhysicalName(rs.getString("name"));
                     fileDto.setPath(rs.getString("path"));
                     fileDto.setOriginalName(rs.getString("original_name"));
                     files.add(fileDto);
@@ -102,7 +102,7 @@ public class FileDao {
 
     public FileDto findById(Long fileId) {
         String sql =
-                "select file_id, board_id, name, path, original_name " +
+                "select file_id, board_id, physical_name, path, original_name " +
                 "from file " +
                 "where file_id = ?";
 
@@ -117,7 +117,7 @@ public class FileDao {
                 while (rs.next()) {
                     fileDto.setFileId(rs.getLong("file_id"));
                     fileDto.setBoardId(rs.getLong("board_id"));
-                    fileDto.setName(rs.getString("name"));
+                    fileDto.setPhysicalName(rs.getString("name"));
                     fileDto.setPath(rs.getString("path"));
                     fileDto.setOriginalName(rs.getString("original_name"));
                 }

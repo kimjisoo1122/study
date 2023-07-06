@@ -16,13 +16,17 @@ public class MyBatisSqlSessionFactory {
             String resource = "mybatis/mybatis-config.xml";
             InputStream inputStream = Resources.getResourceAsStream(resource);
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-            SqlSession sqlSession = sqlSessionFactory.openSession();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static SqlSessionFactory getSqlSessionFactory() {
-        return sqlSessionFactory;
+    /**
+     * 생성된 sqlSessionFactory에서 session을 오픈
+     * @param autoCommit
+     * @return
+     */
+    public static SqlSession openSession(boolean autoCommit) {
+        return sqlSessionFactory.openSession(autoCommit);
     }
 }
