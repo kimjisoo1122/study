@@ -14,7 +14,7 @@ function replyRegister(boardId) {
             `
             <div class="reply">
               <div class="reply-date">${formatCreateDate}</div>
-              <div class="reply-content">${replyDto.content}</div>
+              <div class="reply-content">${replyDto.replyContent}</div>
             </div>
             `
 

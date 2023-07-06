@@ -13,7 +13,7 @@ public class FileDto {
     private String originalName;
     private String path;
     private String fileExtension;
-    private int fileSize;
+    private long fileSize;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 }

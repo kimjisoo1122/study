@@ -27,7 +27,7 @@ public class BoardSearchCondition {
      * @param request
      */
     public void setConditionByReq(HttpServletRequest request) throws UnsupportedEncodingException {
-        fromDate = StringUtil.nvl(request.getParameter("fromDate")) ;
+        fromDate = StringUtil.nvl(request.getParameter("fromDate"));
         toDate = StringUtil.nvl(request.getParameter("toDate"));
         search = URLDecoder.decode(StringUtil.nvl(request.getParameter("search")), "UTF-8");
         searchCategory = StringUtil.nvl(request.getParameter("searchCategory"));

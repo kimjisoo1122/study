@@ -2,11 +2,11 @@ package com.study.servlet.board;
 
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
-import com.study.dao.BoardDao;
-import com.study.dao.FileDao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.FileDto;
+import com.study.service.BoardService;
+import com.study.service.FileService;
 import com.study.servlet.ServletHandler;
 import com.study.util.FileUtil;
 import com.study.util.JspViewResolver;
@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.util.*;
 
 public class BoardUpdateHandler implements ServletHandler {
+
+    private final BoardService boardService = BoardService.getBoardService();
+    private final FileService fileService = FileService.getFileService();
+
     @Override
     public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 검색 조건
@@ -36,13 +40,11 @@ public class BoardUpdateHandler implements ServletHandler {
         }
 
         // 게시글 조회
-        BoardDao boardDao = new BoardDao();
-        BoardDto board = boardDao.findById(Long.valueOf(boardId));
+        BoardDto board = boardService.findById(Long.valueOf(boardId));
         request.setAttribute("board", board);
 
         // 첨부파일 조회
-        FileDao fileDao = new FileDao();
-        List<FileDto> files = fileDao.findByBoardId(board.getBoardId());
+        List<FileDto> files = fileService.findByBoardId(board.getBoardId());
         request.setAttribute("files", files);
 
         String viewPath = JspViewResolver.getViewPath("/board/update");
@@ -57,7 +59,6 @@ public class BoardUpdateHandler implements ServletHandler {
             // 실패시 포워딩
             String viewPath = JspViewResolver.getViewPath("/board/update");
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
-
 
             try {
                 multi = new MultipartRequest(
@@ -77,8 +78,7 @@ public class BoardUpdateHandler implements ServletHandler {
                 requestDispatcher.forward(request, response);
             }
 
-            FileDao fileDao = new FileDao();
-            List<FileDto> files = fileDao.findByBoardId(boardId);
+            List<FileDto> files = fileService.findByBoardId(boardId);
             request.setAttribute("files", files);
 
             BoardSearchCondition condition = new BoardSearchCondition();
@@ -90,8 +90,7 @@ public class BoardUpdateHandler implements ServletHandler {
             String title = multi.getParameter("title");
             String content = multi.getParameter("content");
 
-            BoardDao boardDao = new BoardDao();
-            BoardDto findBoard = boardDao.findById(boardId);
+            BoardDto findBoard = boardService.findById(boardId);
             findBoard.setWriter(writer);
             findBoard.setTitle(title);
             findBoard.setContent(content);
@@ -109,7 +108,11 @@ public class BoardUpdateHandler implements ServletHandler {
             updateMap.put("writer", writer);
             updateMap.put("title", title);
             updateMap.put("content", content);
-            boardDao.update(updateMap, boardId);
+            BoardDto updateBoard = new BoardDto();
+            updateBoard.setWriter(writer);
+            updateBoard.setTitle(title);
+            updateBoard.setContent(content);
+            boardService.update(updateBoard);
 
             // 파일 db 저장
             Enumeration fileInputs = multi.getFileNames();
@@ -118,12 +121,17 @@ public class BoardUpdateHandler implements ServletHandler {
                 String fileName = multi.getFilesystemName(fileInput);
                 String originalFileName = multi.getOriginalFileName(fileInput);
                 if (fileName != null) {
+                    File file = FileUtil.getUploadedFile(fileName);
                     FileDto fileDto = new FileDto();
                     fileDto.setBoardId(boardId);
                     fileDto.setPhysicalName(fileName);
                     fileDto.setPath(FileUtil.FILE_PATH);
                     fileDto.setOriginalName(originalFileName);
-                    fileDao.save(fileDto);
+                    fileDto.setFileSize(file.length());
+                    String fileExtension =
+                            fileName.substring(fileName.lastIndexOf(".") + 1);
+                    fileDto.setFileExtension(fileExtension);
+                    fileService.save(fileDto);
                 }
             }
 
@@ -132,20 +140,20 @@ public class BoardUpdateHandler implements ServletHandler {
             if (fileIds != null) {
                 for (String fileIdStr : fileIds) {
                     Long fileId = Long.parseLong(fileIdStr);
-                    FileDto fileDto = fileDao.findById(fileId);
+                    FileDto fileDto = fileService.findById(fileId);
 
                     // 실제 파일 삭제
                     File uploadedFile = FileUtil.getUploadedFile(fileDto.getPhysicalName());
                     if (uploadedFile.exists()) {
                         if (uploadedFile.delete()) {
                             // 파일 db 삭제
-                            fileDao.delete(fileId);
+                            fileService.delete(fileId);
                         }
                     }
                 }
             }
 
-        response.sendRedirect("/board/board?boardId=" + boardId + condition.getQueryString());
+        response.sendRedirect("/board/board?" + condition.getQueryString() + "&boardId=" + boardId);
         }
     }
 }

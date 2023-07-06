@@ -1,13 +1,14 @@
 package com.study.servlet.board;
 
-import com.study.dao.BoardDao;
-import com.study.dao.FileDao;
-import com.study.dao.ReplyDao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.FileDto;
 import com.study.dto.ReplyDto;
+import com.study.service.BoardService;
+import com.study.service.FileService;
+import com.study.service.ReplyService;
 import com.study.servlet.ServletHandler;
+import com.study.util.FileUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class BoardDeleteHandler implements ServletHandler {
+
+    private final BoardService boardService = BoardService.getBoardService();
+    private final FileService fileService = FileService.getFileService();
+    private final ReplyService replyService = ReplyService.getReplyService();
+
     @Override
     public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -40,24 +46,22 @@ public class BoardDeleteHandler implements ServletHandler {
         }
 
         // 게시글 조회
-        BoardDao boardDao = new BoardDao();
-        BoardDto board = boardDao.findById(boardId);
+        BoardDto board = boardService.findById(boardId);
 
         if (removePassword.equals(board.getPassword())) {
             // 파일 삭제
-            FileDao fileDao = new FileDao();
-            List<FileDto> fileList = fileDao.findByBoardId(boardId);
+            List<FileDto> fileList = fileService.findByBoardId(boardId);
             for (FileDto fileDto : fileList) {
-                File regisetdFile = new File(fileDto.getPath() + File.separator + fileDto.getPhysicalName());
+                File regisetdFile = FileUtil.getUploadedFile(fileDto.getPhysicalName());
                 if (regisetdFile.exists()) {
                     if (regisetdFile.delete()) {
-                        fileDao.delete(fileDto.getFileId());
+                        fileService.delete(fileDto.getFileId());
                     }
                 }
             }
 
             // 댓글, 파일db, 게시글을 트랜잭션 내에서 삭제
-            int deletedRowCnt = boardDao.deleteBoardAll(boardId);
+            int deletedRowCnt = boardService.delete(boardId);
             if (deletedRowCnt > 0) {
                 request.getSession().setAttribute("removeMsg", "게시글을 삭제하였습니다.");
                 response.sendRedirect("/board/?" + condition.getQueryString());
@@ -65,15 +69,12 @@ public class BoardDeleteHandler implements ServletHandler {
             }
         }
 
-        FileDao fileDao = new FileDao();
-        List<FileDto> files = fileDao.findByBoardId(boardId);
+        List<FileDto> files = fileService.findByBoardId(boardId);
         request.setAttribute("files", files);
-        ReplyDao replyDao = new ReplyDao();
-        List<ReplyDto> replies = replyDao.findByBoardId(boardId);
+        List<ReplyDto> replies = replyService.findByBoardId(boardId);
         request.setAttribute("replies", replies);
 
         request.getSession().setAttribute("removeErrMsg", "게시글 삭제에 실패하였습니다.");
         response.sendRedirect("/board/board?" + condition.getQueryString() + "&boardId=" + boardId);
-
     }
 }

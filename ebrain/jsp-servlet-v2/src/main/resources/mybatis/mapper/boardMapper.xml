@@ -39,20 +39,7 @@
         FROM board b
             JOIN category c ON c.category_id = b.category_id
             LEFT JOIN file f ON b.board_id = f.board_id
-        <where>
-            DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
-            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
-                AND b.category_id = #{searchCategory}
-            </if>
-            <if test="search != null &amp;&amp; search != ''">
-                AND
-                (b.writer LIKE CONCAT('%', #{search}, '%')
-                OR
-                b.title LIKE CONCAT('%', #{search}, '%')
-                OR
-                b.content LIKE CONCAT('%', #{search}, '%'))
-            </if>
-        </where>
+        <include refid="boardSearchCondition"/>
         ORDER BY b.create_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
@@ -63,20 +50,7 @@
             resultType="int">
         SELECT COUNT(*)
         FROM board b
-        <where>
-            DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
-            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
-                AND b.category_id = #{searchCategory}
-            </if>
-            <if test="search != null &amp;&amp; search != ''">
-                AND
-                (b.writer LIKE CONCAT('%', #{search}, '%')
-                OR
-                b.title LIKE CONCAT('%', #{search}, '%')
-                OR
-                b.content LIKE CONCAT('%', #{search}, '%'))
-            </if>
-        </where>
+        <include refid="boardSearchCondition"/>
     </select>
 
     <!-- 게시글번호로 조회합니다. -->
@@ -142,4 +116,32 @@
         WHERE board_id = #{boardId}
     </delete>
 
+
+
+    <!-- 게시글 검색조건 -->
+    <sql id="boardSearchCondition">
+        <where>
+            <choose>
+                <when test="(fromDate != null &amp;&amp; fromDate !='') || (toDate != null &amp;&amp; toDate !='')">
+                    DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
+                </when>
+                <otherwise>
+                    DATE_FORMAT(b.create_date, '%Y-%m-%d')
+                    BETWEEN DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR),'%Y-%m-%d')
+                    AND DATE_FORMAT(NOW(),'%Y-%m-%d')
+                </otherwise>
+            </choose>
+            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
+                AND b.category_id = #{searchCategory}
+            </if>
+            <if test="search != null &amp;&amp; search != ''">
+                AND
+                (b.writer LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.title LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.content LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </sql>
 </mapper>

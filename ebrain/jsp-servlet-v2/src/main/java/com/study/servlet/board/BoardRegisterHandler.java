@@ -2,11 +2,11 @@ package com.study.servlet.board;
 
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
-import com.study.dao.BoardDao;
-import com.study.dao.FileDao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.FileDto;
+import com.study.service.BoardService;
+import com.study.service.FileService;
 import com.study.servlet.ServletHandler;
 import com.study.util.FileUtil;
 import com.study.util.JspViewResolver;
@@ -17,17 +17,20 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 
 public class BoardRegisterHandler implements ServletHandler {
+
+    private final BoardService boardService = BoardService.getBoardService();
+    private final FileService fileService = FileService.getFileService();
 
     @Override
     public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 검색 조건
         BoardSearchCondition condition = new BoardSearchCondition();
         condition.setConditionByReq(request);
-
         request.setAttribute("condition", condition);
 
         String path = JspViewResolver.getViewPath("/board/register");
@@ -76,24 +79,27 @@ public class BoardRegisterHandler implements ServletHandler {
                 hasError = true;
                 request.setAttribute("board", board);
             } else {
-                BoardDao boardDao = new BoardDao();
-                Long boardId = boardDao.register(board);
+                Long boardId = boardService.register(board);
                 //TODO 게시글 생성 안될때 파일삭제처리
 
                 // 파일 db 저장
                 Enumeration fileInputs = multi.getFileNames();
-                FileDao fileDao = new FileDao();
                 while (fileInputs.hasMoreElements()) {
                     String fileInput = (String) fileInputs.nextElement();
                     String fileName = multi.getFilesystemName(fileInput);
                     String originalFileName = multi.getOriginalFileName(fileInput);
                     if (fileName != null) {
+                        File file = FileUtil.getUploadedFile(fileName);
                         FileDto fileDto = new FileDto();
                         fileDto.setBoardId(boardId);
                         fileDto.setPhysicalName(fileName);
                         fileDto.setPath(FileUtil.FILE_PATH);
                         fileDto.setOriginalName(originalFileName);
-                        fileDao.save(fileDto);
+                        fileDto.setFileSize(file.length());
+                        String fileExtension =
+                                fileName.substring(fileName.lastIndexOf(".") + 1);
+                        fileDto.setFileExtension(fileExtension);
+                        fileService.save(fileDto);
                     }
                 }
             }

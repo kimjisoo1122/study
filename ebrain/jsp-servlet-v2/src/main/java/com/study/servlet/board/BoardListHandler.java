@@ -1,11 +1,11 @@
 package com.study.servlet.board;
 
-import com.study.dao.BoardDao;
 import com.study.dao.CategoryDao;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.CategoryDto;
 import com.study.page.PageHandler;
+import com.study.service.BoardService;
 import com.study.servlet.ServletHandler;
 import com.study.util.JspViewResolver;
 
@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class BoardListHandler implements ServletHandler {
+
+    private final BoardService boardService = BoardService.getBoardService();
+
     @Override
     public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 웹페이지 뒤로가기 캐시 방지 (조회수 반영)
@@ -26,15 +29,13 @@ public class BoardListHandler implements ServletHandler {
 
         // 검색조건 설정
         BoardSearchCondition condition = new BoardSearchCondition();
-
         condition.setConditionByReq(request);
 
         // 게시글 조회
-        BoardDao boardDao = new BoardDao();
-        List<BoardDto> boards = boardDao.findAll(condition);
+        List<BoardDto> boards = boardService.findAllByCondition(condition);
 
         // 총 게시글 조회
-        int totalCnt = boardDao.getTotalCnt(condition);
+        int totalCnt = boardService.countByCondition(condition);
 
         CategoryDao categoryDao = new CategoryDao();
         Set<Map.Entry<String, List<CategoryDto>>> categories = categoryDao.findAll().entrySet();

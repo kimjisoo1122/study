@@ -110,7 +110,7 @@
             <div class="file-input-container">
               <c:forEach items="<%=files%>" var="file">
                 <div class="file-container">
-                  <div class="file-name">${file.name}</div>
+                  <div class="file-name">${file.physicalName}</div>
                   <button class="file-download">
                     <a href="fileDown.jsp?fileId=${file.fileId}" class="file-download-a">Download</a>
                   </button>

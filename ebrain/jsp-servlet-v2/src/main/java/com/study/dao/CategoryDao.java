@@ -16,7 +16,7 @@ public class CategoryDao {
 
     public  Map<String, List<CategoryDto>> findAll() {
         String sql =
-                "select c1.category_id, c1.name, c1.parent_id, c2.name parent_name " +
+                "select c1.category_id, c1.category_name, c1.parent_id, c2.category_name parent_name " +
                 "from category c1 " +
                 "join category c2 on c1.parent_id = c2.category_id";
         List<CategoryDto> categories = new ArrayList<>();
@@ -28,7 +28,7 @@ public class CategoryDao {
             while (rs.next()) {
                 categories.add(
                         new CategoryDto(rs.getLong("category_id"),
-                                rs.getString("name"),
+                                rs.getString("category_name"),
                                 rs.getLong("parent_id"),
                                 rs.getString("parent_name")));
             }

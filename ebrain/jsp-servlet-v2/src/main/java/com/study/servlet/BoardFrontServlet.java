@@ -30,6 +30,7 @@ public class BoardFrontServlet extends HttpServlet {
         map.put("/board/update", new BoardUpdateHandler());
         map.put("/board/delete", new BoardDeleteHandler());
         map.put("/board/replyRegister", new ReplyRegisterHandler());
+        map.put("/board/fileDown", new BoardFileDownHandler());
         requestHandlerMap = map;
     }
 

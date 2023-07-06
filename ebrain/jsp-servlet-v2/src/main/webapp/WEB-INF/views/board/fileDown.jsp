@@ -4,6 +4,8 @@
 <%@ page import="java.io.FileInputStream" %>
 <%@ page import="java.io.FileNotFoundException" %>
 <%@ page import="java.io.OutputStream" %>
+<%@ page import="com.study.util.FileUtil" %>
+<%@ page import="com.study.service.FileService" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%
@@ -11,11 +13,11 @@
 
   // 파일dto 조회
   Long fileId = Long.parseLong(request.getParameter("fileId"));
-  FileDao fileDao = new FileDao();
-  FileDto fileDto = fileDao.findById(fileId);
+  FileService fileService = FileService.getFileService();
+  FileDto fileDto = fileService.findById(fileId);
 
   // 파일 생성
-  File file = new File(fileDto.getPath() + File.separator + fileDto.getName());
+  File file = FileUtil.getUploadedFile(fileDto.getPhysicalName());
 
   // 한글 오리지널파일명 인코딩
   String fileName = new String(fileDto.getOriginalName().getBytes("utf-8"), "8859_1");

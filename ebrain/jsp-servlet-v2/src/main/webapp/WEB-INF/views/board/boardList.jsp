@@ -51,7 +51,7 @@
                 <c:forEach items="${categoryMap.value}" var="category">
                 <option value="${category.categoryId}"
                   <c:if test="${category.categoryId == param.get('searchCategory')}">selected</c:if>>
-                  ${category.name}
+                  ${category.categoryName}
                 </option>
                 </c:forEach>
               </optgroup>

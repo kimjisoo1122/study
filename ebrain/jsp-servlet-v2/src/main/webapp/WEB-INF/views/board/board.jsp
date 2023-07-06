@@ -50,7 +50,7 @@
 
       <div class="file-container">
         <c:forEach items="<%=files%>" var="file">
-          <a href="fileDown.jsp?fileId=${file.fileId}">${file.name}</a>
+          <a href="/board/fileDown?fileId=${file.fileId}">${file.physicalName}</a>
         </c:forEach>
       </div>
 

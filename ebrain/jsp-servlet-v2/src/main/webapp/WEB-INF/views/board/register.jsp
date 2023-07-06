@@ -45,7 +45,7 @@
                 <c:forEach items="<%=categories%>" var="categoryMap">
                   <optgroup label="${categoryMap.key}">
                     <c:forEach items="${categoryMap.value}" var="category">
-                      <option value="${category.categoryId}">${category.name}</option>
+                      <option value="${category.categoryId}">${category.categoryName}</option>
                     </c:forEach>
                   </optgroup>
                 </c:forEach>

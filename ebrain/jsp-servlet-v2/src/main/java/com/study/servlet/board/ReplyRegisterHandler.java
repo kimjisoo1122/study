@@ -3,6 +3,7 @@ package com.study.servlet.board;
 import com.google.gson.Gson;
 import com.study.dao.ReplyDao;
 import com.study.dto.ReplyDto;
+import com.study.service.ReplyService;
 import com.study.servlet.ServletHandler;
 import com.study.util.StringUtil;
 
@@ -12,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class ReplyRegisterHandler implements ServletHandler {
+
+
+    private final ReplyService replyService = ReplyService.getReplyService();
     @Override
     public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -31,10 +35,9 @@ public class ReplyRegisterHandler implements ServletHandler {
         replyDto.setBoardId(Long.valueOf(boardIdStr));
         replyDto.setReplyContent(content);
         ReplyDao replyDao = new ReplyDao();
-        Long registerId = replyDao.register(replyDto);
 
-        // 댓글 조회
-        ReplyDto reply = replyDao.findById(registerId);
+        // 댓글 조회 (댓글 생성하면 등록한 댓글 반환)
+        ReplyDto reply = replyService.register(replyDto);
 
         // 댓글객체 -> json 응답
         Gson gson = new Gson();
