@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.CategoryMapper">
+
+    <!-- 모든 카테고리를 조회합니다. -->
+    <select id="selectAll"
+            resultType="CategoryDto">
+        SELECT c1.category_id,
+               c1.category_name,
+               c1.parent_id,
+               c2.category_name AS parent_name
+        FROM category c1
+            JOIN category c2 ON c1.parent_id = c2.category_id
+    </select>
+
+</mapper>

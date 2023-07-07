@@ -49,4 +49,13 @@ public interface StringUtil {
         }
         return str.matches("-?\\d+(\\.\\d+)?");
     }
+
+    /**
+     * 문자열을 Long으로 변환 합니다.
+     * @param value 유효한 숫자 문자열
+     * @return 유효하지 않으면 널을 반환합니다.
+     */
+    static Long toLong(String value) {
+        return StringUtil.isNumeric(value) ? Long.valueOf(value) : null;
+    }
 }

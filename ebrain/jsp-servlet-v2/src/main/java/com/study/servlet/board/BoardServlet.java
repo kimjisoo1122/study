@@ -7,7 +7,6 @@ import com.study.dto.ReplyDto;
 import com.study.service.BoardService;
 import com.study.service.FileService;
 import com.study.service.ReplyService;
-import com.study.servlet.MyServlet;
 import com.study.util.StringUtil;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 게시글번호로 게시글을 조회합니다.
+ * 게시글번호로 게시글을 조회하는 서블릿 입니다.
  */
 public class BoardServlet implements MyServlet {
 
@@ -25,17 +24,15 @@ public class BoardServlet implements MyServlet {
 
     @Override
     public String handle(Map<String, String> paramMap, Map<String, Object> model) throws IOException {
+        // 검색조건을 설정합니다.
         BoardSearchCondition condition = new BoardSearchCondition();
         condition.setConditionByParam(paramMap);
 
-        String boardIdParam = paramMap.get("boardId");
-        Long boardId = null;
-        if (StringUtil.isNumeric(boardIdParam)) {
-            boardId = Long.valueOf(boardIdParam);
-        } else {
-            // 게시글번호 잘못들어온 경우 게시글목록으로 리다이렉트
+        Long boardId = StringUtil.toLong(paramMap.get("boardId"));
+        if (boardId == null) {
             return "redirect:/board?" + condition.getQueryString();
         }
+
         // 조회수 증가
         boardService.increaseViewCnt();
         // 게시글 조회

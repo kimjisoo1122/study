@@ -28,4 +28,26 @@ function deleteFile(thisElm, fileId) {
   fileListElm.appendChild(hiddenInput);
 
   thisElm.parentElement.remove();
+
+  const fileInputConElm = document.querySelector('.file-input-container')
+  const fileInputLen = fileInputConElm.children.length;
+  const fileIdx = fileInputLen + 1;
+
+  const inputElm = document.createElement('div');
+  inputElm.setAttribute('class', 'file-register-container');
+  inputElm.innerHTML =
+      `
+        <input type="text"
+               class="file-disabled"
+               value="" 
+               disabled>
+        <label for="file${fileIdx}" class="file-input-label">파일 찾기</label>
+        <input type="file"
+               id="file${fileIdx}"
+               name="file${fileIdx}"
+               class="file-input"
+               onchange="uploadFile(this)">
+      `;
+
+  fileInputConElm.appendChild(inputElm);
 }

@@ -3,17 +3,21 @@ package com.study.service;
 import com.study.config.MyBatisSqlSessionFactory;
 import com.study.dto.FileDto;
 import com.study.mapper.FileMapper;
+import com.study.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
 
+import java.io.File;
 import java.util.List;
 
+/**
+ * 첨부파일의 비즈니스로직을 처리하는 서비스 입니다.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileService {
 
     private static final FileService FILE_SERVICE = new FileService();
-
 
     /**
      * 첨부파일을 등록합니다
@@ -53,7 +57,7 @@ public class FileService {
 
         try (SqlSession sqlSession = MyBatisSqlSessionFactory.openSession(true)) {
             FileMapper fileMapper = sqlSession.getMapper(FileMapper.class);
-            files = fileMapper.findByBoardId(boardId);
+            files = fileMapper.selectByBoardId(boardId);
         } catch (Exception e) {
             throw new IllegalStateException("첨부파일 조회에 실패하였습니다.", e);
         }
@@ -67,13 +71,12 @@ public class FileService {
      * @param fileId
      * @return
      */
-
     public FileDto findById(Long fileId) {
         FileDto fileDto = null;
 
         try (SqlSession sqlSession = MyBatisSqlSessionFactory.openSession(true)) {
             FileMapper fileMapper = sqlSession.getMapper(FileMapper.class);
-            fileDto = fileMapper.findById(fileId);
+            fileDto = fileMapper.selectById(fileId);
         } catch (Exception e) {
             throw new IllegalStateException("첨부파일 조회에 실패하였습니다.", e);
         }
@@ -82,7 +85,7 @@ public class FileService {
     }
 
     /**
-     * 첨부파일을 삭제합니다.
+     * 첨부파일과 업로드된 실제파일도 삭제합니다
      * @param fileId
      * @return 삭제행 갯수
      */
@@ -92,9 +95,14 @@ public class FileService {
 
         try {
             FileMapper fileMapper = sqlSession.getMapper(FileMapper.class);
-            deletedRow = fileMapper.delete(fileId);
 
-            // TODO 실제파일 삭제
+            FileDto fileDto = fileMapper.selectById(fileId);
+            File file = FileUtil.createFile(fileDto.getPhysicalName());
+            if (file.exists()) {
+                if (file.delete()) {
+                    deletedRow = fileMapper.delete(fileId);
+                }
+            }
 
             sqlSession.commit();
         } catch (Exception e) {
@@ -107,6 +115,9 @@ public class FileService {
         return deletedRow;
     }
 
+    /**
+     * @return FILE_SERVICE 싱글톤 객체 반환
+     */
     public static FileService getFileService() {
         return FILE_SERVICE;
     }

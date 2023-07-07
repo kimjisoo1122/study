@@ -1,6 +1,6 @@
 package com.study.util;
 
-import com.study.servlet.MyView;
+import com.study.servlet.modelview.MyView;
 
 public interface JspViewResolver {
 

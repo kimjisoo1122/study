@@ -9,8 +9,11 @@
 
 <%
   BoardSearchCondition condition = (BoardSearchCondition) request.getAttribute("condition");
-  BoardDto board = (BoardDto) Optional.ofNullable(request.getAttribute("board")).orElse(null);
-  String fileError = (String) Optional.ofNullable(request.getAttribute("fileError")).orElse(null);
+  BoardDto board = (BoardDto) request.getAttribute("board");
+  Map<String, List<CategoryDto>> categories =
+          (Map<String, List<CategoryDto>>) request.getAttribute("categories");
+  String fileError = (String) session.getAttribute("fileError");
+  session.removeAttribute("fileError");
 %>
 
 <html>
@@ -36,11 +39,6 @@
               <span class="required-star">*</span>
             </div>
             <div class="category-select-container">
-              <%-- 카테고리 조회 --%>
-              <%
-                CategoryDao categoryDao = new CategoryDao();
-                Set<Map.Entry<String, List<CategoryDto>>> categories = categoryDao.findAll().entrySet();
-              %>
               <select name="categoryId" class="category-select">
                 <c:forEach items="<%=categories%>" var="categoryMap">
                   <optgroup label="${categoryMap.key}">
@@ -135,8 +133,19 @@
           <div class="button-container">
             <button type="button" class="button-cancel">
               <c:url value="boardList.jsp" var="boardListUrl">
-                <c:param name="page" value="<%=String.valueOf(condition.getPage())%>"/>
-                <%@include file="condition/conditionParam.jsp"%>
+                <c:choose>
+                  <c:when test="<%=condition != null%>">
+                    <c:param name="page" value="<%=String.valueOf(condition.getPage())%>"/>
+                    <%@include file="condition/conditionParam.jsp"%>
+                  </c:when>
+                  <c:otherwise>
+                    <c:param name="page" value="${param.page}"/>
+                    <c:param name="fromDate" value="${param.fromDate}"/>
+                    <c:param name="toDate" value="${param.toDate}"/>
+                    <c:param name="search" value="${param.search}"/>
+                    <c:param name="searchCategory" value="${param.searchCategory}"/>
+                  </c:otherwise>
+                </c:choose>
               </c:url>
               <a href="${boardListUrl}" class="button-cancel-a">취소</a>
             </button>
@@ -145,16 +154,20 @@
 
         </div>
 
-        <%--검색조건--%>
-        <%@include file="condition/conditionHidden.jsp"%>
-
+        <%-- 검색조건 --%>
+        <c:choose>
+          <c:when test="<%=condition != null%>">
+            <%@include file="condition/conditionHidden.jsp"%>
+          </c:when>
+          <c:otherwise>
+            <input type="hidden" name="search" value="<c:out value="${param.search}"/>">
+            <input type="hidden" name="fromDate" value="<c:out value="${param.fromDate}"/>">
+            <input type="hidden" name="toDate" value="<c:out value="${param.toDate}"/>">
+            <input type="hidden" name="searchCategory" value="${param.searchCategory}"/>">
+            <input type="hidden" name="page" value="<c:out value="${param.page}"/>">
+          </c:otherwise>
+        </c:choose>
       </form>
 
     </body>
 </html>
-
-<%
-  session.removeAttribute("board");
-  session.removeAttribute("fileError");
-%>
-

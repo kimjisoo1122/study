@@ -3,14 +3,14 @@
 <%@ page import="com.study.dto.FileDto" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.study.dto.BoardSearchCondition" %>
-<%@ page import="java.util.Optional" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%
   BoardDto board = (BoardDto) request.getAttribute("board");
   List<FileDto> files = (List<FileDto>) request.getAttribute("files");
   BoardSearchCondition condition = (BoardSearchCondition) request.getAttribute("condition");
-  String fileError = (String) Optional.ofNullable(request.getAttribute("fileError")).orElse(null);
+  String fileError = (String) session.getAttribute("fileError");
+  session.removeAttribute("fileError");
 %>
 
 <html>
@@ -26,6 +26,7 @@
   <body>
     <form method="post"
           enctype="multipart/form-data"
+          action="/board/update?boardId=<%=board.getBoardId()%>"
           accept-charset="UTF-8"
           onsubmit="return validForm()">
 
@@ -112,7 +113,7 @@
                 <div class="file-container">
                   <div class="file-name">${file.physicalName}</div>
                   <button class="file-download">
-                    <a href="fileDown.jsp?fileId=${file.fileId}" class="file-download-a">Download</a>
+                    <a href="/board/fileDown?fileId=${file.fileId}" class="file-download-a">Download</a>
                   </button>
                   <button class="file-cancel"
                           type="button"
@@ -120,17 +121,17 @@
                   </button>
                 </div>
               </c:forEach>
-              <c:forEach begin="1" end="<%=3 - files.size()%>" varStatus="statue">
+              <c:forEach begin="1" end="<%=3 - files.size()%>" varStatus="status">
                 <div class="file-register-container">
                   <input type="text"
                          class="file-disabled"
                          value="<%=fileError == null ? "" : fileError%>"
                          style="<%=fileError == null ? "color : black" : "color : red"%>"
                          disabled>
-                  <label for="file${statue.index}" class="file-input-label">파일 찾기</label>
+                  <label for="file${status.index}" class="file-input-label">파일 찾기</label>
                   <input type="file"
-                         id="file${statue.index}"
-                         name="file${statue.index}"
+                         id="file${status.index}"
+                         name="file${status.index}"
                          class="file-input"
                          onchange="uploadFile(this)">
                 </div>

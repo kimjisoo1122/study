@@ -8,9 +8,9 @@ import java.util.List;
 public interface BoardMapper {
 
     int insert(BoardDto boardDto);
-    List<BoardDto> findAllByCondition(BoardSearchCondition condition);
+    List<BoardDto> selectByCondition(BoardSearchCondition condition);
     int countByCondition(BoardSearchCondition condition);
-    BoardDto findById(Long boardId);
+    BoardDto selectById(Long boardId);
     int update(BoardDto boardDto);
 
     void increaseViewCnt();

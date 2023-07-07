@@ -63,7 +63,7 @@ class BoardServiceTest {
         condition.setFromDate(now.minusYears(1).format(DateTimeFormatter.ISO_DATE));
         condition.setToDate(now.format(DateTimeFormatter.ISO_DATE));
 
-        List<BoardDto> boardsByCondition = boardService.findAllByCondition(condition);
+        List<BoardDto> boardsByCondition = boardService.findByCondition(condition);
 
         assertEquals(1, boardsByCondition.size());
 

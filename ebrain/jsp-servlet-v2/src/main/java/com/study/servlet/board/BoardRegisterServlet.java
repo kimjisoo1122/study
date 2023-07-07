@@ -1,96 +1,82 @@
 package com.study.servlet.board;
 
 import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.study.dto.BoardDto;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.FileDto;
 import com.study.exception.FileUploadPathNotExistException;
 import com.study.service.BoardService;
-import com.study.service.FileService;
-import com.study.servlet.MyServlet;
+import com.study.servlet.multipart.MyFileRenamePolicy;
 import com.study.util.FileUtil;
 import com.study.util.StringUtil;
 import com.study.validation.BoardValidation;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * 게시글을 등록하는 서블릿 입니다.
+ */
 public class BoardRegisterServlet implements MyServlet {
 
     private final BoardService boardService = BoardService.getBoardService();
-    private final FileService fileService = FileService.getFileService();
 
     @Override
     public String handle(Map<String, String> paramMap, Map<String, Object> model) throws IOException {
-        // 파일업로드 경로 확인
+        // 파일을 업로드할 경로를 확인합니다.
         if (!FileUtil.checkUploadPath()) {
             throw new FileUploadPathNotExistException();
         }
 
+
         HttpServletRequest request = (HttpServletRequest) model.get("request");
-        boolean hasError = false;
         MultipartRequest multi = null;
+
         try {
             multi = new MultipartRequest(
                     request, FileUtil.FILE_PATH, FileUtil.BOARD_FILE_MAX_SIZE, FileUtil.ENC_TYPE,
-                    new DefaultFileRenamePolicy());
+                    new MyFileRenamePolicy());
         } catch (IOException e) {
             e.printStackTrace();
-            //TODO 파일등록 실패
-            return "redirect:/board";
+            request.getSession().setAttribute("fileError", "잘못된 파일입니다.");
+            return "board/register";
         }
 
+        // 검색조건을 설정합니다.
         BoardSearchCondition condition = new BoardSearchCondition();
-        condition.setConditionByReq(multi);
+        condition.setConditionByMulti(multi);
 
         // 게시글 DTO 생성
-        BoardDto board = new BoardDto();
-        String categoryId = multi.getParameter("categoryId");
-        if (StringUtil.isNumeric(categoryId)) {
-            board.setCategoryId(Long.valueOf(categoryId));
+        BoardDto registerBoard = new BoardDto();
+        Long categoryId = StringUtil.toLong(multi.getParameter("categoryId"));
+        if (categoryId != null) {
+            registerBoard.setCategoryId(categoryId);
         }
-        board.setWriter(StringUtil.nvl(multi.getParameter("writer")));
-        board.setPassword(StringUtil.nvl(multi.getParameter("password")));
-        board.setTitle(StringUtil.nvl(multi.getParameter("title")));
-        board.setContent(StringUtil.nvl(multi.getParameter("content")));
+        registerBoard.setWriter(multi.getParameter("writer"));
+        registerBoard.setPassword(multi.getParameter("password"));
+        registerBoard.setTitle(multi.getParameter("title"));
+        registerBoard.setContent(multi.getParameter("content"));
 
-        if (!BoardValidation.validBoard(board)) {
-            hasError = true;
-            model.put("board", board);
-        } else {
-            Long boardId = boardService.register(board);
-            //TODO 게시글 생성 안될때 파일삭제처리
+        // 게시글 유효성 검증
+        if (!BoardValidation.isBoardValid(registerBoard)) {
+            // 게시글이 유효하지 않은경우 저장된 파일을 삭제처리 합니다.
+            FileUtil.deleteFromMulti(multi);
 
-            // 파일 db 저장
-            Enumeration fileInputs = multi.getFileNames();
-            while (fileInputs.hasMoreElements()) {
-                String fileInput = (String) fileInputs.nextElement();
-                String fileName = multi.getFilesystemName(fileInput);
-                String originalFileName = multi.getOriginalFileName(fileInput);
-                if (fileName != null) {
-                    File file = FileUtil.getUploadedFile(fileName);
-                    FileDto fileDto = new FileDto();
-                    fileDto.setBoardId(boardId);
-                    fileDto.setPhysicalName(fileName);
-                    fileDto.setPath(FileUtil.FILE_PATH);
-                    fileDto.setOriginalName(originalFileName);
-                    fileDto.setFileSize(file.length());
-                    String fileExtension =
-                            fileName.substring(fileName.lastIndexOf(".") + 1);
-                    fileDto.setFileExtension(fileExtension);
-                    fileService.save(fileDto);
-                }
-            }
-        }
+            model.put("board", registerBoard);
+            model.put("condition", condition);
 
-        if (hasError) {
             return "board/register";
         } else {
-            return "redirect:/board?" + condition.getQueryString();
+            // BoardDto의 files 리스트에 fileDto를 저장하여 트랜잭션내에서 동시에 등록합니다.
+            List<FileDto> files = FileUtil.getFilesFromMulti(multi);
+            registerBoard.setFiles(files);
+            // 게시글을 등록합니다.
+            boardService.register(registerBoard);
         }
+        return "redirect:/board?" + condition.getQueryString();
     }
+
+
 }

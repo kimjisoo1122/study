@@ -1,6 +1,6 @@
 package com.study.servlet.adapter;
 
-import com.study.servlet.MyModelAndView;
+import com.study.servlet.modelview.MyModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

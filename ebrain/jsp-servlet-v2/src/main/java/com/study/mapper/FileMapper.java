@@ -7,8 +7,8 @@ import java.util.List;
 public interface FileMapper {
 
     Long insert(FileDto fileDto);
-    List<FileDto> findByBoardId(Long boardId);
-    FileDto findById(Long fileId);
+    List<FileDto> selectByBoardId(Long boardId);
+    FileDto selectById(Long fileId);
     int delete(Long fileId);
     int deleteByBoardId(Long boardId);
 }

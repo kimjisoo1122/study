@@ -7,6 +7,9 @@ import org.apache.ibatis.session.SqlSession;
 
 import java.util.List;
 
+/**
+ * 댓글의 비즈니스로직을 처리하는 서비스 입니다.
+ */
 public class ReplyService {
 
     private static final ReplyService REPLY_SERVICE = new ReplyService();
@@ -15,7 +18,7 @@ public class ReplyService {
      * 게시글의 댓글을 등록한 후
      * 등록된 댓글을 조회하여 반환합니다.
      * @param replyDto
-     * @return ReplyDto
+     * @return ReplyDto 등록된 댓글객체
      */
     public ReplyDto register(ReplyDto replyDto) {
         SqlSession sqlSession = MyBatisSqlSessionFactory.openSession(false);
@@ -28,9 +31,8 @@ public class ReplyService {
             if (replyId == null) {
                 throw new IllegalStateException();
             }
-
-            // 댓글 조회
-            findReply = replyMapper.findById(replyId);
+            // 댓글을 조회합니다.
+            findReply = replyMapper.selectById(replyId);
 
             sqlSession.commit();
         } catch (Exception e) {
@@ -44,7 +46,7 @@ public class ReplyService {
     }
 
     /**
-     * 댓글 ID로 댓글을 조회합니다.
+     * 댓글을 조회합니다.
      * @param replyId
      * @return ReplyDto
      */
@@ -53,7 +55,7 @@ public class ReplyService {
 
         try (SqlSession sqlSession = MyBatisSqlSessionFactory.openSession(true)) {
             ReplyMapper replyMapper = sqlSession.getMapper(ReplyMapper.class);
-            replyDto = replyMapper.findById(replyId);
+            replyDto = replyMapper.selectById(replyId);
         } catch (Exception e) {
             throw new IllegalStateException("댓글 등록에 실패하였습니다.", e);
         }
@@ -71,7 +73,7 @@ public class ReplyService {
 
         try (SqlSession sqlSession = MyBatisSqlSessionFactory.openSession(true)) {
             ReplyMapper replyMapper = sqlSession.getMapper(ReplyMapper.class);
-            replies = replyMapper.findByBoardId(boardId);
+            replies = replyMapper.selectByBoardId(boardId);
         } catch (Exception e) {
             throw new IllegalStateException("댓글 등록에 실패하였습니다.", e);
         }
@@ -79,6 +81,9 @@ public class ReplyService {
         return replies;
     }
 
+    /**
+     * @return REPLY_SERVICE 싱글톤 객체 반환
+     */
     public static ReplyService getReplyService() {
         return REPLY_SERVICE;
     }

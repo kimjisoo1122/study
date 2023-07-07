@@ -8,7 +8,7 @@ public interface ReplyMapper {
 
     Long insert(ReplyDto replyDto);
 
-    ReplyDto findById(Long replyId);
+    ReplyDto selectById(Long replyId);
 
-    List<ReplyDto> findByBoardId(Long boardId);
+    List<ReplyDto> selectByBoardId(Long boardId);
 }

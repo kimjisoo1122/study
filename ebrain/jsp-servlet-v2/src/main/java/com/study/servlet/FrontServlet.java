@@ -1,10 +1,11 @@
-package com.study.servlet.board;
+package com.study.servlet;
 
 import com.study.exception.HandlerAdapterNotFoundException;
-import com.study.servlet.MyModelAndView;
-import com.study.servlet.MyView;
 import com.study.servlet.adapter.MyAdapter;
 import com.study.servlet.adapter.ServletAdapter;
+import com.study.servlet.board.*;
+import com.study.servlet.modelview.MyModelAndView;
+import com.study.servlet.modelview.MyView;
 import com.study.util.JspViewResolver;
 
 import javax.servlet.ServletException;
@@ -18,17 +19,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 게시판과 관련된 모든 요청을 처리하는 프론트 서블릿입니다.
+ * 특정 요청을 처리하는 핸들러를 찾고 어댑터를 통해 실행합니다.
+ */
 @WebServlet("/board/*")
 public class FrontServlet extends HttpServlet {
 
-    private final String REDIRECT_PATH = "redirect:";
+    // 리다이렉트 경로의 접두사
+    private final String redirectPath = "redirect:";
 
+    // GET 요청에 대한 핸들러 맵
     private final Map<String, Object> requestGetMap = new HashMap<>();
+    // POST 요청에 대한 핸들러 맵
     private final Map<String, Object> requestPostMap = new HashMap<>();
+    // 핸들러 어댑터 목록
     private final List<MyAdapter> adapters = new ArrayList<>();
 
     /**
-     * requestMapping을 등록한다.
+     * 서블릿 생성시 요청 맵과 어댑터를 초기화 합니다.
      */
     public FrontServlet() {
         initRequestGetMap();
@@ -38,65 +47,55 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*
-            requestMap에서 요청된 uri에 해당하는 handler 반환
-            adapeter가 handler를 처리할 수 있는 경우
-            request에 들어온 파라미터를 파싱하고 모델을 생성하여 실제 servlet에 전달
-            servlet의 반환된 값으로 ModelAndView를 생성하여 프론트서블릿에 반환
-            프론트서블릿은 viewResolver를 통해 실제 경로를 가지고 있는 view 리턴
-            view는 model and view에서 model을 request에 다시 담아 실제 view경로로 포워딩
-         */
-
-        // requestMap 조회
+        // 요청된 URI
         String requestURI = request.getRequestURI();
         Object handler = null;
-        // get or post
-        if (request.getMethod().equalsIgnoreCase("get")) {
+        // GET 또는 POST 요청에 따라 핸들러를 조회합니다.
+        if (request.getMethod().equalsIgnoreCase("GET")) {
             handler = requestGetMap.get(requestURI);
         } else {
             handler = requestPostMap.get(requestURI);
         }
-        // 요청한 URI가 잘못된 경우 게시글 목록 handler 리턴
+        // 핸들러가 존재 하지 않는 경우, 게시글 목록으로 조회합니다.
         if (handler == null) {
             handler = new BoardListServlet();
         }
 
-        // 어뎁터는 request를 파싱하고 모델을 생성하여 servlet을 호출하고8
-        // ModelAndView를 프론트서블릿에 반환 한다.
-        MyModelAndView modelAndView = null;
+        // 핸들러를 처리할 수 있는 어댑터를 조회합니다.
+        MyAdapter handlerAdapter = null;
         for (MyAdapter adapter : adapters) {
             if (adapter.isProcess(handler)) {
-                modelAndView = adapter.handle(request,response, handler);
+                handlerAdapter = adapter;
             }
         }
 
-        if (modelAndView == null) {
+        if (handlerAdapter == null) {
             throw new HandlerAdapterNotFoundException();
         }
 
-
+        // 서블릿 호출 결과 뷰와 모델을 담고 있습니다.
+        MyModelAndView modelAndView = handlerAdapter.handle(request, response, handler);
         String logicalViewPath = modelAndView.getLogicalViewPath();
-        // 응답 View 없는 경우 (파일 다운로드, 댓글)
+
+        // 응답 뷰가 없는 경우 파일다운로드 또는 댓글로 판단, 정상적으로 종료합니다.
         if (logicalViewPath == null) {
             return;
         }
 
-        // 리다이렉트
+        // 리다이렉트인지 확인 하여 경로를 추출하여 리다이렉트 합니다.
         if (isRedirectPath(logicalViewPath)) {
             response.sendRedirect(getRedirectPath(logicalViewPath));
-            // 리다이렉트는 그 즉시 페이지를 이동하는게 아니라
-            // 리다이렉트 이후 response header에 이동할 url을 반환하고 로직을 이어간다.
             return;
         }
 
-        // 뷰리졸버를 통해 MyView를 반환합니다.
+        // 뷰리졸버를 통해 논리적인 뷰 경로를 실제 물리적인 뷰 경로를 포함한 뷰 객체를 반환합니다.
         MyView myView = JspViewResolver.viewResolve(modelAndView.getLogicalViewPath());
-        // render를 통해 해당 view로 포워딩 합니다.
+        // 뷰를 통해 실제 뷰(JSP)를 호출 합니다.
         myView.render(modelAndView.getModel(), request, response);
     }
 
     /**
-     * GET requestMap을 초기화 합니다.
+     * GET 요청에 대한 핸들러를 초기화 합니다.
      */
     private void initRequestGetMap() {
         requestGetMap.put("/board", new BoardListServlet());
@@ -104,11 +103,10 @@ public class FrontServlet extends HttpServlet {
         requestGetMap.put("/board/board", new BoardServlet());
         requestGetMap.put("/board/update", new BoardUpdateFormServlet());
         requestGetMap.put("/board/fileDown", new FileDownServlet());
-        // POST
     }
 
     /**
-     * POST requestMap을 초기화 합니다.
+     * POST 요청에 대한 핸들러를 초기화 합니다.
      */
     private void initRequestPostMap() {
         requestPostMap.put("/board/register", new BoardRegisterServlet());
@@ -119,27 +117,28 @@ public class FrontServlet extends HttpServlet {
 
 
     /**
-     * adapters 초기화 합니다.
+     * 어댑터 목록을 초기화 합니다.
      */
     private void initAdapters() {
         adapters.add(new ServletAdapter());
     }
 
     /**
-     * 반환된 viewPath가 redirect인지 확인합니다.
-     * @param viewPath
-     * @return
+     * 제공된 뷰 경로가 리다이렉트를 나타내는지 확인합니다.
+     * @param viewPath 확인할 뷰 경로
+     * @return 뷰 경로가 리다이렉트를 나타내는 경우 true를 반환하고, 그렇지 않은 경우 false를 반환합니다.
      */
     private boolean isRedirectPath(String viewPath) {
-        return viewPath.startsWith(REDIRECT_PATH);
+        return viewPath.startsWith(redirectPath);
     }
 
     /**
-     * 리다이렉트 path인 경우 리다이렉트 URL 반환
-     * @param viewPath
-     * @return
+     * 리다이렉트 경로가 주어지면 실제 리다이렉트 URL을 반환합니다.
+     *
+     * @param viewPath 리다이렉트 경로
+     * @return 실제 리다이렉트 URL
      */
     private String getRedirectPath(String viewPath) {
-        return viewPath.replace(REDIRECT_PATH, "");
+        return viewPath.replace(redirectPath, "");
     }
 }

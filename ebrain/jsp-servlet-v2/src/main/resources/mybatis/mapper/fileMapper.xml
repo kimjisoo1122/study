@@ -24,7 +24,7 @@
     </insert>
 
     <!-- 게시글번호로 첨부파일을 조회합니다.-->
-    <select id="findByBoardId"
+    <select id="selectByBoardId"
             parameterType="long"
             resultType="FileDto">
         SELECT file_iD,
@@ -41,7 +41,7 @@
     </select>
 
     <!-- 파일 ID로 조회합니다. -->
-    <select id="findById"
+    <select id="selectById"
             parameterType="long"
             resultType="FileDto">
         SELECT file_iD,

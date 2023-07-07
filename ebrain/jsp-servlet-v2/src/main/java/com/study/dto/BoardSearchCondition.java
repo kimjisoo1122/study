@@ -4,43 +4,36 @@ import com.oreilly.servlet.MultipartRequest;
 import com.study.util.StringUtil;
 import lombok.Data;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Map;
 
+/**
+ * 게시글 검색 조건을 설정하는 클래스입니다.
+ */
 @Data
 public class BoardSearchCondition {
 
+    // 게시글 검색조건
     private String searchCategory;
     private String search;
     private String fromDate;
     private String toDate;
 
-    private int page;
-    private int pageSize;
+    // 페이징처리에 사용합니다.
+    private int page; // 현재페이지
+    private int pageSize; // 페이지 크기
+
+    // 조회 SQL에 사용합니다.
     private int offset;
     private int limit;
-
     /**
-     * 클라이언트의 request를 파싱하여 검색조건을 설정한다.
-     * @param request
+     * 멀티파트 폼 요청시에 게시글 검색조건을 설정합니다.
+     * @param multi
+     * @throws UnsupportedEncodingException 검색조건중에 한글을 인코딩합니다.
      */
-    public void setConditionByReq(HttpServletRequest request) throws UnsupportedEncodingException {
-        fromDate = StringUtil.nvl(request.getParameter("fromDate"));
-        toDate = StringUtil.nvl(request.getParameter("toDate"));
-        search = URLDecoder.decode(StringUtil.nvl(request.getParameter("search")), "UTF-8");
-        searchCategory = StringUtil.nvl(request.getParameter("searchCategory"));
-        page = Integer.parseInt(StringUtil.nvl(request.getParameter("page"), "1"));
-        pageSize = Integer.parseInt(StringUtil.nvl(request.getParameter("pageSize"), "10"));
-
-        // 페이징 처리
-        offset = (page - 1) * pageSize;
-        limit = pageSize;
-    }
-
-    public void setConditionByReq(MultipartRequest multi) throws UnsupportedEncodingException {
+    public void setConditionByMulti(MultipartRequest multi) throws UnsupportedEncodingException {
         fromDate = StringUtil.nvl(multi.getParameter("fromDate")) ;
         toDate = StringUtil.nvl(multi.getParameter("toDate"));
         search = URLDecoder.decode(StringUtil.nvl(multi.getParameter("search")), "UTF-8");
@@ -53,12 +46,11 @@ public class BoardSearchCondition {
         limit = pageSize;
     }
 
-    public String getQueryString() throws UnsupportedEncodingException {
-        return String.format(
-                "page=%s&fromDate=%s&toDate=%s&search=%s&searchCategory=%s",
-                page, fromDate, toDate, URLEncoder.encode(search, "UTF-8") , searchCategory);
-    }
-
+    /**
+     * 서블릿에서 사용하는 리퀘스트 정보를
+     * 담은 맵에서 검색조건들을 설정 합니다.
+     * @param paramMap
+     */
     public void setConditionByParam(Map<String, String> paramMap) {
         fromDate = StringUtil.nvl(paramMap.get("fromDate"));
         toDate = StringUtil.nvl(paramMap.get("toDate"));
@@ -75,5 +67,16 @@ public class BoardSearchCondition {
         // 페이징 처리
         offset = (page - 1) * pageSize;
         limit = pageSize;
+    }
+
+    /**
+     * 검색조건들을 쿼리스트링으로 변환합니다.
+     * @return 리다이렉트에 사용하는 쿼리스트링
+     * @throws UnsupportedEncodingException 검색조건중에 한글을 인코딩합니다.
+     */
+    public String getQueryString() throws UnsupportedEncodingException {
+        return String.format(
+                "page=%s&fromDate=%s&toDate=%s&search=%s&searchCategory=%s",
+                page, fromDate, toDate, URLEncoder.encode(search, "UTF-8") , searchCategory);
     }
 }

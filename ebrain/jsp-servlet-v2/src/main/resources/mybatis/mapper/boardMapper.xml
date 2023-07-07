@@ -23,7 +23,7 @@
     </insert>
 
     <!-- 게시글을 검색조건, 페이징처리하여 조회합니다. -->
-    <select id="findAllByCondition"
+    <select id="selectByCondition"
             parameterType="BoardSearchCondition"
             resultType="boardDto">
         SELECT b.board_id,
@@ -54,7 +54,7 @@
     </select>
 
     <!-- 게시글번호로 조회합니다. -->
-    <select id="findById"
+    <select id="selectById"
             parameterType="long"
             resultType="BoardDto">
         SELECT b.board_id,

@@ -16,7 +16,7 @@
     </insert>
 
     <!-- 댓글을 조회합니다. -->
-    <select id="findById"
+    <select id="selectById"
             parameterType="long"
             resultType="ReplyDto">
         SELECT
@@ -30,7 +30,7 @@
     </select>
 
     <!-- 게시글번호로 댓글을 조회합니다.-->
-    <select id="findByBoardId"
+    <select id="selectByBoardId"
             parameterType="long"
             resultType="ReplyDto">
         SELECT

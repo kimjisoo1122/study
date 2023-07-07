@@ -1,4 +1,4 @@
-package com.study.servlet;
+package com.study.servlet.board;
 
 import java.io.IOException;
 import java.util.Map;
