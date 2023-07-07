@@ -1,40 +1,33 @@
 package com.study.servlet.board;
 
 import com.google.gson.Gson;
-import com.study.dao.ReplyDao;
 import com.study.dto.ReplyDto;
 import com.study.service.ReplyService;
-import com.study.servlet.ServletHandler;
+import com.study.servlet.MyServlet;
 import com.study.util.StringUtil;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
-public class ReplyRegisterHandler implements ServletHandler {
-
+public class BoardReplyServlet implements MyServlet {
 
     private final ReplyService replyService = ReplyService.getReplyService();
-    @Override
-    public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-    }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String handle(Map<String, String> paramMap, Map<String, Object> model) throws IOException {
+        HttpServletResponse response = (HttpServletResponse) model.get("response");
         // 파라미터 파싱
-        String content = request.getParameter("content");
-        String boardIdStr = request.getParameter("boardId");
-        if (!StringUtil.isNumeric(boardIdStr)) {
+        String content = paramMap.get("content");
+        String boardIdParam = paramMap.get("boardId");
+        if (!StringUtil.isNumeric(boardIdParam)) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);;
         }
 
         // 댓글 생성
         ReplyDto replyDto = new ReplyDto();
-        replyDto.setBoardId(Long.valueOf(boardIdStr));
+        replyDto.setBoardId(Long.valueOf(boardIdParam));
         replyDto.setReplyContent(content);
-        ReplyDao replyDao = new ReplyDao();
 
         // 댓글 조회 (댓글 생성하면 등록한 댓글 반환)
         ReplyDto reply = replyService.register(replyDto);
@@ -43,5 +36,6 @@ public class ReplyRegisterHandler implements ServletHandler {
         Gson gson = new Gson();
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(gson.toJson(reply));
+        return null;
     }
 }

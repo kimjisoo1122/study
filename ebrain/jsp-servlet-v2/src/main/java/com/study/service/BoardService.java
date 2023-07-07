@@ -115,7 +115,6 @@ public class BoardService {
             BoardMapper boardMapper = sqlSession.getMapper(BoardMapper.class);
             updatedRow = boardMapper.update(boardDto);
 
-
             sqlSession.commit();
         } catch (Exception e) {
             sqlSession.rollback();

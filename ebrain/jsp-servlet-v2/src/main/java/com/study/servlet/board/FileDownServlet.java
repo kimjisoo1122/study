@@ -2,17 +2,20 @@ package com.study.servlet.board;
 
 import com.study.dto.FileDto;
 import com.study.service.FileService;
-import com.study.servlet.ServletHandler;
+import com.study.servlet.MyServlet;
 import com.study.util.FileUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-public class BoardFileDownHandler implements ServletHandler {
+public class FileDownServlet implements MyServlet {
     @Override
-    public void getHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String handle(Map<String, String> paramMap, Map<String, Object> model) throws IOException {
+        HttpServletRequest request = (HttpServletRequest) model.get("request");
+        HttpServletResponse response = (HttpServletResponse) model.get("response");
         // 파일dto 조회
         Long fileId = Long.parseLong(request.getParameter("fileId"));
         FileService fileService = FileService.getFileService();
@@ -22,7 +25,8 @@ public class BoardFileDownHandler implements ServletHandler {
         File file = FileUtil.getUploadedFile(fileDto.getPhysicalName());
 
         // 한글 오리지널파일명 인코딩 utf-8로 읽어서 8859_1로 인코딩
-        String fileName = new String(fileDto.getOriginalName().getBytes("utf-8"), "8859_1");
+        String fileName = new String(fileDto.getOriginalName()
+                .getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
 
         try (FileInputStream is = new FileInputStream(file)) {
             // 지정되지 않은 파일 형식
@@ -40,10 +44,6 @@ public class BoardFileDownHandler implements ServletHandler {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        return null;
     }
 }

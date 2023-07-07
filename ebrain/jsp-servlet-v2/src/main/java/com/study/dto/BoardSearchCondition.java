@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Map;
 
 @Data
 public class BoardSearchCondition {
@@ -56,5 +57,23 @@ public class BoardSearchCondition {
         return String.format(
                 "page=%s&fromDate=%s&toDate=%s&search=%s&searchCategory=%s",
                 page, fromDate, toDate, URLEncoder.encode(search, "UTF-8") , searchCategory);
+    }
+
+    public void setConditionByParam(Map<String, String> paramMap) {
+        fromDate = StringUtil.nvl(paramMap.get("fromDate"));
+        toDate = StringUtil.nvl(paramMap.get("toDate"));
+        search = StringUtil.nvl(paramMap.get("search"));
+        try {
+            search = URLDecoder.decode(search, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        searchCategory = StringUtil.nvl(paramMap.get("searchCategory"));
+        page = Integer.parseInt(StringUtil.nvl(paramMap.get("page"), "1"));
+        pageSize = Integer.parseInt(StringUtil.nvl(paramMap.get("pageSize"), "10"));
+
+        // 페이징 처리
+        offset = (page - 1) * pageSize;
+        limit = pageSize;
     }
 }
