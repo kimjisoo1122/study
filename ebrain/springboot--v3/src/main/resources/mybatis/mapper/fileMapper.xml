@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.FileMapper">
+
+    <!-- 첨부파일을 등록합니다. -->
+    <insert id="insert"
+            parameterType="FileDto"
+            useGeneratedKeys="true"
+            keyProperty="fileId">
+        INSERT INTO file
+            (board_id,
+             physical_name,
+             original_name,
+             path,
+             file_size,
+             file_extension)
+        VALUES
+            (#{boardId},
+             #{physicalName},
+             #{originalName},
+             #{path},
+             #{fileSize},
+             #{fileExtension})
+    </insert>
+
+    <!-- 게시글번호로 첨부파일을 조회합니다.-->
+    <select id="selectByBoardId"
+            parameterType="long"
+            resultType="FileDto">
+        SELECT file_iD,
+               board_id,
+               physical_name,
+               original_name,
+               path,
+               file_extension,
+               file_size,
+               create_date,
+               update_date
+        FROM file
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- 파일 ID로 조회합니다. -->
+    <select id="selectById"
+            parameterType="long"
+            resultType="FileDto">
+        SELECT file_iD,
+               board_id,
+               physical_name,
+               original_name,
+               path,
+               file_extension,
+               file_size,
+               create_date,
+               update_date
+        FROM file
+        WHERE file_id = #{fileId}
+    </select>
+
+    <!-- 첨부파일을 삭제합니다. -->
+    <delete id="delete"
+            parameterType="long">
+        DELETE FROM file WHERE file_id = #{fileId}
+    </delete>
+
+    <!-- 게시글의 등록된 첨부파일을 삭제합니다 -->
+    <delete id="deleteByBoardId"
+            parameterType="long">
+        DELETE FROM file WHERE file_id = #{boardId}
+    </delete>
+
+</mapper>

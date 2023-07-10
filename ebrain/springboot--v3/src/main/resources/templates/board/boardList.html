@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8">
+    <title>게시글 목록</title>
+    <link rel="stylesheet" th:href="@{/css/board/boardList.css}">
+    <script th:src="@{/js/board/boardList.js}"></script>
+  </head>
+  <body>
+
+    <div class="boardlist-container">
+
+      <form th:method="get" class="search-form">
+        <div class="search-container">
+          <div class="date-container">
+            <p class="date-register">등록일</p>
+            <input type="date"
+                   class="date-from"
+                   name="fromDate"
+                   th:value="${condition.getFromDate()}">
+            <span class="date-between"> ~ </span>
+            <input type="date"
+                   class="date-to"
+                   name="toDate"
+                   th:value="${condition.getToDate()}">
+          </div>
+          <div class="condition-container">
+
+            <select name="searchCategory" class="condition-category">
+              <option value="">전체 카테고리</option>
+                  <optgroup label="${categoryMap.key}"
+                            th:each="categoryMap : ${categories}">
+                      <option th:each="category : ${categoryMap.getValue()}"
+                              th:value="${category.getCategoryId()}"
+                              th:selected="${category.getCategoryId() == condition.getSearchCategory()}"
+                              th:text="${category.getCategoryName()}">
+                      </option>
+                  </optgroup>
+            </select>
+            <input type="text"
+                   name="search"
+                   class="condition-search"
+                   th:value="${condition.getSearch()}"
+                   placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)">
+            <button type="submit" class="condition-submit">검색9</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="total-container">
+        <p class="total-board" th:text="'총 ' + ${pageHandler.getTotalCnt()} + ' 건'"/>
+      </div>
+
+      <div class="list-container">
+        <ul class="list-header">
+          <li class="list-category">카테고리</li>
+          <li class="list-title">제목</li>
+          <li class="list-writer">작성자</li>
+          <li class="list-view">조회수</li>
+          <li class="list-create">등록 일시</li>
+          <li class="list-update">수정 일시</li>
+        </ul>
+
+          <div class="list-board-container" th:each="board : ${boards}">
+            <div class="list-category" th:text="${board.getCategoryName()}"></div>
+            <div class="list-title">
+              <span th:if="${board.isHasFile()}" class="list-title-file">File</span>
+              <a th:href="@{${'/board/' + board.getBoardId()} + ${condition.getQueryParamString(condition.getPage())}}"
+                 th:text="${board.getTitle()}"
+                 class="list-title-a">
+              </a>
+            </div>
+            <div class="list-writer" th:text="${board.getWriter()}"></div>
+            <div class="list-view" th:text="${board.getViewCnt()}"></div>
+            <div class="list-create" th:text="${board.getFormattedCreateDate()()}"></div>
+            <div class="list-update" th:text="${board.getFormattedUpdateDate()()}"></div>
+          </div>
+      </div>
+
+      <div class="paging-container" >
+        <div class="paging-prev-total-container">
+            <a th:if="${pageHandler.isPrevious()}"
+               th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}}"
+               class="paging-prev-total">&lt;&lt;
+            </a>
+        </div>
+
+        <div class="paging-prev-container">
+          <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()}"
+             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() - 1)}}"
+             class="paging-prev">&lt;
+          </a>
+        </div>
+
+        <div class="paging-index-container">
+          <a th:each="idx : ${#numbers.sequence(pageHandler.getBeginPage(), pageHandler.getMaxPage())}"
+             th:href="@{${'/board'} + ${condition.getQueryParamString(idx)}}"
+             th:text="${idx}"
+             class="paging-page">
+          </a>
+        </div>
+
+        <div class="paging-next-container">
+          <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()}"
+             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() + 1)}}"
+             class="paging-next">&gt;
+          </a>
+        </div>
+
+        <div class="paging-next-total-container">
+          <a th:if="${pageHandler.isNext()}"
+             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}}"
+             class="paging-next-total">&gt;&gt;
+          </a>
+        </div>
+
+      </div>
+
+      <div class="board-register-container">
+        <button class="board-register-button">
+          <a th:href="@{${'/board/register'} + ${condition.getQueryParamString(condition.getPage())}}">등록</a>
+        </button>
+      </div>
+
+    </div>
+
+<!--    <c:if test="${removeMsg != null}">-->
+<!--      <script>-->
+<!--        alert('${removeMsg}');-->
+<!--      </script>-->
+<!--      <%-->
+<!--      session.removeAttribute("removeMsg");-->
+<!--      %>-->
+<!--    </c:if>-->
+
+  </body>
+
+</html>

@@ -15,7 +15,7 @@ import java.util.Map;
 public class BoardSearchCondition {
 
     // 게시글 검색조건
-    private String searchCategory ;
+    private String searchCategory;
     private String search;
     private String fromDate;
     private String toDate;
@@ -27,18 +27,6 @@ public class BoardSearchCondition {
     // 조회 SQL에 사용합니다.
     private int offset;
     private int limit;
-
-    public BoardSearchCondition() {
-        this.searchCategory = "";
-        this.search = "";
-        this.fromDate = "";
-        this.toDate = "";
-
-        this.page = 1;
-        this.offset = 0;
-        this.limit = 10;
-    }
-
     /**
      * 멀티파트 폼 요청시에 게시글 검색조건을 설정합니다.
      * @param multi

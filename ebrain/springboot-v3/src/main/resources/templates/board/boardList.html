@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>게시글 목록</title>
-    <link th:href="@{/static/css/board/boardList.css}">
-    <script th:src="@{/static/js/board/boardList.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/board/boardList.css}">
+    <script th:src="@{/js/board/boardList.js}"></script>
   </head>
   <body>
 
@@ -28,7 +28,7 @@
 
             <select name="searchCategory" class="condition-category">
               <option value="">전체 카테고리</option>
-                  <optgroup label="${categoryMap.key}"
+                  <optgroup th:label="${categoryMap.key}"
                             th:each="categoryMap : ${categories}">
                       <option th:each="category : ${categoryMap.getValue()}"
                               th:value="${category.getCategoryId()}"
@@ -42,13 +42,13 @@
                    class="condition-search"
                    th:value="${condition.getSearch()}"
                    placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)">
-            <button type="submit" class="condition-submit">검색</button>
+            <button type="submit" class="condition-submit">검색9</button>
           </div>
         </div>
       </form>
 
       <div class="total-container">
-        <p class="total-board" th:text="총 ${pageHandler.getTotalCnt()} 건"/>
+        <p class="total-board" th:text="'총 ' + ${pageHandler.getTotalCnt()} + ' 건'"/>
       </div>
 
       <div class="list-container">
@@ -72,8 +72,8 @@
             </div>
             <div class="list-writer" th:text="${board.getWriter()}"></div>
             <div class="list-view" th:text="${board.getViewCnt()}"></div>
-            <div class="list-create" th:text="${board.getFormattedCreateDate()()}"></div>
-            <div class="list-update" th:text="${board.getFormattedUpdateDate()()}"></div>
+            <div class="list-create" th:text="${board.getFormattedCreateDate()}"></div>
+            <div class="list-update" th:text="${board.getFormattedUpdateDate()}"></div>
           </div>
       </div>
 
@@ -81,40 +81,36 @@
         <div class="paging-prev-total-container">
             <a th:if="${pageHandler.isPrevious()}"
                th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}}"
-               th:text="<<"
-               class="paging-prev-total">
+               class="paging-prev-total">&lt;&lt;
             </a>
         </div>
 
         <div class="paging-prev-container">
           <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()}"
              th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() - 1)}}"
-             th:text="<"
-             class="paging-prev">
+             class="paging-prev">&lt;
           </a>
         </div>
 
         <div class="paging-index-container">
-          <a th:each="idx : ${#numbers.sequence(${pageHandler.getBeginPage()}, ${pageHandler.getMaxPage()})}"
-             th:href="@{${'/board'} + ${condition.getQueryParamString(${idx})}}"
+          <a th:each="idx : ${#numbers.sequence(pageHandler.getBeginPage(), pageHandler.getMaxPage())}"
+             th:href="@{${'/board'} + ${condition.getQueryParamString(idx)}}"
              th:text="${idx}"
              class="paging-page">
           </a>
         </div>
 
         <div class="paging-next-container">
-          <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()()}"
+          <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()}"
              th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() + 1)}}"
-             th:text=">"
-             class="paging-next">
+             class="paging-next">&gt;
           </a>
         </div>
 
         <div class="paging-next-total-container">
           <a th:if="${pageHandler.isNext()}"
              th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}}"
-             th:text=">>"
-             class="paging-next-total">
+             class="paging-next-total">&gt;&gt;
           </a>
         </div>
 
