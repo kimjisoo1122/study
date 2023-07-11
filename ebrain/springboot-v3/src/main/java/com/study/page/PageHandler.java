@@ -1,9 +1,16 @@
 package com.study.page;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+/**
+ * 게시글의 페이지처리를 담당하는 핸들러 입니다.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 public class PageHandler {
 
     private int page;
@@ -15,6 +22,11 @@ public class PageHandler {
     private int totalCnt;
     private boolean isPrevious;
     private boolean isNext;
+
+    private int offset;
+    private int limit;
+
+
 
     public PageHandler(int page, int totalCnt) {
         this(page, totalCnt, 10);

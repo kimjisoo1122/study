@@ -1,3 +1,23 @@
+function validCategory() {
+  const categoryElm = document.querySelector('.category-select');
+  const categoryLength = categoryElm.value.length;
+  const errElm = document.querySelector('.category-select-error');
+  console.log(errElm);
+
+  if (categoryLength === 0) {
+    categoryElm.classList.add('select-error');
+    errElm.style.display = 'block';
+    errElm.textContent = '카테고리는 필수 항목 입니다.';
+    return false;
+  }
+
+  categoryElm.classList.remove('select-error');
+  errElm.style.display = 'none';
+
+  return true;
+}
+
+
 function validWriter() {
   const writerElm = document.querySelector('.writer-input');
   const writerLength = writerElm.value.length;
@@ -96,7 +116,9 @@ function validForm() {
   const validatedPassword = validPassword();
   const validatedTitle = validTitle();
   const validatedContent = validContent();
-  console.log(validatedWriter && validatedPassword && validatedTitle && validatedContent);
+  const validatedCategory = validCategory();
 
-  return validatedWriter && validatedPassword && validatedTitle && validatedContent;
+  console.log(validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory);
+
+  return validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory;
 }

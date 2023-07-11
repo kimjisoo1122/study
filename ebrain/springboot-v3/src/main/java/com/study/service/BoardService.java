@@ -6,12 +6,15 @@ import com.study.dto.FileDto;
 import com.study.mapper.BoardMapper;
 import com.study.mapper.FileMapper;
 import com.study.util.FileUtil;
+import com.study.util.StringUtil;
 import com.study.validation.BoardValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -74,7 +77,7 @@ public class BoardService {
      * @return 게시글 총 갯수
      */
     @Transactional(readOnly = true)
-    public int countByCondition(BoardSearchCondition condition) {
+    public int getTotalSize(BoardSearchCondition condition) {
         return boardMapper.countByCondition(condition);
     }
 

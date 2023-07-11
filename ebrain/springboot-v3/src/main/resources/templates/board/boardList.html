@@ -28,27 +28,27 @@
 
             <select name="searchCategory" class="condition-category">
               <option value="">전체 카테고리</option>
-                  <optgroup th:label="${categoryMap.key}"
-                            th:each="categoryMap : ${categories}">
-                      <option th:each="category : ${categoryMap.getValue()}"
-                              th:value="${category.getCategoryId()}"
-                              th:selected="${category.getCategoryId() == condition.getSearchCategory()}"
-                              th:text="${category.getCategoryName()}">
-                      </option>
-                  </optgroup>
+                <optgroup th:label="${categoryMap.key}"
+                          th:each="categoryMap : ${categories}">
+                    <option th:each="category : ${categoryMap.getValue()}"
+                            th:value="${category.getCategoryId()}"
+                            th:selected="${category.getCategoryId() == condition.getSearchCategory()}"
+                            th:text="${category.getCategoryName()}">
+                    </option>
+                </optgroup>
             </select>
             <input type="text"
                    name="search"
                    class="condition-search"
                    th:value="${condition.getSearch()}"
                    placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)">
-            <button type="submit" class="condition-submit">검색9</button>
+            <button type="submit" class="condition-submit">검색</button>
           </div>
         </div>
       </form>
 
       <div class="total-container">
-        <p class="total-board" th:text="'총 ' + ${pageHandler.getTotalCnt()} + ' 건'"/>
+        <p class="total-board" th:text="|총 ${pageHandler.getTotalCnt()} 건|"/>
       </div>
 
       <div class="list-container">
@@ -65,7 +65,7 @@
             <div class="list-category" th:text="${board.getCategoryName()}"></div>
             <div class="list-title">
               <span th:if="${board.isHasFile()}" class="list-title-file">File</span>
-              <a th:href="@{${'/board/' + board.getBoardId()} + ${condition.getQueryParamString(condition.getPage())}}"
+              <a th:href="@{'/board/' + ${board.getBoardId()} + ${condition.getQueryParamString()}}"
                  th:text="${board.getTitle()}"
                  class="list-title-a">
               </a>
@@ -80,21 +80,21 @@
       <div class="paging-container" >
         <div class="paging-prev-total-container">
             <a th:if="${pageHandler.isPrevious()}"
-               th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}}"
+               th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}}"
                class="paging-prev-total">&lt;&lt;
             </a>
         </div>
 
         <div class="paging-prev-container">
           <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()}"
-             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() - 1)}}"
+             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getPage() - 1)}}"
              class="paging-prev">&lt;
           </a>
         </div>
 
-        <div class="paging-index-container">
+        <div th:if="${pageHandler.getTotalCnt() != 0}" class="paging-index-container">
           <a th:each="idx : ${#numbers.sequence(pageHandler.getBeginPage(), pageHandler.getMaxPage())}"
-             th:href="@{${'/board'} + ${condition.getQueryParamString(idx)}}"
+             th:href="@{'/board' + ${condition.getQueryParamString(idx)}}"
              th:text="${idx}"
              class="paging-page">
           </a>
@@ -102,14 +102,14 @@
 
         <div class="paging-next-container">
           <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()}"
-             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getPage() + 1)}}"
+             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getPage() + 1)}}"
              class="paging-next">&gt;
           </a>
         </div>
 
         <div class="paging-next-total-container">
           <a th:if="${pageHandler.isNext()}"
-             th:href="@{${'/board'} + ${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}}"
+             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}}"
              class="paging-next-total">&gt;&gt;
           </a>
         </div>
@@ -118,7 +118,7 @@
 
       <div class="board-register-container">
         <button class="board-register-button">
-          <a th:href="@{${'/board/register'} + ${condition.getQueryParamString(condition.getPage())}}">등록</a>
+          <a th:href="@{'/board/register' + ${condition.getQueryParamString()}}">등록</a>
         </button>
       </div>
 

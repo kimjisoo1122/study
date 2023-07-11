@@ -40,17 +40,27 @@ input {
 .category-select-container {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
+  margin-left: 10px;
 }
 
 .category-select {
   height: 30px;
-  margin-left: 10px;
   padding: 0 5px;
   width: 200px;
+  margin: 5px 0;
 }
-.category-select option {
 
+.select-error {
+  border: 1px solid red;
 }
+
+.category-select-error {
+  color: red;
+  flex-basis: 100%;
+  font-size: 12px;
+}
+
 
 .writer-container {
   border-top: 1px solid black;
@@ -69,7 +79,6 @@ input {
 
 .writer-input-error {
   color: red;
-  display: none;
   font-size: 12px;
 }
 
@@ -95,7 +104,6 @@ input {
 
 .password-input-error {
   color: red;
-  display: none;
   font-size: 12px;
   flex-basis: 100%;
 }
@@ -118,7 +126,6 @@ input {
 
 .title-input-error {
   color: red;
-  display: none;
   font-size: 12px;
 }
 
@@ -143,7 +150,6 @@ input {
 
 .content-text-error {
   color: red;
-  display: none;
   font-size: 12px;
   margin: 5px 0;
 }

@@ -125,21 +125,20 @@
   text-decoration: none;
 }
 
-.paging-prev-total {
-  margin-right: 20px;
+.paging-prev, .paging-next, .paging-prev-total, .paging-next-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 2px;
 }
 
-.paging-prev, .paging-next {
-  margin-right: 15px;
-}
-
-.paging-next-total {
-  margin-left: 20px;
-}
 
 .paging-prev-total-container,.paging-prev-container,
 .paging-next-container, .paging-next-total-container {
   width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .paging-index-container {
