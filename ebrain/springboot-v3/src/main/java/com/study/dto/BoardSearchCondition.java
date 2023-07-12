@@ -20,7 +20,6 @@ public class BoardSearchCondition {
     private String toDate;
     private String search;
     private String searchCategory ;
-    private Long boardId;
 
     // 페이징처리에 사용합니다.
     private int page; // 현재 페이지

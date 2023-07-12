@@ -36,7 +36,7 @@
 
     <div class="file-container">
         <a th:each="file : ${files}"
-           th:href="@{/board/fileDown(fileId=${file.getFileId()})}"
+           th:href="@{/fileDown/{fileId}(fileId=${file.getFileId()})}"
            th:text="${file.getPhysicalName()}"/>
     </div>
 
@@ -54,8 +54,9 @@
                placeholder="댓글을 입력해 주세요.">
         <button
           type="submit"
+          data-th-boardId="${board.getBoardId()}"
           class="reply-register-button"
-          onclick="replyRegister()">등록
+          onclick="replyRegister(this.getAttribute('boardId'))">등록
         </button>
       </div>
     </div>

@@ -27,7 +27,6 @@ public class ReplyService {
     public ReplyDto register(ReplyDto replyDto) {
         replyMapper.insert(replyDto);
         Long replyId = replyDto.getReplyId();
-
         return replyMapper.selectById(replyId);
     }
 

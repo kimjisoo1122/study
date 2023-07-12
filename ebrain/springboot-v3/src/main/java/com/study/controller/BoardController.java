@@ -12,14 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.net.URLEncoder;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 게시글 관련 컨트롤러 입니다.
@@ -48,12 +44,13 @@ public class BoardController {
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @ModelAttribute(value = "condition") BoardSearchCondition condition,
             Model model) {
-        setPagination(page, pageSize, condition);
+
+        BoardSearchCondition paginatedCondition = configurePagination(page, pageSize, condition);
 
         model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("boards", boardService.findByCondition(condition));
+        model.addAttribute("boards", boardService.findByCondition(paginatedCondition));
         model.addAttribute("pageHandler",
-                new PageHandler(condition.getPage(), boardService.getTotalSize(condition)));
+                new PageHandler(paginatedCondition.getPage(), boardService.getTotalSize(paginatedCondition)));
 
         return "board/boardList";
     }
@@ -82,14 +79,14 @@ public class BoardController {
 
     /**
      * 게시글 등록폼으로 이동합니다
-     * @param board 게시글 DTO
+     * @param form 게시글 등록 Form
      * @param condition 검색조건
      * @param model
      * @return board/register
      */
     @GetMapping("/register")
     private String registerForm(
-            @ModelAttribute("board") BoardDto board,
+            @ModelAttribute("form") BoardRegisterForm form,
             @ModelAttribute("condition") BoardSearchCondition condition,
             Model model) {
 
@@ -99,51 +96,122 @@ public class BoardController {
     }
 
     /**
-     * 게시글을 등록합니다
-     * @param board 게시글 DTO
-     * @param bindingResult 게시글 Validation
+     * 게시글을 등록 합니다.
+     * @param form 게시글 등록 Form
+     * @param bindingResult Form 유효성검증 객체
      * @param condition 검색조건
-     * @param model
-     * @return redirect:/board
+     * @return
+     * @throws IOException
      */
     @PostMapping("/register")
     private String register(
-            @Validated @ModelAttribute("board") BoardDto board,
+            @Validated @ModelAttribute("form") BoardRegisterForm form,
             BindingResult bindingResult,
             @ModelAttribute("condition") BoardSearchCondition condition,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            Model model) throws IOException {
 
-        model.addAttribute("categories", categoryService.findAll());
-
-        if (bindingResult.hasErrors()) {
-            return "board/register";
+        if (!form.checkConfirmPassword()) {
+            bindingResult.rejectValue("confirmPassword", null,
+                    "비밀번호가 서로 맞지 않습니다.");
         }
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", categoryService.findAll());
+            return "board/register";
+        }
+        // 유효성 검증 종료
 
+        boardService.register(form);
 
-        setRedirectFromCondition(condition, redirectAttributes);
-        return "redirect:/board";
+        // 한글 파라미터 인코딩 (서버내에선 한글 인코딩 해야함, URI입력은 톰캣이 해줌)
+        return "redirect:/board" + encodeQueryParam(condition).getQueryParamString();
     }
 
-    private void setRedirectFromCondition(BoardSearchCondition condition, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addAttribute("fromDate", condition.getFromDate());
-        redirectAttributes.addAttribute("toDate", condition.getToDate());
-        redirectAttributes.addAttribute("search", condition.getSearch());
-        redirectAttributes.addAttribute("searchCategory", condition.getSearchCategory());
+    @GetMapping("/update/{boardId}")
+    public String updateForm(
+            @PathVariable("boardId") Long boardId,
+            @ModelAttribute("condition") BoardSearchCondition condition,
+            Model model) {
+
+        BoardDto findBoard = boardService.findById(boardId);
+        BoardUpdateForm updateForm = createUpdateForm(findBoard);
+
+        model.addAttribute("form", updateForm);
+        model.addAttribute("files", fileService.findByBoardId(boardId));
+        model.addAttribute("categories", categoryService.findAll());
+
+        return "board/update";
     }
 
+    @PostMapping("/update/{boardId}")
+    public String update(
+            @PathVariable("boardId") Long boardId,
+            @ModelAttribute("condition") BoardSearchCondition condition,
+            @Validated @ModelAttribute("form") BoardUpdateForm form,
+            BindingResult bindingResult,
+            Model model) throws IOException {
+
+        if (!boardService.isPasswordMatch(boardId, form.getPassword())) {
+            bindingResult.rejectValue("password", null,
+                    "비밀번호가 맞지 않습니다");
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("files", fileService.findByBoardId(boardId));
+            model.addAttribute("categories", categoryService.findAll());
+            return "board/update";
+        }
+        // 유효성 검증 종료
+
+        boardService.update(form);
+
+
+
+        return "redirect:/board/" + boardId + encodeQueryParam(condition).getQueryParamString();
+    }
+
+    /**
+     * 서버 내부에서 리다이렉트하는 경우 쿼리스트링을 인코딩해준다.
+     * @param condition 검색조건
+     * @return 인코딩된 검색조건
+     */
+    private BoardSearchCondition encodeQueryParam(BoardSearchCondition condition) {
+        condition.setSearch(UriUtils.encode(condition.getSearch(), StandardCharsets.UTF_8));
+        return condition;
+    }
+
+    /**
+     * 게시글 DTO를 업데이트 전용 DTO로 변환하여 반환합니다.
+     * @param boardDto 게시글 DTO
+     * @return BoardUpdateForm 업데이트 Form
+     */
+    private BoardUpdateForm createUpdateForm(BoardDto boardDto) {
+
+        BoardUpdateForm boardUpdateForm = new BoardUpdateForm();
+        boardUpdateForm.setBoardId(boardDto.getBoardId());
+        boardUpdateForm.setCategoryId(boardDto.getCategoryId());
+        boardUpdateForm.setCategoryName(boardDto.getCategoryName());
+        boardUpdateForm.setWriter(boardDto.getWriter());
+        boardUpdateForm.setTitle(boardDto.getTitle());
+        boardUpdateForm.setContent(boardDto.getContent());
+        boardUpdateForm.setViewCnt(boardDto.getViewCnt());
+        boardUpdateForm.setCreateDate(boardDto.getCreateDate());
+        boardUpdateForm.setUpdateDate(boardDto.getUpdateDate());
+        return boardUpdateForm;
+    }
 
     /**
      * 검색조건 페이징처리를 위한 condition객체의 값을 설정합니다.
      * @param page
      * @param pageSize
      * @param condition
+     * @return BoardSearchCondition 페이지설정된 검색조건 객체
      */
-    private void setPagination(int page, int pageSize, BoardSearchCondition condition) {
+    private BoardSearchCondition configurePagination(int page, int pageSize, BoardSearchCondition condition) {
         condition.setPage(page);
         condition.setPageSize(pageSize);
         condition.setOffset((page - 1) * pageSize);
         condition.setLimit(pageSize);
+        return condition;
     }
 }

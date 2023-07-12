@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>에러페이지</title>
+</head>
+<body>
+스프링부트는 컨트롤러에서 익셉션을 발생시키거나, resoponse.sendError를 보내면 에러를 발생시킨다.
+에러는 컨트롤러에서 발생한 에러를 인터셉터 -> 서블릿 -> 필터 -> was순으로 다시 역으로 보내고
+was는 에러를 확인하고 /error url로 다시 컨트롤러에 요청한다 이떄 request의 dispather type은 error이다
+그러므로 필터나 인터셉터를 커스터마이징하거나 추가할때 필터는 디스페처타입을 request(디폴트)로 설정하고
+인터셉터는 exclued로 /error/* error url을 추가하여 제외시키면 된다.
+
+WebServerFactoryCustomizer<<ConfigurableWebServerFacotry>>를 구현해서 bean으로 등록하여
+에러페이지를 추가하면 해당 에러에 맞는 url을 만들어줄수있다
+이런설정이없으면 모든 에러에 대한 요청을 /error로 보내 basicerrorcontroller가 처리하게 만든다
+에러컨트롤러는 에러를 받으면 템플릿 -> 정적 -> 그냥 의 error폴더의 5xx, 500 이런 에러코드에 맞는 html파일을 찾아서 반환한다.
+고로 우리는 error폴더에 해당코드에 맞는 500이나 404 같은 html 파일을 만들어주면 된다
+이때 전송되는 request의 attribute에 에러정보들이 담겨져있으니 나중에 확인
+
+베이직에러컨트롤러가 produce의 text/html || application/json에 따라 응답을 form또는 responseenttiy로 반환한다.
+api의 에러같은 경우에는 form으로 내보내면 안되니까 json형태로 내보내야 한다.
+api의 경우 basicerrocontroller를 사용하기보단 @ExceptionHandler로 처리한다.
+
+
+스프링에서 예외를 처리하는 exception resolver가 존재한다 HandlrExceptionResolver를 구현해서
+  예외를 try 로 잡아서 빈 모델앤 뷰를 반환하면 정상처리로 인식한다.
+  null을 반환하면 다른 리졸버를 찾고 없으면 에러를 그대로 전달한다.
+  예외를 잡아서 sendError로 다른 에러로 전달할 수도 있고 response.getWriter를통해 바디에직접 문자열이나 json을 넣을수도 있다
+  물론 WebMvcConfiguer에 extentHandlrResolver로 추가해야한다.
+
+  인터셉터에서는 preHandle = 컨트롤러 호출 직전 postandle = 컨트롤러가 성공처리 afterCompletion 어떤상태에서도 (에러포함)
+
+  스프링부트의 익셉션리졸버는 3개가 등록되있음
+  1.@ExceptionHandlerResolver
+  2.ResponseStatusExceptionResolver = @ResponserStatus(reason="에러코드")
+  3.DefaultExceptionResolver = 스프링내부에서 발생하는 에러 (파라미터바인딩) => 400에러로 전달함
+
+  근데 결국 @ExceptuonHnadlerResolver를씀
+
+  단순 view 컨트롤러의 경우 -> BasicErrorController로 400 500해결
+  api의 경우 @ExceptionHandler를 사용
+</body>
+</html>

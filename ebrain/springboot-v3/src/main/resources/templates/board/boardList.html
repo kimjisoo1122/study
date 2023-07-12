@@ -32,7 +32,7 @@
                           th:each="categoryMap : ${categories}">
                     <option th:each="category : ${categoryMap.getValue()}"
                             th:value="${category.getCategoryId()}"
-                            th:selected="${category.getCategoryId() == condition.getSearchCategory()}"
+                            th:selected="${category.getCategoryId()} == ${condition.getSearchCategory()}"
                             th:text="${category.getCategoryName()}">
                     </option>
                 </optgroup>

@@ -39,7 +39,7 @@ input {
   width: 1000px;
 }
 
-.category-name, .create-date, .update-date, .view-cnt, .writer-input-container,
+.create-date, .update-date, .view-cnt, .writer-input-container,
 .password-input-container, .title-input-container, .file-input-container  {
   align-items: center;
   display: flex;
@@ -50,9 +50,25 @@ input {
 .writer-input-error, .password-input-error,
 .title-input-error, .content-text-error {
   color: red;
-  display: none;
   flex-basis: 100%;
   font-size: 12px;
+}
+
+.select-error {
+  border: 1px solid red;
+}
+
+.category-select-container {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 5px 10px;
+}
+
+.category-select-error {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: red;
 }
 
 .title-input-container {

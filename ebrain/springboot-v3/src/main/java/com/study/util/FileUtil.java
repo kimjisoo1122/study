@@ -1,5 +1,7 @@
 package com.study.util;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.File;
 
 /**

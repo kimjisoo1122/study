@@ -172,10 +172,6 @@ input {
   border: 1px solid black;
 }
 
-.file-error {
-  margin-left: 10px;
-}
-
 .file-input-container label {
   border: 1px solid black;
   background-color: lightgray;
@@ -185,11 +181,6 @@ input {
 
 .file-input-container input[type="file"] {
   display: none;
-}
-
-.file-error {
-  color: red;
-  font-size: 12px;
 }
 
 .button-container {

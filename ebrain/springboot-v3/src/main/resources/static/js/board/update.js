@@ -1,15 +1,16 @@
+function uploadFile(idx) {
+  const fileElm = document.querySelector(`input[type="file"][idx="${idx}"]`);
+  const disabledElm = document.querySelector(`input[disabled][idx="${idx}"]`);
 
-function uploadFile(thisElm) {
-  const fileName = thisElm.value.split('/').pop().split('\\').pop();
-  const disabledElm = thisElm.parentElement.querySelector('input[disabled]');
+
+  const fileName = fileElm.value.split('/').pop().split('\\').pop();
   disabledElm.value = fileName;
 
-  // 파일 사이즈 체크
-  if (thisElm.files) {
-    const fileSize = thisElm.files[0].size;
+  if (fileElm.files) {
+    const fileSize = fileElm.files[0].size;
 
     if (fileSize / (1024 * 1024) > 10) {
-      thisElm.value = '';
+      fileElm.value = '';
       disabledElm.value = '10MB를 넘을 수 없습니다.';
       disabledElm.style.color = 'red';
     } else {
@@ -17,13 +18,12 @@ function uploadFile(thisElm) {
     }
   }
 }
-
 function deleteFile(thisElm, fileId) {
   const fileListElm = document.querySelector('.file-list-container');
   const hiddenInput = document.createElement('input');
 
   hiddenInput.setAttribute('type', 'hidden');
-  hiddenInput.setAttribute('name', 'fileId');
+  hiddenInput.setAttribute('name', 'fileIds');
   hiddenInput.setAttribute('value', fileId);
   fileListElm.appendChild(hiddenInput);
 
@@ -39,14 +39,16 @@ function deleteFile(thisElm, fileId) {
       `
         <input type="text"
                class="file-disabled"
+               idx="${fileIdx}"
                value="" 
                disabled>
         <label for="file${fileIdx}" class="file-input-label">파일 찾기</label>
         <input type="file"
                id="file${fileIdx}"
-               name="file${fileIdx}"
+               idx="${fileIdx}"
+               name="files"
                class="file-input"
-               onchange="uploadFile(this)">
+               onchange="uploadFile(this.getAttribute('idx'))">
       `;
 
   fileInputConElm.appendChild(inputElm);

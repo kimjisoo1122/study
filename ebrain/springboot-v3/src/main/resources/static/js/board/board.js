@@ -1,6 +1,6 @@
 function replyRegister(boardId) {
   const inputElm = document.querySelector('.reply-register-input');
-  const content = inputElm.value;
+  const replyContent = inputElm.value;
 
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
@@ -9,11 +9,10 @@ function replyRegister(boardId) {
         const replyDto = JSON.parse(xhr.responseText);
         const containerElm = document.querySelector('.reply-list-container');
 
-        const formatCreateDate = formatDate(replyDto.createDate);
         const reply =
             `
             <div class="reply">
-              <div class="reply-date">${formatCreateDate}</div>
+              <div class="reply-date">${replyDto.formattedCreateDate}</div>
               <div class="reply-content">${replyDto.replyContent}</div>
             </div>
             `
@@ -27,23 +26,28 @@ function replyRegister(boardId) {
     }
   }
 
-  xhr.open('POST', '/board/reply', true);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+  xhr.open('POST', '/reply/register', true);
+  xhr.setRequestHeader("Content-Type", "application/json")
 
-  xhr.send("boardId=" + encodeURIComponent(boardId) + "&content=" + encodeURIComponent(content));
+  const data = {
+    boardId: boardId,
+    replyContent: replyContent,
+  }
+
+  xhr.send(JSON.stringify(data));
 }
 
-function formatDate(localDateTime) {
-  const date = localDateTime.date;
-  const time = localDateTime.time;
-  const year = date.year;
-  const month = date.month.toString().padStart(2, '0');
-  const day = date.day.toString().padStart(2, '0');
-  const hours = time.hour.toString().padStart(2, '0');
-  const minute = time.minute.toString().padStart(2, '0');
-
-  return year + '.' + month + '.' + day + ' ' + hours + ':' + minute;
-}
+// function formatDate(localDateTime) {
+//   const date = localDateTime.date;
+//   const time = localDateTime.time;
+//   const year = date.year;
+//   const month = date.month.toString().padStart(2, '0');
+//   const day = date.day.toString().padStart(2, '0');
+//   const hours = time.hour.toString().padStart(2, '0');
+//   const minute = time.minute.toString().padStart(2, '0');
+//
+//   return year + '.' + month + '.' + day + ' ' + hours + ':' + minute;
+// }
 
 function removeCancel() {
   const modalElm = document.querySelector('.remove-modal-bg');

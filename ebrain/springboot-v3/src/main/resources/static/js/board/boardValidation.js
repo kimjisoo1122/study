@@ -2,7 +2,11 @@ function validCategory() {
   const categoryElm = document.querySelector('.category-select');
   const categoryLength = categoryElm.value.length;
   const errElm = document.querySelector('.category-select-error');
-  console.log(errElm);
+  const thErrElm = document.querySelector('.category-select-error.th-err');
+
+  if (thErrElm) {
+    thErrElm.style.display = 'none';
+  }
 
   if (categoryLength === 0) {
     categoryElm.classList.add('select-error');
@@ -22,6 +26,11 @@ function validWriter() {
   const writerElm = document.querySelector('.writer-input');
   const writerLength = writerElm.value.length;
   const errElm = document.querySelector('.writer-input-error');
+  const thErrElm = document.querySelector('.writer-input-error.th-err');
+
+  if (thErrElm) {
+    thErrElm.style.display = 'none';
+  }
 
   if (writerLength < 3 || writerLength >= 5) {
     writerElm.classList.add('input-error');
@@ -41,6 +50,11 @@ function validPassword() {
   const confirmElm = document.querySelector('.password-input-confirm');
   const pwd = pwdElm.value;
   const errElm = document.querySelector('.password-input-error');
+  const thErrElm = document.querySelector('.password-input-error.th-err');
+
+  if (thErrElm) {
+    thErrElm.style.display = 'none';
+  }
 
   if (pwd.length < 4 || pwd.length > 15) {
     pwdElm.classList.add('input-error');
@@ -78,6 +92,11 @@ function validPassword() {
 function validTitle() {
   const titleElm = document.querySelector('.title-input');
   const errElm = document.querySelector('.title-input-error');
+  const thErrElm = document.querySelector('.title-input-error.th-err');
+
+  if (thErrElm) {
+    thErrElm.style.display = 'none';
+  }
 
   if (titleElm.value.length < 4 || titleElm.value.length > 99) {
     titleElm.classList.add('input-error')
@@ -96,6 +115,11 @@ function validTitle() {
 function validContent() {
   const contentElm = document.querySelector('.content-text');
   const errElm = document.querySelector('.content-text-error');
+  const thErrElm = document.querySelector('.content-text-error.th-err');
+
+  if (thErrElm) {
+    thErrElm.style.display = 'none';
+  }
 
   if (contentElm.value.length < 4 || contentElm.value.length > 1999) {
     contentElm.classList.add('input-error');
@@ -118,7 +142,10 @@ function validForm() {
   const validatedContent = validContent();
   const validatedCategory = validCategory();
 
-  console.log(validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory);
+  const validateResult = validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory;
+  if (!validateResult) {
+    console.error('유효성 검증 실패');
+  }
 
-  return validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory;
+  return validateResult;
 }

@@ -13,6 +13,7 @@ public class ReplyDto {
     private String replyContent;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private String formattedCreateDate;
 
     public String getFormattedCreateDate() {
         return createDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
