@@ -18,11 +18,10 @@ function replyRegister(boardId) {
             `
 
         containerElm.insertAdjacentHTML('beforeend', reply);
-
-        inputElm.value = '';
       } else {
-        console.error('댓글 등록 실패');
+        console.error(xhr.responseText);
       }
+      inputElm.value = '';
     }
   }
 

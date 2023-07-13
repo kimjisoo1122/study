@@ -34,8 +34,7 @@
                path,
                file_extension,
                file_size,
-               create_date,
-               update_date
+               create_date
         FROM file
         WHERE board_id = #{boardId}
     </select>
@@ -51,8 +50,7 @@
                path,
                file_extension,
                file_size,
-               create_date,
-               update_date
+               create_date
         FROM file
         WHERE file_id = #{fileId}
     </select>

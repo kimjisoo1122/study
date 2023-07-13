@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
 import java.io.FileNotFoundException;
@@ -24,22 +23,29 @@ import java.nio.charset.StandardCharsets;
  */
 @Controller
 @RequestMapping("/fileDown")
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class FileDownController {
 
     private final FileService fileService;
 
+    /**
+     * 파일다운로드를 처리합니다.
+     * @param fileId 파일번호
+     * @return 파일다운로드
+     * @throws MalformedURLException 파일경로가 올바르지 않은경우
+     * @throws FileNotFoundException 파일을 찾지 못했을 경우
+     */
     @GetMapping("/{fileId}")
     public ResponseEntity<Resource> fileDown(
             @PathVariable("fileId") Long fileId) throws MalformedURLException, FileNotFoundException {
 
+
         FileDto findFile = fileService.findById(fileId);
-        String fullPath = findFile.getPath() + findFile.getPhysicalName();
-        UrlResource resource = new UrlResource("file:" + fullPath);
+        UrlResource resource = new UrlResource("file:" + findFile.getFullPath());
 
         if (!resource.exists() || !resource.isReadable()) {
-            throw new FileNotFoundException("download file not found ......" + fullPath);
+            throw new FileNotFoundException("download file not found ......" + findFile.getFullPath());
         }
 
         String encodedOriginalFileName = UriUtils.encode(findFile.getOriginalName(), StandardCharsets.UTF_8);

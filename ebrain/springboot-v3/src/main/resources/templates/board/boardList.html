@@ -124,14 +124,12 @@
 
     </div>
 
-<!--    <c:if test="${removeMsg != null}">-->
-<!--      <script>-->
-<!--        alert('${removeMsg}');-->
-<!--      </script>-->
-<!--      <%-->
-<!--      session.removeAttribute("removeMsg");-->
-<!--      %>-->
-<!--    </c:if>-->
+    <script th:inline="javascript">
+      const deleteMsg = /*[[${deleteMsg}]]*/
+      if (deleteMsg) {
+        alert(deleteMsg);
+      }
+    </script>
 
   </body>
 

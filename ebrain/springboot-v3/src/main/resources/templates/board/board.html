@@ -90,8 +90,8 @@
 
   <div class="remove-modal-bg">
     <div class="remove-modal">
-      <form method="post"
-            action="/board/delete"
+      <form th:method="post"
+            th:action="|/board/delete/${board.getBoardId()}|"
             onsubmit="return validRemovePassword()">
         <div class="remove-password-container">
           <div class="remove-password-title">비밀번호
@@ -115,7 +115,6 @@
           </button>
         </div>
 
-        <input type="hidden" name="boardId" th:value="${board.getBoardId()}">
         <input type="hidden" name="search" th:value="${condition.getSearch()}">
         <input type="hidden" name="fromDate" th:value="${condition.getFromDate()}">
         <input type="hidden" name="toDate" th:value="${condition.getToDate()}">
@@ -125,6 +124,13 @@
       </form>
     </div>
   </div>
+
+  <script th:inline="javascript">
+    const deleteMsg = /*[[${deleteMsg}]]*/
+    if (deleteMsg) {
+      alert(deleteMsg);
+    }
+  </script>
 
   </body>
 </html>

@@ -21,7 +21,7 @@ public class ReplyService {
     /**
      * 게시글의 댓글을 등록한 후
      * 등록된 댓글을 조회하여 반환합니다.
-     * @param replyDto
+     * @param replyDto 댓글정보 (boardId (게시글번호), replyContent (댓글내용)
      * @return ReplyDto 등록된 댓글객체
      */
     public ReplyDto register(ReplyDto replyDto) {
@@ -32,8 +32,8 @@ public class ReplyService {
 
     /**
      * 댓글을 조회합니다.
-     * @param replyId
-     * @return ReplyDto
+     * @param replyId 댓글번호
+     * @return ReplyDto 댓글정보
      */
     @Transactional(readOnly = true)
     public ReplyDto findById(Long replyId) {
@@ -42,12 +42,11 @@ public class ReplyService {
 
     /**
      * 게시글번호로 댓글을 조회합니다.
-     * @param boardId
-     * @return List<ReplyDto>
+     * @param boardId 게시글 번호
+     * @return List<ReplyDto> 게시글 댓글정보
      */
     @Transactional(readOnly = true)
     public List<ReplyDto> findByBoardId(Long boardId) {
-
         return replyMapper.selectByBoardId(boardId);
     }
 }

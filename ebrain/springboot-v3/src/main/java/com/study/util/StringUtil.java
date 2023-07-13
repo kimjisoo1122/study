@@ -28,34 +28,4 @@ public interface StringUtil {
             return value;
         }
     }
-
-    /**
-     * String값의 null과 ""(빈값)체크
-     * @param value
-     * @return null or empty -> true
-     */
-    static boolean isEmpty(String value) {
-        return value == null || value.trim().length() == 0;
-    }
-
-    /**
-     * 스트링 문자열이 정수 또는 실수인지 확인한다.
-     * @param str
-     * @return
-     */
-    static boolean isNumeric(String str) {
-        if (str == null) {
-            return false;
-        }
-        return str.matches("-?\\d+(\\.\\d+)?");
-    }
-
-    /**
-     * 문자열을 Long으로 변환 합니다.
-     * @param value 유효한 숫자 문자열
-     * @return 유효하지 않으면 널을 반환합니다.
-     */
-    static Long toLong(String value) {
-        return StringUtil.isNumeric(value) ? Long.valueOf(value) : null;
-    }
 }

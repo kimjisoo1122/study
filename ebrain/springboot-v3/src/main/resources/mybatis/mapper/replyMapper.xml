@@ -8,8 +8,8 @@
             useGeneratedKeys="true"
             keyProperty="replyId">
         INSERT INTO reply
-            (board_id
-            , reply_content)
+            (board_id,
+             reply_content)
         VALUES
             (#{boardId},
              #{replyContent})
@@ -24,7 +24,8 @@
             board_id,
             reply_content,
             create_date,
-            update_date
+            update_date,
+            DATE_FORMAT(create_date, '%Y.%m.%d %H:%i') as formattedCreateDate
         FROM reply
         WHERE reply_id = #{replyId}
     </select>
@@ -38,9 +39,18 @@
             board_id,
             reply_content,
             create_date,
-            update_date
+            update_date,
+            DATE_FORMAT(create_date, '%Y.%m.%d %H:%i') as formattedCreateDate
         FROM reply
         WHERE board_id = #{boardId}
     </select>
+
+    <!-- 댓글을 삭제합니다. -->
+    <delete id="deleteByBoardId"
+            parameterType="long">
+        DELETE FROM reply
+        WHERE board_id = #{boardId}
+    </delete>
+
 
 </mapper>

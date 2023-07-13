@@ -2,11 +2,9 @@ package com.study.service;
 
 import com.study.dto.FileDto;
 import com.study.mapper.FileMapper;
-import com.study.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -23,18 +21,18 @@ import java.util.List;
 @Transactional
 public class FileService {
 
-    private final String filePath;
+    private final String filePath; // 업로드 파일경로
     private final FileMapper fileMapper;
 
-    public FileService( @Value("${file.save-folder}") String filePath, FileMapper fileMapper) {
+    public FileService(@Value("${file.save-folder}") String filePath, FileMapper fileMapper) {
         this.filePath = filePath;
         this.fileMapper = fileMapper;
     }
 
     /**
-     * 멀티파트파일을 실제 파일로 업로드하고 DTO를 반환합니다.
+     * Form에서 입력받은 멀티파트파일을 실제 파일로 업로드하고 DTO를 반환합니다.
      * @param multipartFiles 폼에서 전송된 멀티파트파일
-     * @return List<FileDto> 파일 DTO
+     * @return List<FileDto> 파일 DB에 저장하는 DTO 리스트
      * @throws IOException
      */
     public List<FileDto> createFiles(List<MultipartFile> multipartFiles) throws IOException {
@@ -43,30 +41,29 @@ public class FileService {
             if (file.isEmpty()) {
                 continue;
             }
+
+            // 업로드경로에 파일 저장
             String fileName = file.getOriginalFilename();
             String ext = extractExtension(fileName);
             String formattedFileName = getFormattedFileName(ext);
             file.transferTo(new File(filePath + formattedFileName));
-            // 저장성공
 
-            // 파일 db저장
-            FileDto fileDto = new FileDto();
-            fileDto.setPhysicalName(formattedFileName);
-            fileDto.setOriginalName(file.getOriginalFilename());
-            fileDto.setFileExtension(ext);
-            fileDto.setFileSize(file.getSize());
-            fileDto.setPath(filePath);
-            files.add(fileDto);
+            // 파일 DB 데이터 생성
+            FileDto saveFile = new FileDto();
+            saveFile.setPhysicalName(formattedFileName);
+            saveFile.setOriginalName(file.getOriginalFilename());
+            saveFile.setFileExtension(ext);
+            saveFile.setFileSize(file.getSize());
+            saveFile.setPath(filePath);
+            files.add(saveFile);
         }
         return files;
     }
 
-
-
     /**
      * 첨부파일을 등록합니다
      * @param fileDto
-     * @return fileId
+     * @return fileId 등록된 파일 번호
      */
     public Long save(FileDto fileDto) {
         fileMapper.insert(fileDto);
@@ -75,19 +72,18 @@ public class FileService {
 
     /**
      * 게시글번호로 첨부파일을 조회합니다.
-     * @param boardId
-     * @return List<FileDto>
+     * @param boardId 게시글번호
+     * @return List<FileDto> 파일정보 리스트
      */
     @Transactional(readOnly = true)
     public List<FileDto> findByBoardId(Long boardId) {
         return fileMapper.selectByBoardId(boardId);
     }
 
-
     /**
      * 첨부파일을 조회합니다.
      * @param fileId
-     * @return
+     * @return FileDto 조회한 파일정보 DTO
      */
     @Transactional(readOnly = true)
     public FileDto findById(Long fileId) {
@@ -96,28 +92,23 @@ public class FileService {
 
     /**
      * 첨부파일과 업로드된 실제파일도 삭제합니다
-     * @param fileId
-     * @return 삭제행 갯수
+     * @param fileId 파일번호
+     * @return 삭제 행 갯수
      */
     public int delete(Long fileId) {
-        int deletedRow = 0;
         FileDto findFile = fileMapper.selectById(fileId);
-        File uploadedFile = new File(findFile.getPath() + findFile.getPhysicalName());
+        File uploadedFile = new File(findFile.getFullPath());
         if (uploadedFile.exists()) {
-            if (uploadedFile.delete()) {
-                deletedRow = fileMapper.delete(fileId);
-            }
+            uploadedFile.delete();
         }
 
-        return deletedRow;
+        return fileMapper.delete(fileId);
     }
-
-
 
     /**
      * 현재날짜로 포맷된 파일명을 반환합니다.
-     * @param ext
-     * @return formattedFileName
+     * @param ext 파일확장자
+     * @return formattedFileNam e
      */
     private String getFormattedFileName(String ext) {
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmdd"));
@@ -126,11 +117,19 @@ public class FileService {
 
     /**
      * 파일의 확장자명을 추출합니다.
-     * @param fileName
-     * @return fileExntension
+     * @param fileName 파일이름
+     * @return fileExntension 파일확장자
      */
     private String extractExtension(String fileName) {
         int dotIdx = fileName.lastIndexOf(".");
         return fileName.substring(dotIdx + 1);
+    }
+
+    /**
+     * 파일의 업로드경로를 반환합니다.
+     * @return filePath
+     */
+    public String getFilePath() {
+        return filePath;
     }
 }
