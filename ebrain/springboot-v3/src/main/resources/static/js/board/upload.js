@@ -1,6 +1,11 @@
+/**
+ * 업로드파일의 유효성을 검증합니다.
+ * @param idx 업로드할 파일의 input index
+ */
 function uploadFile(idx) {
   const fileElm = document.querySelector(`input[type="file"][idx="${idx}"]`);
   const disabledElm = document.querySelector(`input[disabled][idx="${idx}"]`);
+
 
   const fileName = fileElm.value.split('/').pop().split('\\').pop();
   disabledElm.value = fileName;

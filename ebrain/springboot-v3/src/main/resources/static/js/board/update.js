@@ -1,23 +1,9 @@
-function uploadFile(idx) {
-  const fileElm = document.querySelector(`input[type="file"][idx="${idx}"]`);
-  const disabledElm = document.querySelector(`input[disabled][idx="${idx}"]`);
-
-
-  const fileName = fileElm.value.split('/').pop().split('\\').pop();
-  disabledElm.value = fileName;
-
-  if (fileElm.files) {
-    const fileSize = fileElm.files[0].size;
-
-    if (fileSize / (1024 * 1024) > 10) {
-      fileElm.value = '';
-      disabledElm.value = '10MB를 넘을 수 없습니다.';
-      disabledElm.style.color = 'red';
-    } else {
-      disabledElm.style.color = 'black';
-    }
-  }
-}
+/**
+ * 업데이드 폼에서 첨부파일을 삭제처리합니다.
+ * 히든폼에 fileId를 첨부하고 전송시 서버에서 최종 삭제를 진행합니다.
+ * @param thisElm 해당 첨부파일 엘리먼트
+ * @param fileId 해당 첨부파일번호
+ */
 function deleteFile(thisElm, fileId) {
   const fileListElm = document.querySelector('.file-list-container');
   const hiddenInput = document.createElement('input');

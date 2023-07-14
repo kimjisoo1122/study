@@ -1,0 +1,36 @@
+<div class="remove-modal-bg" th:fragment="removeModal">
+  <div class="remove-modal">
+    <form th:method="post"
+          th:action="|/board/delete/${board.getBoardId()}|"
+          onsubmit="return validRemovePassword()">
+      <div class="remove-password-container">
+        <div class="remove-password-title">비밀번호
+          <span class="required-star">*</span>
+        </div>
+        <div class="remove-password-input-container">
+          <input type="password"
+                 name="removePassword"
+                 class="remove-password-input"
+                 onchange="validRemovePassword()">
+          <span class="remove-password-input-error">비밀번호를 입력해주세요.</span>
+        </div>
+      </div>
+      <div class="remove-button-container">
+        <button type="button"
+                class="remove-button-cancel"
+                onclick="removeCancel()">취소
+        </button>
+        <button type="submit"
+                class="remove-button-submit">확인
+        </button>
+      </div>
+
+      <input type="hidden" name="search" th:value="${condition.getSearch()}">
+      <input type="hidden" name="fromDate" th:value="${condition.getFromDate()}">
+      <input type="hidden" name="toDate" th:value="${condition.getToDate()}">
+      <input type="hidden" name="searchCategory" th:value="${condition.getSearchCategory()}">
+      <input type="hidden" name="page" th:value="${condition.getPage()}">
+
+    </form>
+  </div>
+</div>

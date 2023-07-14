@@ -1,3 +1,11 @@
+/**
+ * 게시글의 수정과 등록에 쓰이는 게시글의 유효성검증 스크립트 입니다.
+ */
+
+
+/**
+ * 카테고리를 검증합니다.
+ */
 function validCategory() {
   const categoryElm = document.querySelector('.category-select');
   const categoryLength = categoryElm.value.length;
@@ -21,6 +29,9 @@ function validCategory() {
   return true;
 }
 
+/**
+ * 작성자를 검증합니다.
+ */
 
 function validWriter() {
   const writerElm = document.querySelector('.writer-input');
@@ -45,6 +56,9 @@ function validWriter() {
   return true;
 }
 
+/**
+ * 비밀번호를 검증합니다.
+ */
 function validPassword() {
   const pwdElm = document.querySelector('.password-input');
   const confirmElm = document.querySelector('.password-input-confirm');
@@ -73,6 +87,7 @@ function validPassword() {
     return false;
   }
 
+  // 등록폼의 경우에만 진행합니다.
   if (confirmElm) {
     if (pwd.length !== confirmElm.value.length) {
       pwdElm.classList.add('input-error');
@@ -89,6 +104,9 @@ function validPassword() {
   return true;
 }
 
+/**
+ * 제목을 검증합니다.
+ */
 function validTitle() {
   const titleElm = document.querySelector('.title-input');
   const errElm = document.querySelector('.title-input-error');
@@ -112,6 +130,9 @@ function validTitle() {
   return true;
 }
 
+/**
+ * 내용을 검증합니다.
+ */
 function validContent() {
   const contentElm = document.querySelector('.content-text');
   const errElm = document.querySelector('.content-text-error');
@@ -135,6 +156,9 @@ function validContent() {
   return true;
 }
 
+/**
+ * 폼 전송시 모든 유효성검증을 진행합니다.
+ */
 function validForm() {
   const validatedWriter = validWriter();
   const validatedPassword = validPassword();
@@ -142,7 +166,9 @@ function validForm() {
   const validatedContent = validContent();
   const validatedCategory = validCategory();
 
-  const validateResult = validatedWriter && validatedPassword && validatedTitle && validatedContent && validatedCategory;
+  const validateResult = validatedWriter && validatedPassword
+      && validatedTitle && validatedContent && validatedCategory;
+
   if (!validateResult) {
     console.error('유효성 검증 실패');
   }

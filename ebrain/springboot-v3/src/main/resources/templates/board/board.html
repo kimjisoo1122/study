@@ -10,127 +10,78 @@
 
   <body>
 
-  <div class="board-container">
+    <div class="board-container">
 
-    <div class="header-container">
-      <div class="header-top-container">
-        <p class="header-name" th:text="${board.getWriter()}"/>
-        <div class="header-date-container">
-          <p class="header-date-create" th:text="|등록일시 ${board.getFormattedCreateDate()}|"/>
-          <p class="header-date-update" th:text="|수정일시 ${board.getFormattedUpdateDate()}|"/>
-        </div>
-      </div>
-
-      <div class="header-bottom-container">
-        <div class="header-title-container">
-          <p th:text="|[${board.getCategoryName()}]|"/>
-          <h1 class="header-title" th:text="${board.getTitle()}"/>
-        </div>
-        <p class="header-view" th:text="|조회수: ${board.getViewCnt()}|"/>
-      </div>
-    </div>
-
-    <div class="content-container">
-      <p class="content-text" th:text="${board.getContent()}"/>
-    </div>
-
-    <div class="file-container">
-        <a th:each="file : ${files}"
-           th:href="@{/fileDown/{fileId}(fileId=${file.getFileId()})}"
-           th:text="${file.getPhysicalName()}"/>
-    </div>
-
-    <div class="reply-container">
-      <div class="reply-list-container">
-          <div class="reply" th:each="reply : ${replies}">
-            <div class="reply-date" th:text="${reply.getFormattedCreateDate()}"/>
-            <div class="reply-content" th:text="${reply.getReplyContent()}"/>
+      <div class="header-container">
+        <div class="header-top-container">
+          <p class="header-name" th:text="${board.getWriter()}"/>
+          <div class="header-date-container">
+            <p class="header-date-create" th:text="|등록일시 ${board.getFormattedCreateDate()}|"/>
+            <p class="header-date-update" th:text="|수정일시 ${board.getFormattedUpdateDate()}|"/>
           </div>
+        </div>
+
+        <div class="header-bottom-container">
+          <div class="header-title-container">
+            <p th:text="|[${board.getCategoryName()}]|"/>
+            <h1 class="header-title" th:text="${board.getTitle()}"/>
+          </div>
+          <p class="header-view" th:text="|조회수: ${board.getViewCnt()}|"/>
+        </div>
       </div>
-      <div class="reply-register-container">
-        <input type="text"
-               name="content"
-               class="reply-register-input"
-               placeholder="댓글을 입력해 주세요.">
-        <button
-          type="submit"
-          data-th-boardId="${board.getBoardId()}"
-          class="reply-register-button"
-          onclick="replyRegister(this.getAttribute('boardId'))">등록
+
+      <div class="content-container">
+        <p class="content-text" th:text="${board.getContent()}"/>
+      </div>
+
+      <div class="file-container">
+          <a th:each="file : ${files}"
+             th:href="|/fileDown/${file.getFileId()}|"
+             th:text="${file.getPhysicalName()}"/>
+      </div>
+
+      <div class="reply-container">
+        <div class="reply-list-container">
+            <div class="reply" th:each="reply : ${replies}">
+              <div class="reply-date" th:text="${reply.getFormattedCreateDate()}"/>
+              <div class="reply-content" th:text="${reply.getReplyContent()}"/>
+            </div>
+        </div>
+        <div class="reply-register-container">
+          <input type="text"
+                 name="content"
+                 class="reply-register-input"
+                 placeholder="댓글을 입력해 주세요.">
+          <button
+            type="submit"
+            data-th-boardId="${board.getBoardId()}"
+            class="reply-register-button"
+            onclick="registerReply(this.getAttribute('boardId'))">등록
+          </button>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button class="button-list">
+          <a th:href="|/board${condition.getQueryParamString()}|" class="button-list-a">목록</a>
+        </button>
+        <button class="button-update">
+          <a th:href="|/board/update/${board.getBoardId()}${condition.getQueryParamString()}|"
+             class="button-update-a">수정
+          </a>
+        </button>
+        <button type="button"
+                class="button-remove"
+                onclick="removeOpen()">삭제
         </button>
       </div>
+
     </div>
 
-    <div class="button-container">
-      <button class="button-list">
-        <a th:href="@{'/board' + ${condition.getQueryParamString()}}" class="button-list-a">목록</a>
-      </button>
-      <button class="button-update">
-        <a th:href="@{'/board/update/' + ${board.getBoardId()} + ${condition.getQueryParamString()}}"
-           class="button-update-a">수정
-        </a>
-      </button>
-      <button type="button"
-              class="button-remove"
-              onclick="removeOpen()">삭제
-      </button>
-    </div>
-
-  </div>
-
-<!--  <%&#45;&#45; 게시글 삭제실패시 alert 호출 &#45;&#45;%>-->
-<!--  <c:if test="${removeErrMsg != null}">-->
-<!--    <script>-->
-<!--      alert('${removeErrMsg}');-->
-<!--    </script>-->
-<!--    <%-->
-<!--    session.removeAttribute("removeErrMsg");-->
-<!--    %>-->
-<!--  </c:if>-->
-
-  <div class="remove-modal-bg">
-    <div class="remove-modal">
-      <form th:method="post"
-            th:action="|/board/delete/${board.getBoardId()}|"
-            onsubmit="return validRemovePassword()">
-        <div class="remove-password-container">
-          <div class="remove-password-title">비밀번호
-            <span class="required-star">*</span>
-          </div>
-          <div class="remove-password-input-container">
-            <input type="password"
-                   name="removePassword"
-                   class="remove-password-input"
-                   onchange="validRemovePassword()">
-            <span class="remove-password-input-error">비밀번호를 입력해주세요.</span>
-          </div>
-        </div>
-        <div class="remove-button-container">
-          <button type="button"
-                  class="remove-button-cancel"
-                  onclick="removeCancel()">취소
-          </button>
-          <button type="submit"
-                  class="remove-button-submit">확인
-          </button>
-        </div>
-
-        <input type="hidden" name="search" th:value="${condition.getSearch()}">
-        <input type="hidden" name="fromDate" th:value="${condition.getFromDate()}">
-        <input type="hidden" name="toDate" th:value="${condition.getToDate()}">
-        <input type="hidden" name="searchCategory" th:value="${condition.getSearchCategory()}">
-        <input type="hidden" name="page" th:value="${condition.getPage()}">
-
-      </form>
-    </div>
-  </div>
-
-  <script th:inline="javascript">
-    const deleteMsg = /*[[${deleteMsg}]]*/
-    if (deleteMsg) {
-      alert(deleteMsg);
-    }
-  </script>
+    <!-- 게시글 삭제 모달창 -->
+    <div th:replace="~{/fragment/deleteModal :: removeModal}"></div>
+    <!-- 게시글 삭제결과 -->
+    <script th:replace="~{/fragment/deleteMsg :: deleteMsg}"></script>
 
   </body>
 </html>

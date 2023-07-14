@@ -197,9 +197,6 @@ public class BoardController {
             @ModelAttribute("condition") BoardSearchCondition condition,
             RedirectAttributes redirectAttributes) {
 
-        // 비밀번호 검증
-        boardService.isPasswordMatch(boardId, removePassword);
-
         try {
             if (!boardService.isPasswordMatch(boardId, removePassword)) {
                 throw new IllegalArgumentException();

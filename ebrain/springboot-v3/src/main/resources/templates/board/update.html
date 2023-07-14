@@ -5,6 +5,7 @@
     <title>게시글 수정</title>
     <link rel="stylesheet" th:href="@{/css/board/update.css}">
     <script th:src="@{/js/board/update.js}"></script>
+    <script th:src="@{/js/board/upload.js}"></script>
     <script th:src="@{/js/board/boardValidation.js}"></script>
   </head>
 
@@ -156,7 +157,7 @@
 
       </div>
 
-      <!-- 히든필드 -->
+      <!-- 업데이트 게시글의 모든 정보를 Form으로 같이 전송한다 (유효성검증 실패시 다시 폼으로 전송)-->
       <input type="hidden" name="boardId" th:value="${form.getBoardId()}">
       <input type="hidden" name="createDate" th:value="${form.getCreateDate()}">
       <input type="hidden" name="updateDate" th:value="${form.getUpdateDate()}">

@@ -10,7 +10,7 @@
 
     <div class="boardlist-container">
 
-      <form th:method="get" class="search-form">
+      <form th:method="get" class="search-form" onsubmit="return validCondition()">
         <div class="search-container">
           <div class="date-container">
             <p class="date-register">등록일</p>
@@ -65,7 +65,7 @@
             <div class="list-category" th:text="${board.getCategoryName()}"></div>
             <div class="list-title">
               <span th:if="${board.isHasFile()}" class="list-title-file">File</span>
-              <a th:href="@{'/board/' + ${board.getBoardId()} + ${condition.getQueryParamString()}}"
+              <a th:href="|/board/${board.getBoardId()}${condition.getQueryParamString()}|"
                  th:text="${board.getTitle()}"
                  class="list-title-a">
               </a>
@@ -80,21 +80,21 @@
       <div class="paging-container" >
         <div class="paging-prev-total-container">
             <a th:if="${pageHandler.isPrevious()}"
-               th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}}"
+               th:href="|/board${condition.getQueryParamString(pageHandler.getBeginPage() - 1)}|"
                class="paging-prev-total">&lt;&lt;
             </a>
         </div>
 
         <div class="paging-prev-container">
           <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getBeginPage()}"
-             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getPage() - 1)}}"
+             th:href="|/board${condition.getQueryParamString(pageHandler.getPage() - 1)}|"
              class="paging-prev">&lt;
           </a>
         </div>
 
         <div th:if="${pageHandler.getTotalCnt() != 0}" class="paging-index-container">
-          <a th:each="idx : ${#numbers.sequence(pageHandler.getBeginPage(), pageHandler.getMaxPage())}"
-             th:href="@{'/board' + ${condition.getQueryParamString(idx)}}"
+          <a th:each="idx : ${#numbers.sequence(pageHandler.getBeginPage(), pageHandler.getEndPage())}"
+             th:href="|/board${condition.getQueryParamString(idx)}|"
              th:text="${idx}"
              class="paging-page">
           </a>
@@ -102,14 +102,14 @@
 
         <div class="paging-next-container">
           <a th:if="${pageHandler.getTotalCnt() != 0 && pageHandler.getPage() != pageHandler.getEndPage()}"
-             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getPage() + 1)}}"
+             th:href="|/board${condition.getQueryParamString(pageHandler.getPage() + 1)}|"
              class="paging-next">&gt;
           </a>
         </div>
 
         <div class="paging-next-total-container">
           <a th:if="${pageHandler.isNext()}"
-             th:href="@{'/board' + ${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}}"
+             th:href="|/board${condition.getQueryParamString(pageHandler.getMaxPage() + 1)}|"
              class="paging-next-total">&gt;&gt;
           </a>
         </div>
@@ -118,18 +118,14 @@
 
       <div class="board-register-container">
         <button class="board-register-button">
-          <a th:href="@{'/board/register' + ${condition.getQueryParamString()}}">등록</a>
+          <a th:href="|/board/register${condition.getQueryParamString()}|">등록</a>
         </button>
       </div>
 
     </div>
 
-    <script th:inline="javascript">
-      const deleteMsg = /*[[${deleteMsg}]]*/
-      if (deleteMsg) {
-        alert(deleteMsg);
-      }
-    </script>
+    <!-- 게시글 삭제결과 -->
+    <script th:replace="~{/fragment/deleteMsg :: deleteMsg}"></script>
 
   </body>
 
