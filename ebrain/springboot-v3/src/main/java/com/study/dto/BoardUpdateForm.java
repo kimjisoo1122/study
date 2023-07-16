@@ -40,6 +40,7 @@ public class BoardUpdateForm {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createDate; // 생성일시
+
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updateDate; // 수정일시
 
