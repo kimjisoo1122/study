@@ -25,6 +25,7 @@
             reply_content,
             create_date,
             update_date,
+            # Date Format은 웬만하면 어플리케이션단에서
             DATE_FORMAT(create_date, '%Y.%m.%d %H:%i') as formattedCreateDate
         FROM reply
         WHERE reply_id = #{replyId}

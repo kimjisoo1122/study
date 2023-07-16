@@ -27,7 +27,7 @@
     <select id="selectByBoardId"
             parameterType="long"
             resultType="FileDto">
-        SELECT file_iD,
+        SELECT file_id,
                board_id,
                physical_name,
                original_name,
@@ -43,7 +43,7 @@
     <select id="selectById"
             parameterType="long"
             resultType="FileDto">
-        SELECT file_iD,
+        SELECT file_id,
                board_id,
                physical_name,
                original_name,

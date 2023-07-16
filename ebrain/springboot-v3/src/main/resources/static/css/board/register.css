@@ -166,7 +166,7 @@ input {
   margin: 5px 0 5px 10px;
 }
 
-.file-input {
+.file-disabled{
   width: 300px;
   background-color: white;
   border: 1px solid black;

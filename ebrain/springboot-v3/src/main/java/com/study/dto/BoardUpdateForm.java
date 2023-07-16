@@ -47,7 +47,7 @@ public class BoardUpdateForm {
     private int viewCnt; // 조회수
 
     private List<MultipartFile> files; // 첨부파일
-    private String[] fileIds; // 삭제파일
+    private Long[] fileIds; // 삭제파일
 
     /**
      * 게시글에 맞는 포맷된 형식의 생성일시 반환합니다.

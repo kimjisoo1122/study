@@ -40,7 +40,6 @@ public class FileDownController {
     public ResponseEntity<Resource> fileDown(
             @PathVariable("fileId") Long fileId) throws MalformedURLException, FileNotFoundException {
 
-
         FileDto findFile = fileService.findById(fileId);
         UrlResource resource = new UrlResource("file:" + findFile.getFullPath());
 

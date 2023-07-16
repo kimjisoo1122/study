@@ -8,11 +8,11 @@
             useGeneratedKeys="true"
             keyProperty="boardId">
         INSERT INTO board
-        (category_id,
-         title,
-         writer,
-         content,
-         board.password)
+            (category_id,
+             title,
+             writer,
+             content,
+             board.password)
         VALUES
             (#{categoryId},
              #{title},
@@ -26,7 +26,8 @@
     <select id="selectByCondition"
             parameterType="boardSearchCondition"
             resultType="boardDto">
-        SELECT distinct b.board_id,
+        /* TODO DISTINCT는 제외시키는게 좋다. 상관서브쿼리로 풀어내도록*/
+        SELECT DISTINCT b.board_id,
                b.category_id,
                b.title,
                b.writer,
@@ -146,4 +147,5 @@
             </if>
         </where>
     </sql>
+
 </mapper>

@@ -48,7 +48,6 @@ public class BoardController {
             @ModelAttribute(value = "condition") BoardSearchCondition condition,
             Model model) {
 
-        // 게시글검색조건의 페이징설정
         condition.setPagination(page, pageSize);
 
         model.addAttribute("categories", categoryService.findAll());
@@ -120,6 +119,7 @@ public class BoardController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryService.findAll());
+
             return "board/register";
         }
 
@@ -174,6 +174,7 @@ public class BoardController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("files", fileService.findByBoardId(boardId));
             model.addAttribute("categories", categoryService.findAll());
+
             return "board/update";
         }
 

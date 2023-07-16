@@ -103,8 +103,8 @@ public class BoardService {
 
         // 삭제파일이 있는 경우 삭제합니다.
         if (form.getFileIds() != null) {
-            for (String fileId : form.getFileIds()) {
-                fileService.delete(Long.valueOf(fileId));
+            for (Long fileId : form.getFileIds()) {
+                fileService.delete(fileId);
             }
         }
 
@@ -138,6 +138,7 @@ public class BoardService {
 
         replyMapper.deleteByBoardId(boardId);
 
+        // 파일 -> 댓글 -> 게시글순으로 삭제합니다.
         return boardMapper.delete(boardId);
     }
 
@@ -150,7 +151,6 @@ public class BoardService {
         if (password == null) {
             return null;
         }
-
 
         String encryptedPwd = "";
         try {

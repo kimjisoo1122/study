@@ -32,10 +32,12 @@ public class ReplyController {
             @RequestBody ReplyDto replyDto) {
         try {
             ReplyDto registeredReply = replyService.register(replyDto);
+
             return new ResponseEntity<>(registeredReply, HttpStatus.OK);
         } catch (Exception e) {
             String errMsg = "댓글 등록에 실패하였습니다";
-            log.error(errMsg  + "...... {} replyDto = {}", e.getMessage(), replyDto);
+            log.error("댓글 등록에 실패하였습니다 ...... {} replyDto = {}", e.getMessage(), replyDto);
+
             return new ResponseEntity<>(errMsg, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

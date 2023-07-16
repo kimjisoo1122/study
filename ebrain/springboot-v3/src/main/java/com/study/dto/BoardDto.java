@@ -21,8 +21,7 @@ public class BoardDto {
     private LocalDateTime createDate; // 생성일시
     private LocalDateTime updateDate; // 수정일시
     private int viewCnt; // 조회수
-
-    private boolean hasFile; // 첨부파일 존재유무 (게시글 목록 Query에 사용)
+    private boolean hasFile; // 첨부파일 존재유무 (게시글 목록 쿼리에 사용)
 
     /**
      * 게시글에 맞는 포맷된 형식의 생성일시 반환합니다.
