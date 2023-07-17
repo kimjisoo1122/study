@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.BoardMapper">
+
+    <!-- 게시글을 등록합니다. DTO의 PK(boardId)값 생성. -->
+    <insert id="insert"
+            parameterType="boardDto"
+            useGeneratedKeys="true"
+            keyProperty="boardId">
+        INSERT INTO board
+            (category_id,
+             title,
+             writer,
+             content,
+             board.password)
+        VALUES
+            (#{categoryId},
+             #{title},
+             #{writer},
+             #{content},
+             #{password}
+            )
+    </insert>
+
+    <!-- 게시글을 검색조건, 페이징처리하여 조회합니다. -->
+    <select id="selectByCondition"
+            parameterType="boardSearchCondition"
+            resultType="boardDto">
+        /* TODO DISTINCT는 제외시키는게 좋다. 상관서브쿼리로 풀어내도록*/
+        SELECT DISTINCT b.board_id,
+               b.category_id,
+               b.title,
+               b.writer,
+               b.content,
+               b.view_cnt,
+               b.create_date,
+               b.update_date,
+               c.category_name,
+               IF (f.file_id IS NOT NULL, TRUE, FALSE) has_file
+        FROM board b
+            JOIN category c ON c.category_id = b.category_id
+            LEFT JOIN file f ON b.board_id = f.board_id
+        <include refid="boardSearchConditionQuery"/>
+        ORDER BY b.create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 검색조건에 따라 게시글 총갯수 조회 -->
+    <select id="countByCondition"
+            parameterType="boardSearchCondition"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM board b
+        <include refid="boardSearchConditionQuery"/>
+    </select>
+
+    <!-- 게시글번호로 조회합니다. -->
+    <select id="selectById"
+            parameterType="long"
+            resultType="boardDto">
+        SELECT b.board_id,
+               b.category_id,
+               b.title,
+               b.writer,
+               b.content,
+               b.password,
+               b.view_cnt,
+               b.create_date,
+               b.update_date,
+               c.category_name
+        FROM board b
+            JOIN category c ON c.category_id = b.category_id
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- dto 존재하는 값으로 업데이트 합니다. -->
+    <update id="update"
+            parameterType="boardDto">
+        UPDATE board
+        <set>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="title != null &amp;&amp; title != ''">
+                title = #{title},
+            </if>
+            <if test="writer != null &amp;&amp; writer != ''">
+                writer = #{writer},
+            </if>
+            <if test="content != null &amp;&amp; content != ''">
+                content = #{content},
+            </if>
+            <if test="password != null &amp;&amp; password != ''">
+                password = #{password},
+            </if>
+            <if test="categoryId != null
+                || (writer != null &amp;&amp; writer != '')
+                || (title != null &amp;&amp; title != '')
+                || (content != null &amp;&amp; content != '')
+                || (password != null &amp;&amp; password != '')">
+                update_date = now()
+            </if>
+        </set>
+        WHERE board_id = #{boardId}
+    </update>
+
+    <!-- 게시글의 조회수를 1 증가 시킵니다. -->
+    <update id="increaseViewCnt"
+            parameterType="long">
+        UPDATE board
+        SET view_cnt = view_cnt + 1
+        WHERE board_id = #{board_id}
+    </update>
+
+    <!-- 게시글을 삭제합니다. -->
+    <delete id="delete"
+            parameterType="boardSearchCondition">
+        DELETE FROM board
+        WHERE board_id = #{boardId}
+    </delete>
+
+
+
+    <!-- 게시글 검색조건 -->
+    <sql id="boardSearchConditionQuery">
+        <where>
+            <choose>
+                <when test="(fromDate != null &amp;&amp; fromDate !='') || (toDate != null &amp;&amp; toDate !='')">
+                    DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
+                </when>
+                <otherwise>
+                    DATE_FORMAT(b.create_date, '%Y-%m-%d')
+                    BETWEEN DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR),'%Y-%m-%d')
+                    AND DATE_FORMAT(NOW(),'%Y-%m-%d')
+                </otherwise>
+            </choose>
+            <if test="searchCategory != null &amp;&amp; searchCategory != ''">
+                AND b.category_id = #{searchCategory}
+            </if>
+            <if test="search != null &amp;&amp; search != ''">
+                AND
+                (b.writer LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.title LIKE CONCAT('%', #{search}, '%')
+                OR
+                b.content LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </sql>
+
+</mapper>

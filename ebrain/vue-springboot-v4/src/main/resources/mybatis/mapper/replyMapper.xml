@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.ReplyMapper">
+
+    <!-- 게시글의 댓글을 등록합니다. -->
+    <insert id="insert"
+            parameterType="ReplyDto"
+            useGeneratedKeys="true"
+            keyProperty="replyId">
+        INSERT INTO reply
+            (board_id,
+             reply_content)
+        VALUES
+            (#{boardId},
+             #{replyContent})
+    </insert>
+
+    <!-- 댓글을 조회합니다. -->
+    <select id="selectById"
+            parameterType="long"
+            resultType="ReplyDto">
+        SELECT
+            reply_id,
+            board_id,
+            reply_content,
+            create_date,
+            update_date,
+            # Date Format은 웬만하면 어플리케이션단에서
+            DATE_FORMAT(create_date, '%Y.%m.%d %H:%i') as formattedCreateDate
+        FROM reply
+        WHERE reply_id = #{replyId}
+    </select>
+
+    <!-- 게시글번호로 댓글을 조회합니다.-->
+    <select id="selectByBoardId"
+            parameterType="long"
+            resultType="ReplyDto">
+        SELECT
+            reply_id,
+            board_id,
+            reply_content,
+            create_date,
+            update_date,
+            DATE_FORMAT(create_date, '%Y.%m.%d %H:%i') as formattedCreateDate
+        FROM reply
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- 댓글을 삭제합니다. -->
+    <delete id="deleteByBoardId"
+            parameterType="long">
+        DELETE FROM reply
+        WHERE board_id = #{boardId}
+    </delete>
+
+
+</mapper>
