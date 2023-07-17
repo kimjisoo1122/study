@@ -1,9 +1,7 @@
 <template>
-  <div class="container mt-4">
-    <h5>개발자의 블로그입니다.</h5>
-    <p>Vue로 만들었음</p>
-  </div>
-
+<div>
+  <h1>홈화면입니다.</h1>
+</div>
 </template>
 
 <script>

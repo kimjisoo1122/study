@@ -1,19 +1,19 @@
 <template>
-  <div>
-    <h4 @click="$router.push('/detail/0')">{{ data[$route.params.id].title }}</h4>
-    <p>{{ data[$route.params.id].content }}</p>
-  </div>
+<div>
+  {{ $route.params.id }}
+  <h4>상세페이지</h4>
+  <h4>{{ 블로그글[0].title }}</h4>
+<!--  <router-view></router-view>-->
+</div>
 </template>
 
 <script>
 export default {
   name: "Detail",
-  data() {
-    // id: $route.params.id
-  },
   props: {
-    data: Array
-  },
+    블로그글 : Array,
+    글번호 : Number
+  }
 }
 </script>
 

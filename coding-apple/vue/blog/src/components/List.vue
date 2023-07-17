@@ -1,15 +1,32 @@
 <template>
-  <div v-for="(blog, i) in data" :key="i">
-    <h4>{{blog.title}}</h4>
-    <p>{{blog.content}}</p>
+  <div>
+    <!-- $route.params.??pathvariable    -->
+    <!-- $router.go(-1)    -->
+    <h5 @click="$router.push('/detail/0')">
+      <router-link to="/detail">{{ 블로그글[0].title }}
+      </router-link>
+    </h5>
+    <p>{{ 블로그글[0].content }}</p>
+    <p>{{ 블로그글[0].date }}</p>
+  </div>
+  <div>
+    <h5>{{ 블로그글[1].title }}</h5>
+    <p>{{ 블로그글[1].content }}</p>
+    <p>{{ 블로그글[1].date }}</p>
   </div>
 </template>
 
 <script>
+
 export default {
   name: "List",
+  data() {
+    return {
+      showDetail : false,
+    }
+  },
   props: {
-    data: Array
+    블로그글 : Array,
   }
 }
 </script>

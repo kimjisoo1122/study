@@ -54,6 +54,7 @@ public class BoardController {
         model.addAttribute("boards", boardService.findByCondition(condition));
         model.addAttribute("pageHandler",
                 new PageHandler(condition.getPage(), boardService.getTotalSize(condition)));
+        // 페이징처리 -> 클라이언트
 
         return "board/boardList";
     }

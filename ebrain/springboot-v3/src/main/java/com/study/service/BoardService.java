@@ -112,7 +112,7 @@ public class BoardService {
     }
 
     /**
-     * 조회수를 1 증가시킵니다.
+     * 조회수를 1증가 시킵니다.
      * @param boardId 게시글 번호
      */
     public void increaseViewCnt(Long boardId) {
