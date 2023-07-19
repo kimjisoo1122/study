@@ -9,10 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 첨부파일의 비즈니스로직을 처리하는 서비스 입니다.
@@ -24,9 +23,11 @@ public class FileService {
     private final String filePath; // 업로드 파일경로
     private final FileMapper fileMapper;
 
-    public FileService(@Value("${file.save-folder}") String filePath, FileMapper fileMapper) {
+    public FileService(@Value("${file.upload-folder}") String filePath, FileMapper fileMapper) {
         this.filePath = filePath;
         this.fileMapper = fileMapper;
+        File uploadFolder = new File(filePath);
+        uploadFolder.mkdirs();
     }
 
     /**
@@ -106,13 +107,12 @@ public class FileService {
     }
 
     /**
-     * 현재날짜로 포맷된 파일명을 반환합니다.
+     * 포맷된 파일명을 반환합니다.
      * @param ext 파일확장자
      * @return formattedFileNam e
      */
     private String getFormattedFileName(String ext) {
-        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmdd"));
-        return now + "." + ext;
+        return UUID.randomUUID() + "." + ext;
     }
 
     /**

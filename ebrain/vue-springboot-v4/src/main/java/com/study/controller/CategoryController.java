@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * 카테고리를 처리하는 컨트롤러입니다.
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor()

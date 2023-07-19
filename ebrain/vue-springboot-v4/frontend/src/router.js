@@ -1,6 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
-import BoardList from "@/components/board/BoardList.vue";
-import BoardDetail from "@/components/board/BoardDetail.vue";
+import BoardList from "@/views/board/BoardList.vue";
+import BoardDetail from "@/views/board/BoardDetail.vue";
+import BoardRegister from "@/views/board/BoardRegister.vue";
 
 const routes = [
   {
@@ -8,8 +9,12 @@ const routes = [
     component: BoardList
   },
   {
-    path: '/board/:boardId',
+    path: '/board/:boardId(\\d+)',
     component: BoardDetail
+  },
+  {
+    path: '/board/register',
+    component: BoardRegister
   }
   // {
   //   path: "/list",

@@ -16,4 +16,4 @@ mybatis:
     map-underscore-to-camel-case: true
 
 file:
-  save-folder: C:/Temp/upload/
+  upload-folder: C:/Temp/upload/

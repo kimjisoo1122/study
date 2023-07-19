@@ -1,3 +1,4 @@
+<!-- 게시글목록을 페이징처리하는 컴포넌트입니다. -->
 <template>
 
   <div class="paging-container" >

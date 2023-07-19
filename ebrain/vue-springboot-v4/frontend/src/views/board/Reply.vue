@@ -1,0 +1,145 @@
+<template>
+  <div class="reply-container">
+
+    <div class="reply-list-container">
+      <div v-for="(reply, idx) in replies"
+           :key="idx"
+           class="reply">
+        <div class="reply-date">{{ reply.createDate }}</div>
+        <div class="reply-content">{{ reply.replyContent }}</div>
+      </div>
+    </div>
+
+    <div class="reply-register-container">
+      <input type="text"
+             class="reply-register-input"
+             :class="replyError"
+             @input="validateReply"
+             v-model="replyContent"
+             :placeholder="replyPlaceHolder">
+      <button
+          type="submit"
+          class="reply-register-button"
+          @click="registerReply">등록
+      </button>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "Reply",
+
+  data() {
+    return {
+      replyContent: '',
+      replyError: '',
+      replyPlaceHolder: '댓글을 입력해 주세요.'
+    }
+  },
+
+  props: {
+    replies: Array
+  },
+  methods: {
+
+    /**
+     * 댓글을 등록하고 등록된댓글을 게시글상세 컴포넌트에 전송합니다.
+     */
+    registerReply() {
+      if (this.validateReply()) {
+        const replyDto = {
+          boardId: this.$route.params.boardId,
+          replyContent: this.replyContent,
+        };
+
+        axios.post('/api/reply', replyDto)
+            .then(({data: {data: {reply}}}) => {
+              this.$emit('registerReply', reply);
+              this.replyContent = '';
+            })
+            .catch(({response: {data: {errorMessage}}}) => {
+              console.error(errorMessage);
+            });
+      }
+    },
+
+    /**
+     * 빈 댓글을 검증합니다.
+     * @returns {boolean}
+     */
+    validateReply() {
+      if (!this.replyContent) {
+        this.replyError = 'reply-error';
+        this.replyPlaceHolder = '빈 댓글은 등록할수없습니다.'
+
+        return false;
+      } else {
+        this.replyError = '';
+        this.replyPlaceHolder = '댓글을 입력해 주세요.';
+
+        return true;
+      }
+    },
+  }
+}
+</script>
+
+<style scoped>
+
+  .reply-container {
+    background-color: antiquewhite;
+    padding: 10px;
+  }
+
+  .reply {
+    border-bottom: 1px solid black;
+    padding: 10px 0;
+  }
+
+  .reply-date {
+    font-size: 12px;
+  }
+
+  .reply-content {
+    font-size: 14px;
+  }
+
+  .reply-register-container {
+    height: 100px;
+  }
+
+  .reply-register-input {
+    box-sizing: border-box;
+    font-size: 12px;
+    height: 50px;
+    margin-top: 10px;
+    padding: 0 10px;
+    width: 93%;
+  }
+
+  .reply-register-input::placeholder {
+    color: #ccc;
+  }
+
+  .reply-register-button {
+    background-color: white;
+    border: 1px solid black;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    margin-left: 10px;
+  }
+
+  .reply-error {
+    border: 1px solid red;
+  }
+
+  .reply-error::placeholder {
+    color: red;
+  }
+
+</style>

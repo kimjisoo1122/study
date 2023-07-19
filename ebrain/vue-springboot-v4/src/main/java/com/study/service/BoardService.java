@@ -60,8 +60,8 @@ public class BoardService {
      * @return BoardDto 조회한 게시글 DTO
      */
     @Transactional(readOnly = true)
-    public BoardDto findById(Long boardId) {
-        return boardMapper.selectById(boardId);
+    public BoardDto findBoardById(Long boardId) {
+        return boardMapper.selectBoardById(boardId);
     }
 
     /**
@@ -70,7 +70,7 @@ public class BoardService {
      * @return List<BoardDto> 게시글 목록
      */
     @Transactional(readOnly = true)
-    public List<BoardDto> findByCondition(BoardSearchCondition condition) {
+    public List<BoardDto> findAllByCondition(BoardSearchCondition condition) {
         return boardMapper.selectByCondition(condition);
     }
 
@@ -80,7 +80,7 @@ public class BoardService {
      * @return 게시글 총 갯수
      */
     @Transactional(readOnly = true)
-    public int getTotalSize(BoardSearchCondition condition) {
+    public int getBoardCnt(BoardSearchCondition condition) {
         return boardMapper.countByCondition(condition);
     }
 
@@ -179,7 +179,7 @@ public class BoardService {
      * @return
      */
     public boolean isPasswordMatch(Long boardId, String password) {
-        String findPassword = Optional.ofNullable(boardMapper.selectById(boardId))
+        String findPassword = Optional.ofNullable(boardMapper.selectBoardById(boardId))
                 .map(BoardDto::getPassword)
                 .orElse("");
         String encryptedPassword = encryptPwd(password);

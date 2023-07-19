@@ -1,15 +1,12 @@
+<!-- 게시글 컴포넌트입니다. -->
 <template>
 
   <div class="board-container">
 
-    <div class="board-category">
-      {{ board.categoryName }}
-    </div>
+    <div class="board-category">{{ board.categoryName }}</div>
 
     <div class="board-title">
-      <span v-if="board.hasFile" class="board-title-file">
-        File
-      </span>
+      <span v-if="board.hasFile" class="board-title-file">File</span>
       <router-link class="board-title-link"
                     :to="{
                       path: `/board/${board.boardId}`,
@@ -24,27 +21,17 @@
       </router-link>
     </div>
 
-    <div class="board-writer">
-      {{ board.writer }}
-    </div>
-
-    <div class="board-view">
-      {{ board.viewCnt }}
-    </div>
-
-    <div class="board-create">
-      {{ board.createDate }}
-    </div>
-
-    <div class="board-update">
-      {{ board.updateDate }}
-    </div>
+    <div class="board-writer">{{ board.writer }}</div>
+    <div class="board-view">{{ board.viewCnt }}</div>
+    <div class="board-create">{{ board.createDate }}</div>
+    <div class="board-update">{{ board.updateDate }}</div>
 
   </div>
 
 </template>
 
 <script>
+
 export default {
   name: "Board",
   props: {
@@ -52,6 +39,7 @@ export default {
     condition: Object,
   }
 }
+
 </script>
 
 <style scoped>

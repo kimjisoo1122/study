@@ -9,34 +9,21 @@
         <p class="date-register">등록일</p>
         <input type="date"
                class="date-from"
-               name="fromDate"
                v-model="fromDate">
         <span class="date-between"> ~ </span>
         <input type="date"
                class="date-to"
-               name="toDate"
                v-model="toDate">
       </div>
 
       <div class="condition-container">
 
-        <select name="searchCategory"
-                class="condition-category"
+        <select class="condition-category"
                 v-model="searchCategory">
-          <option value="">전체 카테고리</option>
-          <optgroup v-for="(categoryGroup, groupIdx) in Object.keys(categories)"
-                    :key="groupIdx"
-                    :label="categoryGroup">
-            <option v-for="(category, idx) in categories[categoryGroup]"
-                    :key="idx"
-                    :value="category.categoryId">
-              {{ category.categoryName }}
-            </option>
-          </optgroup>
+          <CategoryOption :categories="categories"/>
         </select>
 
         <input type="text"
-               name="search"
                class="condition-search"
                placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)"
                v-model="search">
@@ -50,8 +37,11 @@
 </template>
 
 <script>
+import CategoryOption from "@/components/CategoryOption.vue";
+
 export default {
   name : "BoardSearch",
+  components: {CategoryOption},
   data() {
     return {
       page: 1,

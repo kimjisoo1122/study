@@ -1,4 +1,4 @@
-package com.study.controller;
+package com.study.exception;
 
 import com.study.api.ResponseDto;
 import com.study.api.ResponseStatus;
