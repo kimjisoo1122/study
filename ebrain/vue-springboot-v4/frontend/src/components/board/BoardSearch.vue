@@ -1,6 +1,7 @@
+<!-- 게시글 검색조건 컴포넌트 입니다. -->
 <template>
 
-  <form class="search-form" @submit.prevent="submitForm">
+  <form class="search-form" @submit.prevent="searchSubmit">
 
     <div class="search-container">
 
@@ -9,25 +10,25 @@
         <input type="date"
                class="date-from"
                name="fromDate"
-               v-model="form.fromDate">
+               v-model="fromDate">
         <span class="date-between"> ~ </span>
         <input type="date"
                class="date-to"
                name="toDate"
-               v-model="form.toDate">
+               v-model="toDate">
       </div>
 
       <div class="condition-container">
 
         <select name="searchCategory"
                 class="condition-category"
-                v-model="form.searchCategory">
+                v-model="searchCategory">
           <option value="">전체 카테고리</option>
-          <optgroup v-for="(categoryGroup, groupName) in Object.keys(categories)"
-                    :key="groupName"
+          <optgroup v-for="(categoryGroup, groupIdx) in Object.keys(categories)"
+                    :key="groupIdx"
                     :label="categoryGroup">
-            <option v-for="(category, i) in categories[categoryGroup]"
-                    :key="i"
+            <option v-for="(category, idx) in categories[categoryGroup]"
+                    :key="idx"
                     :value="category.categoryId">
               {{ category.categoryName }}
             </option>
@@ -37,8 +38,8 @@
         <input type="text"
                name="search"
                class="condition-search"
-               v-model="form.search"
-               placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)">
+               placeholder="검색어를 입력해 주세요. (제목 + 작성자 + 내용)"
+               v-model="search">
         <button type="submit" class="condition-submit">검색</button>
       </div>
 
@@ -49,26 +50,56 @@
 </template>
 
 <script>
-
 export default {
   name : "BoardSearch",
   data() {
     return {
-      form : {
-        fromDate : '',
-        toDate : '',
-        search : '',
-        searchCategory : '',
-      }
+      page: 1,
+      fromDate: '',
+      toDate: '',
+      search: '',
+      searchCategory: '',
     }
   },
-  props : {
-    categories : Object
+  props: {
+    categories: Object,
+    condition: Object,
   },
-  methods : {
-    submitForm() {
 
-    }
+  created() {
+    this.setCondition();
+  },
+
+  methods : {
+    /**
+     * 검색조건을 전송합니다.
+     */
+    searchSubmit() {
+      this.$router.push({
+        path: '/board',
+        query: {
+          page: this.$route.query.page | 1,
+          fromDate: this.fromDate,
+          toDate: this.toDate,
+          search: this.search,
+          searchCategory: this.searchCategory
+        }
+      }).then(() => this.setCondition());
+
+    },
+
+    /**
+     * URL을 파싱하여 검색조건을 설정합니다.
+     */
+    setCondition() {
+      const {page, fromDate, toDate, search, searchCategory} = this.$route.query;
+      this.page = page || 1;
+      this.fromDate = fromDate || '';
+      this.toDate = toDate || '';
+      this.search = search || '';
+      this.searchCategory = searchCategory || '';
+    },
+
   },
 }
 </script>

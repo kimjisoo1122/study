@@ -36,8 +36,7 @@ public class BoardController {
         ResponseDto response = new ResponseDto();
         response.setStatus(ResponseStatus.SUCCESS);
         response.setData(
-                Map.of("categories", categoryService.findAll(),
-                        "boardList", boardService.findByCondition(condition),
+                Map.of("boardList", boardService.findByCondition(condition),
                         "boardCnt", boardService.getTotalSize(condition)));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
