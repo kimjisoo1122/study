@@ -20,7 +20,7 @@
 
         <select class="condition-category"
                 v-model="searchCategory">
-          <CategoryOption :categories="categories"/>
+          <CategoryOption :categories="categories" :selectedId="searchCategory"/>
         </select>
 
         <input type="text"
@@ -68,7 +68,7 @@ export default {
       this.$router.push({
         path: '/board',
         query: {
-          page: this.$route.query.page | 1,
+          page: 1,
           fromDate: this.fromDate,
           toDate: this.toDate,
           search: this.search,

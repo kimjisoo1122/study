@@ -48,14 +48,14 @@ export default {
   .file-input-container {
     display: flex;
     gap: 5px;
-    margin: 5px 0 5px 10px;
+    margin: 5px 0;
   }
 
   .file-upload-label {
     border: 1px solid black;
     background-color: lightgray;
     cursor: pointer;
-    padding: 4px 5px;
+    padding: 5px;
     font-size: 13px;
   }
 
@@ -63,7 +63,6 @@ export default {
     width: 300px;
     background-color: white;
     border: 1px solid black;
-    padding: 0 3px;
   }
 
   .file-upload {

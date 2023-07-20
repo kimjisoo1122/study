@@ -2,11 +2,9 @@
 
   <div class="file-container">
 
-    <router-link v-for="file in files"
-                 :key="file.fileId"
-                 class="file-router"
+    <router-link class="file-router"
                  :to="`/file/${file.fileId}`" >
-      {{ file.physicalName }}
+      {{ file.originalName }}
     </router-link>
 
   </div>
@@ -17,7 +15,7 @@
 export default {
   name: "File",
   props: {
-    files: Array
+    file: Object
   }
 }
 </script>
@@ -25,16 +23,17 @@ export default {
 <style scoped>
 
   .file-container {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-bottom: 10px;
-    padding: 10px;
+    padding: 3px 0;
+    margin-bottom: 3px;
   }
 
   .file-router {
     font-size: 14px;
     text-decoration: navajowhite;
+  }
+
+  .file-router:visited {
+    color: blue;
   }
 
 </style>

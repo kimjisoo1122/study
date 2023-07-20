@@ -13,7 +13,10 @@
 
     <div class="board-register-container">
       <button class="board-register-button">
-        <router-link to="/board/register" class="board-register-router">등록</router-link>
+        <router-link  class="board-register-router"
+                      :to="createSearchQuery('/board/register', condition.page, condition)">
+          등록
+        </router-link>
       </button>
     </div>
 
@@ -39,10 +42,10 @@
 import BoardSearch from "@/views/board/BoardSearch.vue";
 import axios from "axios";
 import Board from "@/views/board/Board.vue";
-import {formatCategories, formatDate} from "@/format";
+import {formatDate} from "@/util/formatUtil";
+import {createPageSearchQuery} from "@/util/queryparamUtil";
 import Pagination from "@/components/Pagination.vue";
 import BoardListHeader from "@/views/board/BoardListHeader.vue";
-import {getCategories} from "@/api/categoryService";
 
 export default {
   name: "BoardList",
@@ -59,6 +62,7 @@ export default {
       boardList: [], // 게시글목록
       categories: {}, // 카테고리목록
       condition: {}, // 검색조건
+      showRegister: false, // 게시글등록 ON/OFF
     }
   },
 
@@ -72,6 +76,7 @@ export default {
   },
 
   methods: {
+    createSearchQuery: createPageSearchQuery,
     /**
      * URL의 검색조건들을 파싱하여 condition 객체를 생성합니다.
      * @returns condition 검색조건
@@ -121,19 +126,6 @@ export default {
             })
             this.boardList = boardList;
             this.boardCnt = boardCnt;
-          })
-          .catch(({response: {data: {errorMessage}}}) => {
-            console.error(errorMessage);
-          });
-    },
-
-    /**
-     * 카테고리를 조회합니다.
-     */
-    getCategories() {
-      axios.get('/api/categories')
-          .then(({data: {data: {categories}}}) => {
-            this.categories = formatCategories(categories);
           })
           .catch(({response: {data: {errorMessage}}}) => {
             console.error(errorMessage);

@@ -2,6 +2,7 @@ import axios from "axios";
 
 /**
  * 카테고리를 조회합니다.
+ * @return 성공 : categories 실패 : errorMessage
  */
 export const getCategories = () => {
   return axios.get('/api/categories')

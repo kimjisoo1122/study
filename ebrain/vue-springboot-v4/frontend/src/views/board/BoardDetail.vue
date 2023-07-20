@@ -1,7 +1,7 @@
 <!-- 게시글상세 컴포넌트 입니다. -->
 <template>
 
-  <div class="board-container">
+  <div v-if="!showUpdate" class="board-container">
 
     <div class="header-container">
 
@@ -26,18 +26,18 @@
       <p class="content-text">{{ board.content }}</p>
     </div>
 
-    <File :files="files"/>
+
+    <File v-for="(file, i) in files" :key="i" :file="file"/>
 
     <Reply :replies="replies" @registerReply="registerReply"/>
 
     <div class="button-container">
-      <button class="button-list" @click="$router.go(-1)">목록</button>
-      <button class="button-update">
-        <router-link to="'/update'" class="button-update-router">수정</router-link>
-<!--        <a th:href="|/board/update/${board.getBoardId()}${condition.getQueryParamString()}|"
-           class="button-update-a">수정
-        </a>-->
-      </button>
+      <router-link :to="createSearchQuery('/board', condition)">
+        <button class="button-list">목록</button>
+      </router-link>
+
+      <button class="button-update" @click="showUpdate = true">수정</button>
+
       <button type="button"
               class="button-remove-router"
               onclick="removeOpen()">삭제
@@ -46,31 +46,58 @@
 
   </div>
 
+  <BoardUpdate v-if="showUpdate"
+               :board="board"
+               :files="files"
+               :condition="condition"
+               @cancelUpdate="showUpdate = false"
+               @updateBoard="initBoardDetail"/>
+
 </template>
 
 <script>
 
-import axios from "axios";
-import {formatDate} from "@/format";
+import {formatDate} from "@/util/formatUtil";
+import {getBoardDetail} from "@/api/boardService";
+import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
 import router from "@/router";
 import Reply from "@/views/board/Reply.vue";
 import File from "@/views/board/File.vue";
+import BoardUpdate from "@/views/board/BoardUpdate.vue";
 
 export default {
   name: "BoardDetail",
-  components: {File, Reply},
+  components: {BoardUpdate, File, Reply},
   data() {
     return {
       board: {},
       files: [],
       replies: [],
+      condition: {},
+      showUpdate: false,
     }
   },
 
   methods: {
-    router() {
-      return router
+    createSearchQuery,
+
+    initBoardDetail: function () {
+      getBoardDetail(this.$route.params.boardId)
+          .then(({board, files, replies}) => {
+            this.formatDate(board, replies);
+
+            this.board = board;
+            this.files = files;
+            this.replies = replies;
+            this.showUpdate = false;
+          })
+          .catch(errorMessage => {
+            console.error(errorMessage);
+          });
+
+      this.condition = createCondition(this.$route.query);
     },
+
     /**
      * 게시글과 댓글들의 날짜형식을 포맷팅합니다.
      * @param board 게시글
@@ -86,24 +113,6 @@ export default {
     },
 
     /**
-     * 게시글을 조회합니다.
-     * @param boardId 게시글번호
-     */
-    getBoard(boardId) {
-      axios.get(`/api/board/${boardId}`)
-          .then(({data: {data: {board, files, replies}}}) => {
-            this.formatDate(board, replies);
-
-            this.board = board;
-            this.files = files;
-            this.replies = replies;
-          })
-          .catch(({response: {data: {errorMessage}}}) => {
-            console.error(errorMessage);
-          });
-    },
-
-    /**
      * 이벤트로 전달된 댓글을 목록에 추가합니다.
      * @param reply 등록된댓글
      */
@@ -114,7 +123,7 @@ export default {
   },
 
   created() {
-    this.getBoard(this.$route.params.boardId);
+    this.initBoardDetail();
   }
 
 }

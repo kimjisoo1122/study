@@ -77,17 +77,16 @@
           <FileInput v-for="fileId in 3"
                      :key="fileId"
                      :fileId="fileId"
-                     @submitFile="createFiles"/>
+                     @submitFile="this.files.push($event)"/>
 
         </div>
       </div>
 
       <div class="button-container">
-        <button type="button"
-                class="button-cancel"
-                @click="$router.go(-1)">
-          취소
-        </button>
+        <router-link :to="createSearchQuery('/board', condition)">
+          <button type="button" class="button-cancel">취소</button>
+        </router-link>
+
         <button type="submit"
                 class="button-save">
           저장
@@ -103,7 +102,8 @@
 <script>
 import CategoryOption from "@/components/CategoryOption.vue";
 import FileInput from "@/components/FileInput.vue";
-import axios from "axios";
+import {registerBoard} from "@/api/boardService";
+import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
 
 export default {
   name: "BoardRegister",
@@ -111,6 +111,7 @@ export default {
 
   data() {
     return {
+      condition: {},
       categoryId: '',
       writer: '',
       password: '',
@@ -122,20 +123,38 @@ export default {
   },
 
   methods: {
-    /**
-     * FileInput 컴포넌트에서 이벤트발송된 파일을 배열로 생성합니다.
-     * @param file 파일객체
-     */
-    createFiles(file) {
-      this.files.push(file)
-    },
-
+    createSearchQuery,
     /**
      * 게시글등록을 서버에 요청합니다.
      * 성공시 게시글목록, 실패시 유효성에러를 띄웁니다.
      * //TODO 유효성검증 설정
      */
     register() {
+      const formData = this.createFormData();
+
+      registerBoard(formData)
+          .then(boardId => {
+            // 게시글상세 페이지로 이동합니다.
+            this.$router.push(createSearchQuery(`/board/${boardId}`, this.condition));
+          })
+          .catch(errorField => {
+            console.log(errorField);
+          });
+    },
+
+    /**
+     * FileInput 컴포넌트에서 이벤트발송된 파일을 배열로 생성합니다.
+     * @param file 파일객체
+     */
+    addFiles(file) {
+      this.files.push(file)
+    },
+
+    /**
+     * FormData를 생성합니다
+     * @returns FormData 게시글form정보
+     */
+    createFormData() {
       const formData = new FormData();
       formData.append('categoryId', this.categoryId);
       formData.append('writer', this.writer);
@@ -143,23 +162,18 @@ export default {
       formData.append('title', this.title);
       formData.append('content', this.content);
 
-      this.files.forEach(e => {
-        formData.append('files', e)
+      this.files.forEach(file => {
+        formData.append('files', file)
       });
 
-      axios.post('/api/board', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(({data: {data: {boardId}}}) => {
-        console.log(boardId);
-      }).catch(({response: {data: {errorFields}}}) => {
-        console.error(errorFields);
-      });
-
+      return formData;
     },
-  }
 
+  },
+
+  created() {
+    this.condition = createCondition(this.$route.query);
+  }
 }
 </script>
 
@@ -177,6 +191,7 @@ export default {
     padding: 10px;
     width: 150px;
     font-size: 14px;
+    box-sizing: border-box;
   }
 
   input {
@@ -307,6 +322,10 @@ export default {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     display: flex;
+  }
+
+  .file-list-container {
+    margin-left: 10px;
   }
 
   .button-container {

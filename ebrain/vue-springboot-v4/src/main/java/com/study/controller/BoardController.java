@@ -5,6 +5,7 @@ import com.study.api.ResponseFormValidDto;
 import com.study.api.ResponseStatus;
 import com.study.dto.BoardRegisterForm;
 import com.study.dto.BoardSearchCondition;
+import com.study.dto.BoardUpdateForm;
 import com.study.service.BoardService;
 import com.study.service.CategoryService;
 import com.study.service.FileService;
@@ -87,20 +88,14 @@ public class BoardController {
      * @return ResponseValidFormDto
      */
     @PostMapping
-    public ResponseEntity<ResponseFormValidDto> register(
+    public ResponseEntity<ResponseDto> registerBoard(
             @Validated BoardRegisterForm form,
             BindingResult bindingResult) throws IOException {
 
-        ResponseFormValidDto response = new ResponseFormValidDto();
+        ResponseDto response = new ResponseDto();
 
         if (bindingResult.hasErrors()) {
-            response.setStatus(ResponseStatus.FAIL);
-            response.setErrorMessage("잘못된 데이터입니다.");
-            // 에러필드이름과 에러메시지를 응답값에 담습니다.
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                response.getErrorFields().put(fieldError.getField(), fieldError.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(response);
+            return createValidFormResponse(bindingResult);
         }
 
         response.setStatus(ResponseStatus.SUCCESS);
@@ -108,5 +103,46 @@ public class BoardController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+
+    /**
+     * 게시글을 업데이트합니다.
+     */
+    @PutMapping("/{boardId}")
+    public ResponseEntity<ResponseDto> updateBoard(
+            @PathVariable("boardId") Long boardId,
+            @Validated BoardUpdateForm form,
+            BindingResult bindingResult) throws IOException {
+
+        if (!boardService.isPasswordMatch(boardId, form.getPassword())) {
+            bindingResult.rejectValue("password", null,
+                    "비밀번호가 맞지 않습니다");
+        }
+
+        if (bindingResult.hasErrors()) {
+            return createValidFormResponse(bindingResult);
+        }
+
+        boardService.update(form);
+
+        ResponseDto response = new ResponseDto();
+        response.setStatus(ResponseStatus.SUCCESS);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    private ResponseEntity<ResponseDto> createValidFormResponse(BindingResult bindingResult) {
+        ResponseFormValidDto response = new ResponseFormValidDto();
+        response.setStatus(ResponseStatus.FAIL);
+        response.setErrorMessage("잘못된 데이터입니다.");
+
+        // 에러필드이름과 에러메시지를 응답값에 담습니다.
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            response.getErrorFields().put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
 
 }

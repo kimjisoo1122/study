@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import BoardList from "@/views/board/BoardList.vue";
 import BoardDetail from "@/views/board/BoardDetail.vue";
 import BoardRegister from "@/views/board/BoardRegister.vue";
+import BoardUpdate from "@/views/board/BoardUpdate.vue";
 
 const routes = [
   {
@@ -15,7 +16,13 @@ const routes = [
   {
     path: '/board/register',
     component: BoardRegister
+  },
+  {
+    path: '/board/:boardId(\d+)/update',
+    component: BoardUpdate
   }
+  //TODO 페이지 낫파운드 에러페이지
+
   // {
   //   path: "/list",
   //   component: List

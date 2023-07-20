@@ -6,7 +6,7 @@
     <div class="paging-prev-total-container">
       <router-link class="paging-prev-total"
                    v-if="isPrevious"
-                    :to="generateBoardLink(beginPage - 1)">
+                   :to="createPageQuery(beginPage - 1)">
         &lt;&lt;
       </router-link>
     </div>
@@ -14,7 +14,7 @@
     <div class="paging-prev-container">
       <router-link class="paging-prev"
                    v-if="totalCnt !== 0 && page !== beginPage"
-                   :to="generateBoardLink(page - 1)">
+                   :to="createPageQuery(page - 1)">
         &lt;
       </router-link>
     </div>
@@ -22,7 +22,7 @@
     <div v-if="totalCnt !== 0" class="paging-index-container">
       <router-link class="paging-page"
                    v-for="page in endPage" :key="page"
-                   :to="generateBoardLink(page)">
+                   :to="createPageQuery(page)">
         {{ page }}
       </router-link>
     </div>
@@ -30,7 +30,7 @@
     <div class="paging-next-container">
       <router-link class="paging-next"
                    v-if="totalCnt !== 0 && page !== endPage"
-                   :to="generateBoardLink(page + 1)">
+                   :to="createPageQuery(page + 1)">
         &gt;
       </router-link>
     </div>
@@ -38,7 +38,7 @@
     <div class="paging-next-total-container">
       <router-link class="paging-next-total"
                    v-if="isNext"
-                   :to=" generateBoardLink(maxPage + 1)">
+                   :to="createPageQuery(maxPage + 1)">
         &gt;&gt;
       </router-link>
     </div>
@@ -48,36 +48,31 @@
 </template>
 
 <script>
+import {createPageSearchQuery} from "@/util/queryparamUtil";
 export default {
   name: "Pagination",
-  props: {
-    condition: Object,
-    boardCnt: Number,
-  },
+
   data() {
     return {
       navSize: 10,// 네비게이션 사이즈
       pageSize: 10, // 페이지 사이즈
     }
   },
+
+  props: {
+    condition: Object,
+    boardCnt: Number,
+  },
+
   methods: {
     /**
      * 게시글목록 라우터링크를 생성합니다.
-     * @param page
-     * @returns 라우터링크
+     * @param page 이동페이지
+     * @returns {라우터링크}
      */
-    generateBoardLink(page) {
-      return {
-        path: '/board',
-        query: {
-          page,
-          fromDate: this.condition.fromDate,
-          toDate: this.condition.toDate,
-          search: this.condition.search,
-          searchCategory: this.condition.searchCategory
-        }
-      }
-    }
+    createPageQuery(page) {
+      return createPageSearchQuery('/board', page, this.condition);
+    },
   },
 
   // 컴퓨티드는 계산이 필요한 값일때 사용한다

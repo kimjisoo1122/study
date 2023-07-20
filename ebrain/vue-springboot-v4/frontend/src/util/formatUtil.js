@@ -6,5 +6,3 @@
 export const formatDate = (date) => {
   return date.replace('T', ' ').replaceAll('-', '.').slice(0, -3);
 }
-
-
