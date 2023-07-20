@@ -109,7 +109,7 @@
 
 <script>
 import CategoryOption from "@/components/CategoryOption.vue";
-import File from "@/views/board/File.vue";
+import File from "@/views/board/BoardFile.vue";
 import FileInput from "@/components/FileInput.vue";
 import {updateBoard} from "@/api/boardService";
 

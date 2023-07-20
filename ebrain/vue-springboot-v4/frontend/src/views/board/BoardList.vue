@@ -131,7 +131,15 @@ export default {
             console.error(errorMessage);
           });
     },
-  }
+  },
+
+  mounted() {
+    const deleteMsg = localStorage.getItem('deleteMsg');
+    if (deleteMsg) {
+      localStorage.removeItem('deleteMsg');
+      alert(deleteMsg);
+    }
+  },
 }
 
 </script>

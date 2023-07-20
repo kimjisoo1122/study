@@ -40,7 +40,7 @@
 
       <button type="button"
               class="button-remove-router"
-              onclick="removeOpen()">삭제
+              @click="showDeleteModal = true">삭제
       </button>
     </div>
 
@@ -53,6 +53,13 @@
                @cancelUpdate="showUpdate = false"
                @updateBoard="initBoardDetail"/>
 
+  <Transition name="fadeDeleteModal">
+    <BoardDeleteModal v-if="showDeleteModal"
+                      :condition="condition"
+                      @cancelDelete="showDeleteModal = false"/>
+  </Transition>
+
+
 </template>
 
 <script>
@@ -62,12 +69,13 @@ import {getBoardDetail} from "@/api/boardService";
 import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
 import router from "@/router";
 import Reply from "@/views/board/Reply.vue";
-import File from "@/views/board/File.vue";
+import File from "@/views/board/BoardFile.vue";
 import BoardUpdate from "@/views/board/BoardUpdate.vue";
+import BoardDeleteModal from "@/views/board/BoardDeleteModal.vue";
 
 export default {
   name: "BoardDetail",
-  components: {BoardUpdate, File, Reply},
+  components: {BoardDeleteModal, BoardUpdate, File, Reply},
   data() {
     return {
       board: {},
@@ -75,6 +83,7 @@ export default {
       replies: [],
       condition: {},
       showUpdate: false,
+      showDeleteModal: false,
     }
   },
 
@@ -187,97 +196,25 @@ export default {
     border: 1px solid black;
   }
 
-  .button-update-router {
-    color: black;
-    text-decoration: none;
-  }
-
   .button-container button {
     cursor: pointer;
     width: 70px;
     margin: 0 5px;
   }
 
-
-
-  .remove-modal-bg {
-    background-color: rgba(0,0,0,0.4);
-    display: none;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    z-index: 1;
-    width: 100%;
-  }
-
-  .remove-modal-bg .required-star {
-    color: red;
-    margin-bottom: 5px;
-  }
-
-  .remove-modal {
-    background: white;
-    width: 500px;
-    border: 1px solid black;
-    margin: 15% auto;
-    padding: 20px;
-  }
-
-  .remove-password-container {
-    display: flex;
-    border: 1px solid black;
-  }
-
-  .remove-password-title {
-    align-items: center;
-    background: lightgray;
-    display: flex;
-    font-size: 13px;
-    padding-left: 10px;
-    width: 100px;
-  }
-
-  .remove-password-input-container {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 1;
-    margin: 5px 0;
-  }
-
-  .remove-password-input {
-    margin-left: 5px;
-    width: 80%;
-    padding: 5px;
-  }
-
-  .remove-password-input-error {
-    color: red;
-    display: none;
-    font-size: 12px;
-    flex-basis: 100%;
-    margin-left: 5px;
-  }
-
-  .remove-button-container {
-    align-items: center;
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 10px;
-  }
-
-  .remove-button-container button {
+  .delete-button-container button {
     border: 1px solid black;
     cursor: pointer;
     width: 70px;
   }
 
-  .remove-button-submit {
-    background-color: grey;
-    color: white;
+  .fadeDeleteModal-enter-from, .fadeDeleteModal-leave-to {
+    opacity: 0;
   }
-
+  .fadeDeleteModal-enter-active, .fadeDeleteModal-leave-active {
+    transition: all 0.5s;
+  }
+  .fadeDeleteModal-enter-to, .fadeDeleteModal-leave-from {
+    opacity: 1;
+  }
 </style>

@@ -114,7 +114,7 @@ public class BoardController {
             @Validated BoardUpdateForm form,
             BindingResult bindingResult) throws IOException {
 
-        if (!boardService.isPasswordMatch(boardId, form.getPassword())) {
+        if (boardService.isPasswordNotMatch(boardId, form.getPassword())) {
             bindingResult.rejectValue("password", null,
                     "비밀번호가 맞지 않습니다");
         }
@@ -129,6 +129,22 @@ public class BoardController {
         response.setStatus(ResponseStatus.SUCCESS);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<ResponseDto> deleteBoard(
+            @PathVariable("boardId") Long boardId,
+            @RequestBody Map<String, String> deleteMap) {
+
+        if (boardService.isPasswordNotMatch(boardId, deleteMap.get("deletePassword"))) {
+            throw new IllegalArgumentException("비밀번호가 맞지 않습니다");
+        }
+
+        boardService.delete(boardId);
+
+        ResponseDto response = new ResponseDto();
+        response.setStatus(ResponseStatus.SUCCESS);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
     private ResponseEntity<ResponseDto> createValidFormResponse(BindingResult bindingResult) {

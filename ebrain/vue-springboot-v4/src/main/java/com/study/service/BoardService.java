@@ -7,6 +7,7 @@ import com.study.mapper.ReplyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -178,12 +179,17 @@ public class BoardService {
      * @param password 입력받은 원본패스워드
      * @return
      */
-    public boolean isPasswordMatch(Long boardId, String password) {
+    public boolean isPasswordNotMatch(Long boardId, String password) {
+        if (!StringUtils.hasText(password)) {
+            return true;
+        }
+
         String findPassword = Optional.ofNullable(boardMapper.selectBoardById(boardId))
                 .map(BoardDto::getPassword)
                 .orElse("");
         String encryptedPassword = encryptPwd(password);
-        return findPassword.equals(encryptedPassword);
+
+        return !findPassword.equals(encryptedPassword);
     }
 
     /**
