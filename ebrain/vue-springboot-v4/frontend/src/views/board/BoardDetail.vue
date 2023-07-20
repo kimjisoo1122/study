@@ -1,4 +1,4 @@
-<!-- 게시글상세 컴포넌트 입니다. -->
+<!-- 게시글상세 라우터뷰 입니다. -->
 <template>
 
   <div v-if="!showUpdate" class="board-container">
@@ -15,7 +15,7 @@
 
       <div class="header-bottom-container">
         <div class="header-title-container">
-          <p>{{ board.categoryName }}</p>
+          <p class="header-title-category">{{ board.categoryName }}</p>
           <h1 class="header-title">{{ board.title }}</h1>
         </div>
         <p class="header-view">조회수: {{ board.viewCnt }}</p>
@@ -26,18 +26,21 @@
       <p class="content-text">{{ board.content }}</p>
     </div>
 
+    <!-- 게시글 첨부파일 -->
+    <BoardFile v-for="(file, i) in files"
+               :key="i"
+               :file="file"/>
 
-    <File v-for="(file, i) in files" :key="i" :file="file"/>
-
-    <Reply :replies="replies" @registerReply="registerReply"/>
+    <!-- 게시글 댓글목록, 댓글등록 -->
+    <Reply :replies="replies"
+           :boardId="board.boardId"
+           @registerReply="registerReply"/>
 
     <div class="button-container">
       <router-link :to="createSearchQuery('/board', condition)">
         <button class="button-list">목록</button>
       </router-link>
-
       <button class="button-update" @click="showUpdate = true">수정</button>
-
       <button type="button"
               class="button-remove-router"
               @click="showDeleteModal = true">삭제
@@ -46,6 +49,7 @@
 
   </div>
 
+  <!-- 게시글 업데이트  -->
   <BoardUpdate v-if="showUpdate"
                :board="board"
                :files="files"
@@ -53,6 +57,7 @@
                @cancelUpdate="showUpdate = false"
                @updateBoard="initBoardDetail"/>
 
+  <!-- 게시글삭제 모달  -->
   <Transition name="fadeDeleteModal">
     <BoardDeleteModal v-if="showDeleteModal"
                       :condition="condition"
@@ -64,33 +69,38 @@
 
 <script>
 
+import Reply from "@/components/board/Reply.vue";
+import BoardFile from "@/components/board/BoardFile.vue";
+import BoardUpdate from "@/components/board/BoardUpdate.vue";
+import BoardDeleteModal from "@/components/board/BoardDeleteModal.vue";
 import {formatDate} from "@/util/formatUtil";
 import {getBoardDetail} from "@/api/boardService";
 import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
-import router from "@/router";
-import Reply from "@/views/board/Reply.vue";
-import File from "@/views/board/BoardFile.vue";
-import BoardUpdate from "@/views/board/BoardUpdate.vue";
-import BoardDeleteModal from "@/views/board/BoardDeleteModal.vue";
 
 export default {
   name: "BoardDetail",
-  components: {BoardDeleteModal, BoardUpdate, File, Reply},
+
+  components: {BoardDeleteModal, BoardUpdate, BoardFile, Reply},
+
   data() {
     return {
-      board: {},
-      files: [],
-      replies: [],
-      condition: {},
-      showUpdate: false,
-      showDeleteModal: false,
+      board: {}, // 게시글
+      files: [], // 첨부파일
+      replies: [], // 댓글목록
+      condition: {}, // 검색조건
+      showUpdate: false, // 업데이트폼
+      showDeleteModal: false, // 게시글삭제모달창
     }
+  },
+
+  created() {
+    this.initBoardDetail();
   },
 
   methods: {
     createSearchQuery,
 
-    initBoardDetail: function () {
+    initBoardDetail() {
       getBoardDetail(this.$route.params.boardId)
           .then(({board, files, replies}) => {
             this.formatDate(board, replies);
@@ -131,10 +141,6 @@ export default {
     },
   },
 
-  created() {
-    this.initBoardDetail();
-  }
-
 }
 
 </script>
@@ -158,13 +164,15 @@ export default {
   .header-title-container {
     align-items: center;
     display: flex;
-    font-size: 20px;
-    font-weight: normal;
+  }
+
+  .header-title-category {
+    font-size: 16px;
   }
 
   .header-title {
     font-size: 20px;
-    font-weight: normal;
+    font-weight: bold;
     margin-left: 20px;
   }
 
@@ -208,6 +216,7 @@ export default {
     width: 70px;
   }
 
+  /* Transition */
   .fadeDeleteModal-enter-from, .fadeDeleteModal-leave-to {
     opacity: 0;
   }

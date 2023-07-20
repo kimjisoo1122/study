@@ -9,9 +9,16 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.io.IOException;
 
+/**
+ * 스프링부트의 웹설정
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    /**
+     * 서버로 들어온 요청중에 매핑이 안되면 인덱스파일을 호출합니다.
+     * @param registry 정적자원에 대한 핸들러
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")

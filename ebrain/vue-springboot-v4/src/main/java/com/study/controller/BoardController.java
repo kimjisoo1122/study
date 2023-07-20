@@ -1,13 +1,12 @@
 package com.study.controller;
 
 import com.study.api.ResponseDto;
-import com.study.api.ResponseFormValidDto;
+import com.study.api.ResponseValidFormDto;
 import com.study.api.ResponseStatus;
 import com.study.dto.BoardRegisterForm;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.BoardUpdateForm;
 import com.study.service.BoardService;
-import com.study.service.CategoryService;
 import com.study.service.FileService;
 import com.study.service.ReplyService;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +21,16 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * 게시글을 처리하는 API 컨트롤러 입니다.
+ * 게시글을 처리하는 API컨트롤러 입니다.
  */
 @RestController
 @RequestMapping("/api/board")
 @RequiredArgsConstructor
 public class BoardController {
 
-    private final CategoryService categoryService;
     private final BoardService boardService;
     private final FileService fileService;
     private final ReplyService replyService;
-
 
     /**
      * 게시글목록을 조회합니다.
@@ -56,7 +53,7 @@ public class BoardController {
                 Map.of("boardList", boardService.findAllByCondition(condition),
                         "boardCnt", boardService.getBoardCnt(condition)));
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -66,9 +63,8 @@ public class BoardController {
      */
     @GetMapping("/{boardId}")
     public ResponseEntity<ResponseDto> getBoard(
-            @PathVariable("boardId") Long boardId) {
+             @PathVariable("boardId") Long boardId) {
 
-        // TODO 조회수는 증가시켰는데 조회에서 예외발생하면?
         boardService.increaseViewCnt(boardId);
 
         ResponseDto response = new ResponseDto();
@@ -85,23 +81,26 @@ public class BoardController {
      * 게시글을 등록합니다.
      * @param form 게시글등록정보
      * @param bindingResult 유효성검증객체
-     * @return ResponseValidFormDto
+     * @return boardId 등록된 게시글번호
      */
     @PostMapping
-    public ResponseEntity<ResponseDto> registerBoard(
+    public ResponseEntity<ResponseValidFormDto> registerBoard(
             @Validated BoardRegisterForm form,
             BindingResult bindingResult) throws IOException {
 
-        ResponseDto response = new ResponseDto();
-
         if (bindingResult.hasErrors()) {
-            return createValidFormResponse(bindingResult);
+            return ResponseEntity
+                    .badRequest()
+                    .body(createValidFormResponse(bindingResult));
         }
 
+        ResponseValidFormDto response = new ResponseValidFormDto();
         response.setStatus(ResponseStatus.SUCCESS);
         response.setData(Map.of("boardId", boardService.register(form)));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 
 
@@ -109,7 +108,7 @@ public class BoardController {
      * 게시글을 업데이트합니다.
      */
     @PutMapping("/{boardId}")
-    public ResponseEntity<ResponseDto> updateBoard(
+    public ResponseEntity<ResponseValidFormDto> updateBoard(
             @PathVariable("boardId") Long boardId,
             @Validated BoardUpdateForm form,
             BindingResult bindingResult) throws IOException {
@@ -120,17 +119,25 @@ public class BoardController {
         }
 
         if (bindingResult.hasErrors()) {
-            return createValidFormResponse(bindingResult);
-        }
+            return ResponseEntity
+                    .badRequest()
+                    .body(createValidFormResponse(bindingResult));
+            }
 
         boardService.update(form);
 
-        ResponseDto response = new ResponseDto();
+        ResponseValidFormDto response = new ResponseValidFormDto();
         response.setStatus(ResponseStatus.SUCCESS);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
+    /**
+     * 게시글을 삭제합니다.
+     * @param boardId 게시글번호
+     * @param deleteMap 게시글비밀번호를 담고있는 Map
+     * @return ResponseDto
+     */
     @DeleteMapping("/{boardId}")
     public ResponseEntity<ResponseDto> deleteBoard(
             @PathVariable("boardId") Long boardId,
@@ -144,11 +151,19 @@ public class BoardController {
 
         ResponseDto response = new ResponseDto();
         response.setStatus(ResponseStatus.SUCCESS);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(response);
     }
 
-    private ResponseEntity<ResponseDto> createValidFormResponse(BindingResult bindingResult) {
-        ResponseFormValidDto response = new ResponseFormValidDto();
+    /**
+     * 유효성검증에 실패한 Form데이터의 에러값을 저장해서 반환합니다.
+     * @param bindingResult 유효성검증객체
+     * @return ResponseValidFormDto
+     */
+    private ResponseValidFormDto createValidFormResponse(BindingResult bindingResult) {
+        ResponseValidFormDto response = new ResponseValidFormDto();
         response.setStatus(ResponseStatus.FAIL);
         response.setErrorMessage("잘못된 데이터입니다.");
 
@@ -157,8 +172,6 @@ public class BoardController {
             response.getErrorFields().put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        return ResponseEntity.badRequest().body(response);
+        return response;
     }
-
-
 }

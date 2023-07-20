@@ -7,6 +7,13 @@ import java.util.Map;
 
 /**
  * API 응답에 사용되는 DTO 입니다.
+ * {
+ *     statues : status,
+ *     errorMessage : errorMessage,
+ *     data : {
+ *
+ *     }
+ * }
  */
 @Data
 public class ResponseDto {

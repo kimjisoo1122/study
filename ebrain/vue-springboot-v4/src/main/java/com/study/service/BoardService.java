@@ -4,6 +4,7 @@ import com.study.dto.*;
 import com.study.mapper.BoardMapper;
 import com.study.mapper.FileMapper;
 import com.study.mapper.ReplyMapper;
+import com.study.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +12,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,35 +142,7 @@ public class BoardService {
         return boardMapper.delete(boardId);
     }
 
-    /**
-     * 비밀번호를 암호화 합니다
-     * @param password 원본 비밀번호
-     * @return 암호화된 비밀번호
-     */
-    public String encryptPwd(String password) {
-        if (password == null) {
-            return null;
-        }
 
-        String encryptedPwd = "";
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(password.getBytes());
-
-            StringBuilder sb = new StringBuilder();
-
-            for (byte byteDatum : md.digest()) {
-                sb.append(Integer.toString((byteDatum & 0xff) + 0x100, 16).substring(1));
-            }
-
-            encryptedPwd = sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new RuntimeException("비밀번호 암호화에 실패하였습니다.");
-        }
-
-        return encryptedPwd;
-    }
 
     /**
      * 비밀번호를 검증합니다.
@@ -187,7 +158,7 @@ public class BoardService {
         String findPassword = Optional.ofNullable(boardMapper.selectBoardById(boardId))
                 .map(BoardDto::getPassword)
                 .orElse("");
-        String encryptedPassword = encryptPwd(password);
+        String encryptedPassword = StringUtil.encrypt(password);
 
         return !findPassword.equals(encryptedPassword);
     }
@@ -204,7 +175,7 @@ public class BoardService {
         boardDto.setTitle(form.getTitle());
         boardDto.setContent(form.getContent());
 
-        String encryptedPwd = encryptPwd(form.getPassword());
+        String encryptedPwd = StringUtil.encrypt(form.getPassword());
         boardDto.setPassword(encryptedPwd);
 
         return boardDto;

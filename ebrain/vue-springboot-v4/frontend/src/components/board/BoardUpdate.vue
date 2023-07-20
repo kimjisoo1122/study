@@ -1,16 +1,18 @@
+<!-- 게시글 업데이트폼 컴포넌트 입니다.-->
 <template>
 
-  <form @submit.prevent="update">
+  <form @submit.prevent="submitUpdate">
 
     <div class="update-container">
 
       <div class="category-container">
-        <div class="category-title">카테고리
-          <span class="required-star">*</span>
+        <div class="category-title">
+          카테고리<span class="required-star">*</span>
         </div>
         <div class="category-select-container">
           <select class="category-select"
                   v-model="categoryId">
+            <!-- 카테고리옵션 -->
             <CategoryOption :selectedId="categoryId"/>
           </select>
           <span class="category-select-error"></span>
@@ -33,8 +35,8 @@
       </div>
 
       <div class="writer-container">
-        <div class="writer-title">작성자
-          <span class="required-star">*</span>
+        <div class="writer-title">
+          작성자<span class="required-star">*</span>
         </div>
         <div class="writer-input-container">
           <input type="text"
@@ -45,7 +47,9 @@
       </div>
 
       <div class="password-container">
-        <div class="password-title">비밀번호</div>
+        <div class="password-title">
+          비밀번호
+        </div>
         <div class="password-input-container">
           <input type="password"
                  class="password-input"
@@ -56,8 +60,8 @@
       </div>
 
       <div class="title-container">
-        <div class="title-title">제목
-          <span class="required-star">*</span>
+        <div class="title-title">
+          제목<span class="required-star">*</span>
         </div>
         <div class="title-input-container">
           <input type="text"
@@ -68,8 +72,8 @@
       </div>
 
       <div class="content-container">
-        <div class="content-title">내용
-          <span class="required-star">*</span>
+        <div class="content-title">
+          내용<span class="required-star">*</span>
         </div>
         <div class="content-text-container">
                 <textarea class="content-text"
@@ -79,19 +83,33 @@
         </div>
       </div>
 
+      <!-- 첨부파일목록 -->
       <div class="file-list-container">
         <div class="file-title">파일 첨부</div>
 
         <div class="file-input-container">
           <div v-for="(file, i) in files" :key="i">
             <div class="file-container" v-if="!hideFile[i]">
-              <File :file="file"/>
-              <button type="button" class="file-delete-btn" @click="deleteFile(file.fileId, i)"> X </button>
+
+              <!-- 첨부파일 -->
+              <BoardFile :file="file"/>
+              <button type="button"
+                      class="file-delete-btn"
+                      @click="deleteFile(file.fileId, i)">
+                X
+              </button>
+
             </div>
           </div>
 
-          <div class="file-register-container" v-for="idx in fileInputSize" :key="idx">
+          <!-- 파일등록 -->
+          <div class="file-register-container"
+               v-for="idx in fileInputSize"
+               :key="idx">
+
+            <!-- 파일인풋 -->
             <FileInput :fileId="idx" @submitFile="this.saveFiles.push($event)"/>
+
          </div>
         </div>
       </div>
@@ -108,41 +126,43 @@
 </template>
 
 <script>
+// TODO 게시글 등록,수정,파일 유효성검증, 등록,수정 INPUT 컴포넌트 분리?
 import CategoryOption from "@/components/CategoryOption.vue";
-import File from "@/views/board/BoardFile.vue";
+import BoardFile from "@/components/board/BoardFile.vue";
 import FileInput from "@/components/FileInput.vue";
 import {updateBoard} from "@/api/boardService";
 
 export default {
   name: "BoardUpdate",
-  components: {FileInput, File, CategoryOption},
+  components: {FileInput, BoardFile, CategoryOption},
 
   data() {
     return {
-      categoryId: '',
-      writer: '',
-      password: '',
-      title: '',
-      content: '',
-      fileInputSize: 0,
+      categoryId: '', // 카테고리
+      writer: '', // 작성자
+      password: '', // 비밀번호
+      title: '', // 제목
+      content: '', // 내용
 
-      saveFiles: [],
-      deleteFiles: [],
-      hideFile: [],
+      // 업데이트폼
+      fileInputSize: 0, // 인풋파일사이즈
+      saveFiles: [],  // 저장파일
+      deleteFiles: [], // 삭제파일
+      hideFile: [], // 숨김파일 (삭제시 임시보관)
     }
   },
 
   props: {
-    board: Object,
-    files: Array,
-    condition: Object
+    board: Object, // 게시글
+    files: Array, // 첨부파일
+    condition: Object // 검색조건
   },
 
   methods: {
-    update() {
+    submitUpdate() {
       const formData = this.createFormData();
 
-      updateBoard(this.$route.params.boardId, formData)
+      updateBoard(this.board.boardId, formData)
           .then(boardId => {
             this.$emit('updateBoard', boardId);
           })

@@ -26,8 +26,7 @@
     <select id="selectByCondition"
             parameterType="boardSearchCondition"
             resultType="boardDto">
-        /* TODO DISTINCT는 제외시키는게 좋다. 상관서브쿼리로 풀어내도록*/
-        SELECT DISTINCT b.board_id,
+        SELECT b.board_id,
                b.category_id,
                b.title,
                b.writer,
@@ -36,10 +35,9 @@
                b.create_date,
                b.update_date,
                c.category_name,
-               IF (f.file_id IS NOT NULL, TRUE, FALSE) has_file
+               EXISTS (SELECT 1 FROM file f WHERE f.board_id = b.board_id) AS has_file
         FROM board b
             JOIN category c ON c.category_id = b.category_id
-            LEFT JOIN file f ON b.board_id = f.board_id
         <include refid="boardSearchConditionQuery"/>
         ORDER BY b.create_date DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -73,7 +71,7 @@
         WHERE board_id = #{boardId}
     </select>
 
-    <!-- dto 존재하는 값으로 업데이트 합니다. -->
+    <!-- 빈값이 아닌경우 업데이트 합니다. -->
     <update id="update"
             parameterType="boardDto">
         UPDATE board
@@ -93,13 +91,7 @@
             <if test="password != null &amp;&amp; password != ''">
                 password = #{password},
             </if>
-            <if test="categoryId != null
-                || (writer != null &amp;&amp; writer != '')
-                || (title != null &amp;&amp; title != '')
-                || (content != null &amp;&amp; content != '')
-                || (password != null &amp;&amp; password != '')">
-                update_date = now()
-            </if>
+            update_date = now()
         </set>
         WHERE board_id = #{boardId}
     </update>
@@ -125,6 +117,7 @@
     <sql id="boardSearchConditionQuery">
         <where>
             <choose>
+                <!-- 검색기간이 존재하지 않으면 지난 1년을 기본으로 조회합니다. -->
                 <when test="(fromDate != null &amp;&amp; fromDate !='') || (toDate != null &amp;&amp; toDate !='')">
                     DATE_FORMAT(b.create_date, '%Y-%m-%d') BETWEEN #{fromDate} AND #{toDate}
                 </when>

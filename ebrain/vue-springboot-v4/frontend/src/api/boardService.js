@@ -1,4 +1,5 @@
 import axios from "axios";
+import {formatDate} from "@/util/formatUtil";
 
 const multipartConfig = {
   headers: {
@@ -33,6 +34,24 @@ export const getBoardDetail = boardId => {
           files: files,
           replies: replies
         };
+      })
+      .catch(({response: {data: {errorMessage}}}) => {
+        throw new Error(errorMessage);
+      });
+}
+
+/**
+ * 게시글목록을 조회합니다.
+ * @param condition 검색조건
+ * @return boardList 게시글목록, boardCnt 게시글갯수
+ */
+export const getBoardList = (condition) => {
+  return axios.get('/api/board', {params: condition})
+      .then(({data: {data: {boardList, boardCnt}}}) => {
+        return {
+          boardList: boardList,
+          boardCnt: boardCnt
+        }
       })
       .catch(({response: {data: {errorMessage}}}) => {
         throw new Error(errorMessage);

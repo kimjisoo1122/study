@@ -1,6 +1,8 @@
+<!-- 댓글 컴포넌트입니다. -->
 <template>
   <div class="reply-container">
 
+    <!-- 댓글목록 -->
     <div class="reply-list-container">
       <div v-for="(reply, idx) in replies"
            :key="idx"
@@ -10,6 +12,7 @@
       </div>
     </div>
 
+    <!-- 댓글등록 -->
     <div class="reply-register-container">
       <input type="text"
              class="reply-register-input"
@@ -18,9 +21,9 @@
              v-model="replyContent"
              :placeholder="replyPlaceHolder">
       <button
-          type="submit"
+          type="button"
           class="reply-register-button"
-          @click="registerReply">등록
+          @click="submitReply">등록
       </button>
     </div>
 
@@ -28,40 +31,42 @@
 </template>
 
 <script>
-import axios from "axios";
+import {registerReply} from "@/api/replyService";
 
 export default {
   name: "Reply",
 
   data() {
     return {
-      replyContent: '',
-      replyError: '',
-      replyPlaceHolder: '댓글을 입력해 주세요.'
+      replyContent: '', // 댓글내용
+      replyError: '', // 댓글에러
+      replyPlaceHolder: '댓글을 입력해 주세요.',
     }
   },
 
   props: {
-    replies: Array
+    boardId: Number,
+    replies: Array,
   },
+
   methods: {
 
     /**
      * 댓글을 등록하고 등록된댓글을 게시글상세 컴포넌트에 전송합니다.
      */
-    registerReply() {
+    submitReply() {
       if (this.validateReply()) {
         const replyDto = {
-          boardId: this.$route.params.boardId,
+          boardId: this.boardId,
           replyContent: this.replyContent,
         };
 
-        axios.post('/api/reply', replyDto)
-            .then(({data: {data: {reply}}}) => {
+        registerReply(replyDto)
+            .then(reply => {
               this.$emit('registerReply', reply);
               this.replyContent = '';
             })
-            .catch(({response: {data: {errorMessage}}}) => {
+            .catch(errorMessage => {
               console.error(errorMessage);
             });
       }
@@ -136,6 +141,7 @@ export default {
 
   .reply-error {
     border: 1px solid red;
+    outline: red;
   }
 
   .reply-error::placeholder {

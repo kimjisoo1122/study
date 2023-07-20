@@ -8,8 +8,8 @@
       <p class="board-list-cnt">{{ boardCnt }} 건</p>
     </div>
 
-    <div class="board-header-container">
     <!-- 게시글목록 헤더 -->
+    <div class="board-header-container">
       <ul class="board-header-list-container">
         <li class="board-header-category">카테고리</li>
         <li class="board-header-title">제목</li>

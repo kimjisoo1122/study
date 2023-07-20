@@ -19,14 +19,15 @@
 import {getCategories} from "@/api/categoryService";
 export default {
   name: "CategoryOption",
+
   data() {
     return {
-      categories: {},
+      categories: {}, // 카테고리목록
     }
   },
 
   props: {
-    selectedId: String
+    selectedId: String // 검색카테고리
   },
 
   created() {

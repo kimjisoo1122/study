@@ -2,7 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import BoardList from "@/views/board/BoardList.vue";
 import BoardDetail from "@/views/board/BoardDetail.vue";
 import BoardRegister from "@/views/board/BoardRegister.vue";
-import BoardUpdate from "@/views/board/BoardUpdate.vue";
+import BoardUpdate from "@/components/board/BoardUpdate.vue";
 
 const routes = [
   {

@@ -3,22 +3,25 @@
 
   <div class="paging-container" >
 
+    <!-- 이전 전체페이지 -->
     <div class="paging-prev-total-container">
       <router-link class="paging-prev-total"
-                   v-if="isPrevious"
+                   v-if="isPreviousTotal"
                    :to="createPageQuery(beginPage - 1)">
         &lt;&lt;
       </router-link>
     </div>
 
+    <!-- 이전 페이지 -->
     <div class="paging-prev-container">
       <router-link class="paging-prev"
-                   v-if="totalCnt !== 0 && page !== beginPage"
+                   v-if="isPrevious"
                    :to="createPageQuery(page - 1)">
         &lt;
       </router-link>
     </div>
 
+    <!-- 페이지 -->
     <div v-if="totalCnt !== 0" class="paging-index-container">
       <router-link class="paging-page"
                    v-for="page in endPage" :key="page"
@@ -27,17 +30,19 @@
       </router-link>
     </div>
 
+    <!-- 다음 페이지 -->
     <div class="paging-next-container">
       <router-link class="paging-next"
-                   v-if="totalCnt !== 0 && page !== endPage"
+                   v-if="isNext"
                    :to="createPageQuery(page + 1)">
         &gt;
       </router-link>
     </div>
 
+    <!-- 다음 전체페이지 -->
     <div class="paging-next-total-container">
       <router-link class="paging-next-total"
-                   v-if="isNext"
+                   v-if="isNextTotal"
                    :to="createPageQuery(maxPage + 1)">
         &gt;&gt;
       </router-link>
@@ -60,8 +65,8 @@ export default {
   },
 
   props: {
-    condition: Object,
-    boardCnt: Number,
+    condition: Object, // 검색조건
+    boardCnt: Number, // 게시글갯수
   },
 
   methods: {
@@ -79,7 +84,7 @@ export default {
   // 또한 props또는 data가 계속 랜더링 될때마다 새로운 값을 계산할때 사용한다.
   computed: {
     page() {
-      return Number(this.$route.query.page || 1);
+      return Number(this.condition.page);
     },
     totalCnt() {
       return this.boardCnt; // 게시글 총 갯수
@@ -94,10 +99,16 @@ export default {
       return Math.min((this.beginPage + this.navSize - 1), this.maxPage); // 마지막페이지
     },
     isPrevious() {
-      return this.beginPage > 1; // 이전페이지 유무
+      return this.totalCnt !== 0 && this.page !== this.beginPage; // 이전페이지 유무
     },
     isNext() {
-      return this.maxPage !== this.endPage; // 다음페이지 유무
+      return this.totalCnt !== 0 && this.page !== this.endPage; // 다음페이지 유무
+    },
+    isPreviousTotal() {
+      return this.beginPage > 1; // 이전 전체페이지 유무
+    },
+    isNextTotal() {
+      return this.maxPage !== this.endPage; // 다음 전체페이지 유무
     },
   }
 

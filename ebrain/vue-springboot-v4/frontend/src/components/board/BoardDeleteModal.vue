@@ -41,12 +41,12 @@ export default {
 
   data() {
     return {
-      deletePassword: ''
+      deletePassword: '' // 게시글 비밀번호
     }
   },
 
   props: {
-    condition: Object
+    condition: Object // 검색조건
   },
 
   methods: {

@@ -27,7 +27,7 @@ public class ReplyController {
     /**
      * 댓글을 등록합니다.
      * @param replyDto boardId 게시글번호, replyContent 댓글내용
-     * @return 등록된 댓글
+     * @return reply 등록된 댓글
      */
     @PostMapping
     public ResponseEntity<ResponseDto> registerReply(
@@ -37,6 +37,8 @@ public class ReplyController {
         response.setStatus(ResponseStatus.SUCCESS);
         response.setData(Map.of("reply", replyService.register(replyDto)));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
 }

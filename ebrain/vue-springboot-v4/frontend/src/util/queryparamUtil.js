@@ -24,7 +24,8 @@ export const createSearchQuery = (path, condition) => {
 
 /**
  * 라우트쿼리로부터 검색조건을 설정합니다.
- * @param routeQuery
+ * @param routeQuery this.$route.query 라우트쿼리
+ * @return condition 검색조건
  */
 export const createCondition = (routeQuery) => {
   const {page, fromDate, toDate, search, searchCategory} = routeQuery;

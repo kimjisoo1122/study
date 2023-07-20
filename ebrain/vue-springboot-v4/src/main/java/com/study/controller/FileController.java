@@ -8,10 +8,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriUtils;
 
 import java.io.FileNotFoundException;
@@ -21,8 +23,8 @@ import java.nio.charset.StandardCharsets;
 /**
  * 파일을 처리하는 API 컨트롤러 입니다.
  */
-@RestController
-@RequestMapping("/api/file")
+@Controller
+@RequestMapping("/file")
 @RequiredArgsConstructor
 @Slf4j
 public class FileController {
@@ -55,5 +57,13 @@ public class FileController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(resource);
+    }
+
+    //TODO 예외처리
+    @ExceptionHandler(FileNotFoundException.class)
+    public ModelAndView fileNotFoundHandler(FileNotFoundException e) {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("errorPage");
+        return mv;
     }
 }

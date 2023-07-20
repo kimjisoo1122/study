@@ -8,15 +8,7 @@
     <div class="board-title">
       <span v-if="board.hasFile" class="board-title-file">File</span>
       <router-link class="board-title-link"
-                    :to="{
-                      path: `/board/${board.boardId}`,
-                      query: {
-                        page: condition.page,
-                        fromDate: condition.fromDate,
-                        toDate: condition.toDate,
-                        search: condition.search,
-                        searchCategory: condition.searchCategory
-                      }}">
+                   :to="createSearchQuery(`/board/${board.boardId}`, condition)">
         {{ board.title }}
       </router-link>
     </div>
@@ -32,12 +24,19 @@
 
 <script>
 
+import {createSearchQuery} from "@/util/queryparamUtil";
+
 export default {
   name: "Board",
+
   props: {
-    board: Object,
-    condition: Object,
-  }
+    board: Object, // 게시글
+    condition: Object, // 검색조건
+  },
+
+  methods: {
+    createSearchQuery
+  },
 }
 
 </script>

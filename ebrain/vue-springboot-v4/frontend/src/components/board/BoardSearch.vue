@@ -1,7 +1,7 @@
 <!-- 게시글 검색조건 컴포넌트 입니다. -->
 <template>
 
-  <form class="search-form" @submit.prevent="searchSubmit">
+  <form class="search-form" @submit.prevent="submitSearch">
 
     <div class="search-container">
 
@@ -20,7 +20,7 @@
 
         <select class="condition-category"
                 v-model="searchCategory">
-          <CategoryOption :categories="categories" :selectedId="searchCategory"/>
+          <CategoryOption :selectedId="searchCategory"/>
         </select>
 
         <input type="text"
@@ -41,30 +41,32 @@ import CategoryOption from "@/components/CategoryOption.vue";
 
 export default {
   name : "BoardSearch",
+
   components: {CategoryOption},
+
   data() {
     return {
-      page: 1,
-      fromDate: '',
-      toDate: '',
-      search: '',
-      searchCategory: '',
+      page: 1, // 페이지
+      fromDate: '', // 작성일이후
+      toDate: '', // 작성일이전
+      search: '', // 검색어
+      searchCategory: '', // 검색카테고리
     }
   },
+
   props: {
-    categories: Object,
-    condition: Object,
+    condition: Object, // 검색조건
   },
 
   created() {
-    this.setCondition();
+    this.initBoardSearch();
   },
 
   methods : {
     /**
      * 검색조건을 전송합니다.
      */
-    searchSubmit() {
+    submitSearch() {
       this.$router.push({
         path: '/board',
         query: {
@@ -74,23 +76,23 @@ export default {
           search: this.search,
           searchCategory: this.searchCategory
         }
-      }).then(() => this.setCondition());
+      });
 
     },
 
     /**
-     * URL을 파싱하여 검색조건을 설정합니다.
+     * condition객체를 통해 검색조건을 설정합니다.
      */
-    setCondition() {
-      const {page, fromDate, toDate, search, searchCategory} = this.$route.query;
-      this.page = page || 1;
-      this.fromDate = fromDate || '';
-      this.toDate = toDate || '';
-      this.search = search || '';
-      this.searchCategory = searchCategory || '';
+    initBoardSearch() {
+      this.page = this.condition.page;
+      this.fromDate =  this.condition.fromDate;
+      this.toDate =  this.condition.toDate;
+      this.search =  this.condition.search;
+      this.searchCategory =  this.condition.searchCategory;
     },
 
   },
+
 }
 </script>
 

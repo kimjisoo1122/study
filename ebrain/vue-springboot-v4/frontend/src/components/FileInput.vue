@@ -1,3 +1,4 @@
+<!-- 파일인풋 컴포넌트 입니다. -->
 <template>
 
   <div class="file-input-container">
@@ -9,7 +10,7 @@
     <input type="file"
            class="file-upload"
            :id="fileId"
-           @change="submitFile($event)">
+           @change="submitFile">
   </div>
   <span class="file-error"></span>
 
@@ -21,21 +22,21 @@ export default {
 
   data() {
     return {
-      fileName: '',
+      fileName: '', // 파일이름
     }
   },
 
   props: {
-    fileId: Number,
+    fileId: Number, // 파일번호
   },
 
   methods: {
     /**
      * 파일객체를 상위 컴포넌트에 전송합니다
-     * @param e 이벤트
+     * @param event 이벤트
      */
-    submitFile(e) {
-      const file = e.target.files[0];
+    submitFile(event) {
+      const file = event.target.files[0];
       this.fileName = file.name;
       this.$emit('submitFile', file);
     },

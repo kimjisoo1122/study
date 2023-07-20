@@ -1,3 +1,4 @@
+<!-- 게시글등록 라우터뷰 입니다. -->
 <template>
 
   <form @submit.prevent="register">
@@ -73,12 +74,10 @@
       <div class="file-container">
         <div class="file-title">파일 첨부</div>
         <div class="file-list-container">
-
           <FileInput v-for="fileId in 3"
                      :key="fileId"
                      :fileId="fileId"
                      @submitFile="this.files.push($event)"/>
-
         </div>
       </div>
 

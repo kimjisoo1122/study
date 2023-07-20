@@ -1,21 +1,19 @@
+<!-- 게시글 첨부파일 컴포넌트 입니다. -->
 <template>
 
+  <!-- 첨부파일 다운로드링크  -->
   <div class="file-container">
-
-    <router-link class="file-router"
-                 :to="`/file/${file.fileId}`" >
-      {{ file.originalName }}
-    </router-link>
-
+    <a class="file-link" :href="`/file/${file.fileId}`" >{{ file.originalName }}</a>
   </div>
 
 </template>
 
 <script>
+
 export default {
-  name: "File",
+  name: "BoardFile",
   props: {
-    file: Object
+    file: Object // 첨부파일
   }
 }
 </script>
@@ -27,13 +25,10 @@ export default {
     margin-bottom: 3px;
   }
 
-  .file-router {
+  .file-link {
+    color: blue;
     font-size: 14px;
     text-decoration: navajowhite;
-  }
-
-  .file-router:visited {
-    color: blue;
   }
 
 </style>

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+//TODO 예외처리
 @ControllerAdvice
 public class BoardControllerAdvice {
 
@@ -18,4 +19,5 @@ public class BoardControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 }
