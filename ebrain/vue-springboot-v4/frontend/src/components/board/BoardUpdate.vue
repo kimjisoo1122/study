@@ -7,15 +7,17 @@
 
       <div class="category-container">
         <div class="category-title">
-          카테고리<span class="required-star">*</span>
+          카테고리
+          <span class="required-star">*</span>
         </div>
         <div class="category-select-container">
           <select class="category-select"
+                  @change="this.errorFields.categoryId = validCategory(this.categoryId)"
                   v-model="categoryId">
             <!-- 카테고리옵션 -->
             <CategoryOption :selectedId="categoryId"/>
           </select>
-          <span class="category-select-error"></span>
+          <span class="category-select-error">{{ errorFields.categoryId }}</span>
         </div>
       </div>
 
@@ -36,13 +38,15 @@
 
       <div class="writer-container">
         <div class="writer-title">
-          작성자<span class="required-star">*</span>
+          작성자
+          <span class="required-star">*</span>
         </div>
         <div class="writer-input-container">
           <input type="text"
                  class="writer-input"
+                 @change="this.errorFields.writer = validWriter(this.writer)"
                  v-model="writer">
-          <span class="writer-input-error"></span>
+          <span class="writer-input-error">{{ errorFields.writer }}</span>
         </div>
       </div>
 
@@ -55,19 +59,21 @@
                  class="password-input"
                  placeholder="비밀번호"
                  v-model="password">
-          <span class="password-input-error"></span>
+          <span class="password-input-error">{{ errorFields.password }}</span>
         </div>
       </div>
 
       <div class="title-container">
         <div class="title-title">
-          제목<span class="required-star">*</span>
+          제목
+          <span class="required-star">*</span>
         </div>
         <div class="title-input-container">
           <input type="text"
                  class="title-input"
+                 @change="this.errorFields.title = validTitle(this.title)"
                  v-model="title">
-          <span class="title-input-error"></span>
+          <span class="title-input-error">{{ errorFields.title }}</span>
         </div>
       </div>
 
@@ -77,40 +83,39 @@
         </div>
         <div class="content-text-container">
                 <textarea class="content-text"
+                          @change="this.errorFields.content = validContent(this.content)"
                           v-model="content">
                 </textarea>
-          <span class="content-text-error"></span>
+          <span class="content-text-error">{{ errorFields.content }}</span>
         </div>
       </div>
 
-      <!-- 첨부파일목록 -->
+
       <div class="file-list-container">
         <div class="file-title">파일 첨부</div>
+        <div class="board-update-file-input-container">
 
-        <div class="file-input-container">
+          <!-- 첨부파일목록 -->
           <div v-for="(file, i) in files" :key="i">
             <div class="file-container" v-if="!hideFile[i]">
-
-              <!-- 첨부파일 -->
               <BoardFile :file="file"/>
               <button type="button"
                       class="file-delete-btn"
                       @click="deleteFile(file.fileId, i)">
                 X
               </button>
-
             </div>
           </div>
 
-          <!-- 파일등록 -->
-          <div class="file-register-container"
-               v-for="idx in fileInputSize"
-               :key="idx">
+          <!-- 파일인풋 -->
+          <div class="file-register-container">
+            <FileInput v-for="fileId in fileInputSize"
+                       :key="fileId"
+                       :fileId="fileId"
+                       :serverFileError="errorFields.files"
+                       @submitFile="this.saveFiles.push($event)"/>
 
-            <!-- 파일인풋 -->
-            <FileInput :fileId="idx" @submitFile="this.saveFiles.push($event)"/>
-
-         </div>
+          </div>
         </div>
       </div>
 
@@ -126,11 +131,11 @@
 </template>
 
 <script>
-// TODO 게시글 등록,수정,파일 유효성검증, 등록,수정 INPUT 컴포넌트 분리?
-import CategoryOption from "@/components/CategoryOption.vue";
+import CategoryOption from "@/components/board/CategoryOption.vue";
 import BoardFile from "@/components/board/BoardFile.vue";
 import FileInput from "@/components/FileInput.vue";
 import {updateBoard} from "@/api/boardService";
+import {validCategory, validConfirm, validContent, validPassword, validTitle, validWriter} from "@/util/validUtil";
 
 export default {
   name: "BoardUpdate",
@@ -143,6 +148,15 @@ export default {
       password: '', // 비밀번호
       title: '', // 제목
       content: '', // 내용
+
+      // 유효성검증
+      errorFields: { // 유효성검증필드
+        categoryId: '',
+        writer: '',
+        title: '',
+        content: '',
+        files: '',
+      },
 
       // 업데이트폼
       fileInputSize: 0, // 인풋파일사이즈
@@ -158,17 +172,38 @@ export default {
     condition: Object // 검색조건
   },
 
+  created() {
+    this.initBoardUpdate();
+  },
+
   methods: {
+    // 유효성검증
+    validContent,
+    validTitle,
+    validPassword,
+    validWriter,
+    validCategory,
+
+    /**
+     * 업데이트를 처리합니다.
+     */
     submitUpdate() {
+      // if (!this.validForm()) {
+      //   return false;
+      // }
+
       const formData = this.createFormData();
 
       updateBoard(this.board.boardId, formData)
           .then(boardId => {
             this.$emit('updateBoard', boardId);
           })
-          .catch(errorMessage => {
-            console.error(errorMessage);
-          })
+          .catch(({data}) => {
+            // 유효성검증에 실패한 필드의 에러메시지를 저장합니다.
+            for (const field in data) {
+              this.errorFields[field] = data[field];
+            }
+          });
     },
 
     /**
@@ -194,6 +229,24 @@ export default {
     },
 
     /**
+     * 폼데이터를 검증합니다.
+     * @returns {boolean}
+     */
+    validForm() {
+      this.errorFields.categoryId = validCategory(this.categoryId);
+      this.errorFields.writer = validWriter(this.writer);
+      this.errorFields.title = validTitle(this.title);
+      this.errorFields.content = validContent(this.content);
+
+      let formError = '';
+      for (const field in this.errorFields) {
+        formError += this.errorFields[field];
+      }
+
+      return formError.length === 0;
+    },
+
+    /**
      * 삭제할 파일을 임시배열에 추가합니다.
      * @param fileId
      * @param i
@@ -204,6 +257,9 @@ export default {
       this.fileInputSize++;
     },
 
+    /**
+     * 초기데이터를 설정합니다.
+     */
     initBoardUpdate() {
       this.categoryId = this.board.categoryId;
       this.writer = this.board.writer;
@@ -212,11 +268,6 @@ export default {
       this.fileInputSize = 3 - this.files.length;
     },
   },
-
-
-  created() {
-    this.initBoardUpdate();
-  }
 }
 </script>
 
@@ -246,21 +297,14 @@ export default {
     margin: 5px 0;
   }
 
-  .input-error {
-    border: none;
-    outline: 1px solid red;
-  }
-
   .update-container > [class$='container'] {
     border-top: 1px solid black;
     display: flex;
   }
 
-/* 공통부분 종료 */
-
 
   .create-date, .update-date, .view-cnt, .writer-input-container,
-  .password-input-container, .title-input-container, .file-input-container  {
+  .password-input-container, .title-input-container {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
@@ -287,10 +331,6 @@ export default {
     color: red;
   }
 
-  .select-error {
-    border: 1px solid red;
-  }
-
   .title-input-container {
     width: 80%;
   }
@@ -314,16 +354,19 @@ export default {
     margin-bottom: 5px;
   }
 
-  .file-input-container {
+  .board-update-file-input-container {
+    display: flex;
     flex-direction: column;
     margin: 5px 10px;
     align-items: flex-start;
-
   }
 
   .file-container {
     display: flex;
     gap: 10px;
+  }
+
+  .file-register-container{
   }
 
   .file-delete-btn {
@@ -332,9 +375,6 @@ export default {
     background-color: white;
   }
 
-  .file-register-container {
-
-  }
 
   .button-container {
     align-items: center;
@@ -346,11 +386,6 @@ export default {
   .button-container button {
     width: 70px;
     cursor: pointer;
-  }
-
-  .button-cancel-a {
-    color: black;
-    text-decoration: none;
   }
 
   .button-save {

@@ -11,8 +11,10 @@
            class="file-upload"
            :id="fileId"
            @change="submitFile">
+    <span class="file-error">{{ fileError }}</span>
+    <span v-if="serverFileError !== ''" class="file-error">{{ serverFileError }}</span>
   </div>
-  <span class="file-error"></span>
+
 
 </template>
 
@@ -22,12 +24,15 @@ export default {
 
   data() {
     return {
+      fileMaxSize: 1000 * 1000 * 10, // 파일최대크기 10MB
       fileName: '', // 파일이름
+      fileError: '', // 파일에러
     }
   },
 
   props: {
     fileId: Number, // 파일번호
+    serverFileError: String, // 서버파일에러
   },
 
   methods: {
@@ -37,6 +42,13 @@ export default {
      */
     submitFile(event) {
       const file = event.target.files[0];
+
+      if (file.size > this.fileMaxSize) {
+        const formattedMaxSize = this.fileMaxSize / (1000 * 1000) + 'MB';
+        this.fileError = `파일사이즈는 ${formattedMaxSize}를 넘길수 없습니다.`;
+        return false;
+      }
+
       this.fileName = file.name;
       this.$emit('submitFile', file);
     },
@@ -48,6 +60,7 @@ export default {
 
   .file-input-container {
     display: flex;
+    flex-wrap: wrap;
     gap: 5px;
     margin: 5px 0;
   }
@@ -56,18 +69,30 @@ export default {
     border: 1px solid black;
     background-color: lightgray;
     cursor: pointer;
-    padding: 5px;
-    font-size: 13px;
+    font-size: 12px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 5px;
   }
 
   .file-disabled {
+    box-sizing: border-box;
     width: 300px;
+    height: 25px;
     background-color: white;
     border: 1px solid black;
   }
 
   .file-upload {
     display: none;
+  }
+
+  .file-error {
+    font-size: 12px;
+    color: red;
+    flex-basis: 100%;
   }
 
 </style>

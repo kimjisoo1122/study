@@ -16,8 +16,11 @@ export const registerBoard = (formData) => {
   return axios.post('/api/board', formData, multipartConfig)
       .then(({data: {data: {boardId}}}) => {
         return boardId;
-      }).catch(({response: {data: {errorFields}}}) => {
-        throw new Error(errorFields);
+      })
+      .catch(({response: {data: {errorFields}}}) => {
+        throw {
+          data: errorFields
+        }
       });
 }
 
@@ -36,7 +39,9 @@ export const getBoardDetail = boardId => {
         };
       })
       .catch(({response: {data: {errorMessage}}}) => {
-        throw new Error(errorMessage);
+        throw {
+          message: errorMessage
+        };
       });
 }
 
@@ -54,7 +59,9 @@ export const getBoardList = (condition) => {
         }
       })
       .catch(({response: {data: {errorMessage}}}) => {
-        throw new Error(errorMessage);
+        throw {
+          message: errorMessage
+        };
       });
 }
 
@@ -69,8 +76,10 @@ export const updateBoard = (boardId, formData) => {
       .then(() => {
         return boardId;
       })
-      .catch(({response: {data: {errorMessage}}}) => {
-        throw new Error(errorMessage);
+      .catch(({response: {data: {errorFields}}}) => {
+        throw {
+          data: errorFields
+        }
       });
 }
 
@@ -91,7 +100,9 @@ export const deleteBoard = (boardId, deletePassword) => {
         return boardId;
       })
       .catch(({response: {data: {errorMessage}}}) => {
-        throw new Error(errorMessage);
+        throw {
+          message: errorMessage
+        };
       });
 }
 

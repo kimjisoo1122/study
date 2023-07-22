@@ -110,8 +110,8 @@ export default {
             this.replies = replies;
             this.showUpdate = false;
           })
-          .catch(errorMessage => {
-            console.error(errorMessage);
+          .catch(({message}) => {
+            console.error(message);
           });
 
       this.condition = createCondition(this.$route.query);

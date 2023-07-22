@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import CategoryOption from "@/components/CategoryOption.vue";
+import CategoryOption from "@/components/board/CategoryOption.vue";
 
 export default {
   name : "BoardSearch",

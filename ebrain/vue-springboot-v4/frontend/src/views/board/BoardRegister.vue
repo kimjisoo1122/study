@@ -1,82 +1,98 @@
 <!-- 게시글등록 라우터뷰 입니다. -->
 <template>
 
-  <form @submit.prevent="register">
+  <form @submit.prevent="submitRegister">
 
     <div class="register-container">
 
       <div class="category-container">
-        <div class="category-title">카테고리
+        <div class="category-title">
+          카테고리
           <span class="required-star">*</span>
         </div>
 
         <div class="category-select-container">
           <select class="category-select"
+                  @change="this.errorFields.categoryId = validCategory(this.categoryId)"
                   v-model="categoryId">
             <CategoryOption/>
           </select>
-          <span class="category-select-error"></span>
+          <span class="category-select-error">{{ errorFields.categoryId }}</span>
         </div>
 
       </div>
 
       <div class="writer-container">
-        <div class="writer-title">작성자
+        <div class="writer-title">
+          작성자
           <span class="required-star">*</span>
         </div>
         <div class="writer-input-container">
           <input type="text"
                  class="writer-input"
+                 @change="this.errorFields.writer = validWriter(this.writer)"
                  v-model="writer">
-          <span class="writer-input-error"></span>
+          <span class="writer-input-error">{{ errorFields.writer }}</span>
         </div>
       </div>
 
       <div class="password-container">
-        <div class="password-title">비밀번호
+        <div class="password-title">
+          비밀번호
           <span class="required-star">*</span>
         </div>
         <div class="password-input-container">
-          <input type="password"
-                 class="password-input"
-                 v-model="password">
-          <input type="password"
-                 class="password-input-confirm"
-                 v-model="confirmPassword">
-          <span class="password-input-error"></span>
+            <input type="password"
+                   class="password-input"
+                   @change="this.errorFields.password = validPassword(this.password)"
+                   v-model="password">
+            <input type="password"
+                   class="password-input-confirm"
+                   @change="this.errorFields.confirmError = validConfirm(this.password, this.confirmPassword)"
+                   v-model="confirmPassword">
+            <div class="password-input-error-container">
+              <span class="password-input-error">{{ errorFields.password }}</span>
+              <span class="password-input-error">{{ errorFields.confirmPassword }}</span>
+            </div>
+
         </div>
       </div>
 
       <div class="title-container">
-        <div class="title-title">제목
+        <div class="title-title">
+          제목
           <span class="required-star">*</span>
         </div>
         <div class="title-input-container">
           <input type="text"
                  class="title-input"
+                 @change="this.errorFields.title = validTitle(this.title)"
                  v-model="title">
-          <span class="title-input-error"></span>
+          <span class="title-input-error">{{ errorFields.title }}</span>
         </div>
       </div>
 
       <div class="content-container">
-        <div class="content-title">내용
+        <div class="content-title">
+          내용
           <span class="required-star">*</span>
         </div>
         <div class="content-text-container">
                     <textarea class="content-text"
+                              @change="this.errorFields.content = validContent(this.content)"
                               v-model="content">
                     </textarea>
-          <span class="content-text-error"></span>
+          <span class="content-text-error">{{ errorFields.content }}</span>
         </div>
       </div>
 
       <div class="file-container">
         <div class="file-title">파일 첨부</div>
         <div class="file-list-container">
-          <FileInput v-for="fileId in 3"
+          <FileInput v-for="fileId in fineInputSize"
                      :key="fileId"
                      :fileId="fileId"
+                     :serverFileError="errorFields.files"
                      @submitFile="this.files.push($event)"/>
         </div>
       </div>
@@ -86,10 +102,7 @@
           <button type="button" class="button-cancel">취소</button>
         </router-link>
 
-        <button type="submit"
-                class="button-save">
-          저장
-        </button>
+        <button type="submit" class="button-save">저장</button>
       </div>
 
     </div>
@@ -99,10 +112,11 @@
 </template>
 
 <script>
-import CategoryOption from "@/components/CategoryOption.vue";
+import CategoryOption from "@/components/board/CategoryOption.vue";
 import FileInput from "@/components/FileInput.vue";
 import {registerBoard} from "@/api/boardService";
 import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
+import {validCategory, validConfirm, validContent, validPassword, validTitle, validWriter} from "@/util/validUtil";
 
 export default {
   name: "BoardRegister",
@@ -110,25 +124,53 @@ export default {
 
   data() {
     return {
-      condition: {},
-      categoryId: '',
-      writer: '',
-      password: '',
-      confirmPassword: '',
-      title: '',
-      content: '',
-      files: [],
+      condition: {}, // 검색조건
+      categoryId: '', // 카테고리
+      writer: '', // 작성자
+      password: '', // 비밀번호
+      confirmPassword: '', // 확인비밀번호
+      title: '', // 제목
+      content: '', // 내용
+      files: [], // 첨부파일,
+      fineInputSize: 3,
+
+      errorFields: { // 유효성검증필드
+        categoryId: '',
+        writer: '',
+        password: '',
+        confirmPassword: '',
+        title: '',
+        content: '',
+        files: '',
+      },
+
     }
   },
 
+  created() {
+    this.condition = createCondition(this.$route.query);
+  },
+
   methods: {
+    validConfirm,
+    // 등록폼 유효성검증
+    validContent,
+    validTitle,
+    validPassword,
+    validCategory,
+    validWriter,
+
+    // 게시글목록 돌아가기 쿼리생성
     createSearchQuery,
     /**
      * 게시글등록을 서버에 요청합니다.
-     * 성공시 게시글목록, 실패시 유효성에러를 띄웁니다.
-     * //TODO 유효성검증 설정
+     * 성공시 게시글목록, 실패시 유효성에러메시지를 저장합니다.
      */
-    register() {
+    submitRegister() {
+      if (!this.validForm()) {
+        return false;
+      }
+
       const formData = this.createFormData();
 
       registerBoard(formData)
@@ -136,17 +178,32 @@ export default {
             // 게시글상세 페이지로 이동합니다.
             this.$router.push(createSearchQuery(`/board/${boardId}`, this.condition));
           })
-          .catch(errorField => {
-            console.log(errorField);
+          .catch(({data}) => {
+            // 유효성검증에 실패한 필드의 에러메시지를 저장합니다.
+            for (const field in data) {
+              this.errorFields[field] = data[field];
+            }
           });
     },
 
     /**
-     * FileInput 컴포넌트에서 이벤트발송된 파일을 배열로 생성합니다.
-     * @param file 파일객체
+     * 폼데이터를 검증합니다.
+     * @returns {boolean}
      */
-    addFiles(file) {
-      this.files.push(file)
+    validForm() {
+      this.errorFields.categoryId = validCategory(this.categoryId);
+      this.errorFields.writer = validWriter(this.writer);
+      this.errorFields.password = validPassword(this.password);
+      this.errorFields.confirmPassword = validConfirm(this.password, this.confirmPassword);
+      this.errorFields.title = validTitle(this.title);
+      this.errorFields.content = validContent(this.content);
+
+      let formError = '';
+      for (const field in this.errorFields) {
+        formError += this.errorFields[field];
+      }
+
+      return formError.length === 0;
     },
 
     /**
@@ -170,9 +227,7 @@ export default {
 
   },
 
-  created() {
-    this.condition = createCondition(this.$route.query);
-  }
+
 }
 </script>
 
@@ -197,6 +252,7 @@ export default {
     height: 30px;
     padding: 0 5px;
     width: 200px;
+    box-sizing: border-box;
   }
 
   .category-container {
@@ -253,23 +309,23 @@ export default {
   .password-input-container {
     align-items: center;
     display: flex;
-    margin-left: 10px;
+    margin: 5px 0 0 10px;
     flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .password-input {
-    margin: 5px 0;
+  .password-input-error-container {
+    flex-basis: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: -5px;
   }
 
-  .password-input-confirm {
-    margin: 5px 0 5px 10px;
-  }
-
-  .password-input-error {
+  .password-input-error{
     color: red;
     font-size: 12px;
-    flex-basis: 100%;
   }
+
 
   .title-container {
     border-top: 1px solid black;

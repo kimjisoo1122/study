@@ -115,7 +115,7 @@ public class BoardController {
 
         if (boardService.isPasswordNotMatch(boardId, form.getPassword())) {
             bindingResult.rejectValue("password", null,
-                    "비밀번호가 맞지 않습니다");
+                    "비밀번호가 맞지 않습니다.");
         }
 
         if (bindingResult.hasErrors()) {

@@ -57,10 +57,9 @@ export default {
             localStorage.setItem('deleteMsg', '게시글을 삭제하였습니다.');
             this.$router.push(createSearchQuery('/board', this.condition))
           })
-          .catch(errorMessage => {
+          .catch(({message}) => {
             this.$emit('cancelDelete');
-            console.log(errorMessage);
-            alert(errorMessage);
+            alert(message);
           })
     },
   }

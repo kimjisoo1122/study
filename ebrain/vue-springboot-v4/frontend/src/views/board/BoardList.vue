@@ -36,7 +36,7 @@
 
 import BoardSearch from "@/components/board/BoardSearch.vue";
 import Board from "@/components/board/Board.vue";
-import Pagination from "@/components/Pagination.vue";
+import Pagination from "@/components/board/Pagination.vue";
 import BoardListHeader from "@/components/board/BoardListHeader.vue";
 import {createSearchQuery} from "@/util/queryparamUtil";
 import {getBoardList} from "@/api/boardService";
@@ -109,8 +109,8 @@ export default {
             this.boardList = boardList;
             this.boardCnt = boardCnt;
           })
-          .catch(errorMessage => {
-            console.error(errorMessage);
+          .catch(({message}) => {
+            console.error(message);
           })
     },
   },
