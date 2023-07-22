@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum ResponseStatus {
+public enum ResponseApiStatus {
     SUCCESS("success"),
     FAIL("fail");
 

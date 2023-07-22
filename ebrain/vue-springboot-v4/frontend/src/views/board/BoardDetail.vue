@@ -69,7 +69,7 @@
 
 <script>
 
-import Reply from "@/components/board/Reply.vue";
+import Reply from "@/components/Reply.vue";
 import BoardFile from "@/components/board/BoardFile.vue";
 import BoardUpdate from "@/components/board/BoardUpdate.vue";
 import BoardDeleteModal from "@/components/board/BoardDeleteModal.vue";

@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import CategoryOption from "@/components/board/CategoryOption.vue";
+import CategoryOption from "@/components/CategoryOption.vue";
 import FileInput from "@/components/FileInput.vue";
 import {registerBoard} from "@/api/boardService";
 import {createCondition, createSearchQuery} from "@/util/queryparamUtil";
@@ -143,7 +143,6 @@ export default {
         content: '',
         files: '',
       },
-
     }
   },
 

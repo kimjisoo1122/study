@@ -53,7 +53,7 @@
     </select>
 
     <!-- 게시글번호로 조회합니다. -->
-    <select id="selectBoardById"
+    <select id="selectByBoardId"
             parameterType="long"
             resultType="boardDto">
         SELECT b.board_id,

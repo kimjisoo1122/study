@@ -35,14 +35,5 @@ public class BoardRegisterForm {
             message = "영문/숫자/특수문자를 포함 하여야 합니다.")
     private String password; // 비밀번호
 
-    private String confirmPassword; // 확인용 비밀번호
     private List<MultipartFile> files; // 첨부파일 목록
-
-    /**
-     * 등록 폼에서 입력된 패스워드 두개의 값을 비교합니다
-     * @return 입력된 패스워드가 서로 같으면 true 반환
-     */
-    public boolean validConfirmPassword() {
-        return password.equals(confirmPassword);
-    }
 }

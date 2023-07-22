@@ -1,9 +1,9 @@
 package com.study.service;
 
 import com.study.dto.*;
-import com.study.mapper.BoardMapper;
-import com.study.mapper.FileMapper;
-import com.study.mapper.ReplyMapper;
+import com.study.repository.BoardRepository;
+import com.study.repository.FileRepository;
+import com.study.repository.ReplyRepository;
 import com.study.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,15 +19,14 @@ import java.util.Optional;
  * 게시글 관련된 비즈니스 로직을 처리하는 서비스
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BoardService {
 
     private final FileService fileService;
 
-    private final BoardMapper boardMapper;
-    private final FileMapper fileMapper;
-    private final ReplyMapper replyMapper;
+    private final BoardRepository boardRepository;
+    private final FileRepository fileRepository;
+    private final ReplyRepository replyRepository;
 
     /**
      * 게시글을 등록합니다.
@@ -36,10 +35,11 @@ public class BoardService {
      * @return boardId 등록된 게시글번호
      * @throws IOException 첨부파일의 생성에러
      */
+    @Transactional()
     public Long register(BoardRegisterForm form) throws IOException {
         // 게시글을 등록하고 등록된 게시글번호를 반환합니다.
         BoardDto registerBoard = createRegisterBoard(form);
-        boardMapper.insert(registerBoard);
+        boardRepository.insert(registerBoard);
         Long boardId = registerBoard.getBoardId();
 
         // 파일을 생성하고 첨부파일을 등록합니다.
@@ -47,7 +47,7 @@ public class BoardService {
             List<FileDto> files = fileService.createFiles(form.getFiles());
             for (FileDto file : files) {
                 file.setBoardId(boardId);
-                fileMapper.insert(file);
+                fileRepository.insert(file);
             }
         }
 
@@ -59,9 +59,8 @@ public class BoardService {
      * @param boardId
      * @return BoardDto 조회한 게시글 DTO
      */
-    @Transactional(readOnly = true)
-    public BoardDto findBoardById(Long boardId) {
-        return boardMapper.selectBoardById(boardId);
+    public BoardDto findByBoardId(Long boardId) {
+        return boardRepository.selectByBoardId(boardId);
     }
 
     /**
@@ -71,7 +70,7 @@ public class BoardService {
      */
     @Transactional(readOnly = true)
     public List<BoardDto> findAllByCondition(BoardSearchCondition condition) {
-        return boardMapper.selectByCondition(condition);
+        return boardRepository.selectByCondition(condition);
     }
 
     /**
@@ -79,9 +78,8 @@ public class BoardService {
      * @param condition 검색조건
      * @return 게시글 총 갯수
      */
-    @Transactional(readOnly = true)
-    public int getBoardCnt(BoardSearchCondition condition) {
-        return boardMapper.countByCondition(condition);
+    public int findBoardCnt(BoardSearchCondition condition) {
+        return boardRepository.countByCondition(condition);
     }
 
     /**
@@ -91,13 +89,14 @@ public class BoardService {
      * @param form 업데이트용 Form
      * @return 업데이트 행 갯수
      */
+    @Transactional
     public int update(BoardUpdateForm form) throws IOException {
         // 첨부파일이 있는 경우 추가합니다.
         if (form.getFiles() != null) {
             List<FileDto> files = fileService.createFiles(form.getFiles());
             for (FileDto file : files) {
                 file.setBoardId(form.getBoardId());
-                fileMapper.insert(file);
+                fileRepository.insert(file);
             }
         }
 
@@ -108,7 +107,7 @@ public class BoardService {
             }
         }
 
-        return boardMapper.update(createUpdateBoard(form));
+        return boardRepository.update(createUpdateBoard(form));
     }
 
     /**
@@ -116,7 +115,7 @@ public class BoardService {
      * @param boardId 게시글 번호
      */
     public void increaseViewCnt(Long boardId) {
-        boardMapper.increaseViewCnt(boardId);
+        boardRepository.increaseViewCnt(boardId);
     }
 
     /**
@@ -125,21 +124,22 @@ public class BoardService {
      * @param boardId 게시글 번호
      * @return 삭제 행 갯수
      */
+    @Transactional
     public int delete(Long boardId) {
         // 업로드 경로의 파일을 삭제하고 DB의 정보를 삭제합니다.
-        List<FileDto> files = fileMapper.selectByBoardId(boardId);
+        List<FileDto> files = fileRepository.selectByBoardId(boardId);
         for (FileDto file : files) {
             File uploadedFile = new File(file.getFullPath());
             if (uploadedFile.exists()) {
                 uploadedFile.delete();
             }
-            fileMapper.delete(file.getFileId());
+            fileRepository.delete(file.getFileId());
         }
 
-        replyMapper.deleteByBoardId(boardId);
+        replyRepository.deleteByBoardId(boardId);
 
         // 파일 -> 댓글 -> 게시글순으로 삭제합니다.
-        return boardMapper.delete(boardId);
+        return boardRepository.delete(boardId);
     }
 
 
@@ -155,7 +155,7 @@ public class BoardService {
             return true;
         }
 
-        String findPassword = Optional.ofNullable(boardMapper.selectBoardById(boardId))
+        String findPassword = Optional.ofNullable(boardRepository.selectByBoardId(boardId))
                 .map(BoardDto::getPassword)
                 .orElse("");
         String encryptedPassword = StringUtil.encrypt(password);

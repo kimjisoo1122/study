@@ -1,8 +1,8 @@
 package com.study.controller;
 
+import com.study.api.ResponseApiStatus;
 import com.study.api.ResponseDto;
 import com.study.api.ResponseValidFormDto;
-import com.study.api.ResponseStatus;
 import com.study.dto.BoardRegisterForm;
 import com.study.dto.BoardSearchCondition;
 import com.study.dto.BoardUpdateForm;
@@ -40,7 +40,7 @@ public class BoardController {
      * @return boardList 게시글목록, boardCnt 개시글갯수
      */
     @GetMapping()
-    public ResponseEntity<ResponseDto> getBoardList(
+    public ResponseEntity<ResponseDto> findBoardList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @ModelAttribute(value = "condition") BoardSearchCondition condition) {
@@ -48,10 +48,10 @@ public class BoardController {
         condition.setPagination(page, pageSize);
 
         ResponseDto response = new ResponseDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
         response.setData(
                 Map.of("boardList", boardService.findAllByCondition(condition),
-                        "boardCnt", boardService.getBoardCnt(condition)));
+                        "boardCnt", boardService.findBoardCnt(condition)));
 
         return ResponseEntity.ok(response);
     }
@@ -62,17 +62,17 @@ public class BoardController {
      * @return board 게시글
      */
     @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto> getBoard(
+    public ResponseEntity<ResponseDto> findBoard(
              @PathVariable("boardId") Long boardId) {
 
         boardService.increaseViewCnt(boardId);
 
         ResponseDto response = new ResponseDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
         response.setData(
-                Map.of("board", boardService.findBoardById(boardId),
-                        "files", fileService.findByBoardId(boardId),
-                        "replies", replyService.findByBoardId(boardId)));
+                Map.of("board", boardService.findByBoardId(boardId),
+                        "files", fileService.findAllByBoardId(boardId),
+                        "replies", replyService.findAllByBoardId(boardId)));
 
         return ResponseEntity.ok(response);
     }
@@ -84,7 +84,7 @@ public class BoardController {
      * @return boardId 등록된 게시글번호
      */
     @PostMapping
-    public ResponseEntity<ResponseValidFormDto> registerBoard(
+    public ResponseEntity<ResponseValidFormDto> register(
             @Validated BoardRegisterForm form,
             BindingResult bindingResult) throws IOException {
 
@@ -95,7 +95,7 @@ public class BoardController {
         }
 
         ResponseValidFormDto response = new ResponseValidFormDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
         response.setData(Map.of("boardId", boardService.register(form)));
 
         return ResponseEntity
@@ -108,7 +108,7 @@ public class BoardController {
      * 게시글을 업데이트합니다.
      */
     @PutMapping("/{boardId}")
-    public ResponseEntity<ResponseValidFormDto> updateBoard(
+    public ResponseEntity<ResponseValidFormDto> update(
             @PathVariable("boardId") Long boardId,
             @Validated BoardUpdateForm form,
             BindingResult bindingResult) throws IOException {
@@ -127,7 +127,7 @@ public class BoardController {
         boardService.update(form);
 
         ResponseValidFormDto response = new ResponseValidFormDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
 
         return ResponseEntity.ok(response);
     }
@@ -139,7 +139,7 @@ public class BoardController {
      * @return ResponseDto
      */
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<ResponseDto> deleteBoard(
+    public ResponseEntity<ResponseDto> delete(
             @PathVariable("boardId") Long boardId,
             @RequestBody Map<String, String> deleteMap) {
 
@@ -150,7 +150,7 @@ public class BoardController {
         boardService.delete(boardId);
 
         ResponseDto response = new ResponseDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
@@ -164,7 +164,7 @@ public class BoardController {
      */
     private ResponseValidFormDto createValidFormResponse(BindingResult bindingResult) {
         ResponseValidFormDto response = new ResponseValidFormDto();
-        response.setStatus(ResponseStatus.FAIL);
+        response.setStatus(ResponseApiStatus.FAIL);
         response.setErrorMessage("잘못된 데이터입니다.");
 
         // 에러필드이름과 에러메시지를 응답값에 담습니다.

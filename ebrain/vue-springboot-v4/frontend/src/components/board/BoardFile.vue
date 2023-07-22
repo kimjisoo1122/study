@@ -3,17 +3,24 @@
 
   <!-- 첨부파일 다운로드링크  -->
   <div class="file-container">
-    <a class="file-link" :href="`/file/${file.fileId}`" >{{ file.originalName }}</a>
+    <span class="file-link" @click="fileDown(file.fileId)">{{ file.originalName }}</span>
   </div>
 
 </template>
 
 <script>
 
+
+import {fileDown} from "@/api/fileService";
+
 export default {
   name: "BoardFile",
   props: {
     file: Object // 첨부파일
+  },
+
+  methods: {
+    fileDown,
   }
 }
 </script>
@@ -28,7 +35,7 @@ export default {
   .file-link {
     color: blue;
     font-size: 14px;
-    text-decoration: navajowhite;
+    cursor: pointer;
   }
 
 </style>

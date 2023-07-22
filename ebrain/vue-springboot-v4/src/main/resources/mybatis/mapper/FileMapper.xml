@@ -40,7 +40,7 @@
     </select>
 
     <!-- 파일 ID로 조회합니다. -->
-    <select id="selectById"
+    <select id="selectByFileId"
             parameterType="long"
             resultType="FileDto">
         SELECT file_id,

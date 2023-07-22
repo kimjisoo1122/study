@@ -12,12 +12,8 @@ public interface BoardMapper {
     int insert(BoardDto boardDto);
     List<BoardDto> selectByCondition(BoardSearchCondition condition);
     int countByCondition(BoardSearchCondition condition);
-    BoardDto selectBoardById(Long boardId);
+    BoardDto selectByBoardId(Long boardId);
     int update(BoardDto boardDto);
     void increaseViewCnt(Long boardId);
     int delete(Long boardId);
-
-
-
-
 }

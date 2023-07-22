@@ -20,3 +20,8 @@ mybatis:
 
 file:
   upload-folder: C:/Temp/upload/
+
+server:
+  error:
+    whitelabel:
+      enabled: false

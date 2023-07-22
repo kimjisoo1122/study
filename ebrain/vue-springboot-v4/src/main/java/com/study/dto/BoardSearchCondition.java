@@ -1,6 +1,5 @@
 package com.study.dto;
 
-import com.study.util.StringUtil;
 import lombok.Data;
 
 /**
@@ -22,34 +21,6 @@ public class BoardSearchCondition {
     // 조회 SQL에 사용합니다.
     private int offset; // SQL OFFSET
     private int limit; // SQL LIMIT
-
-    public BoardSearchCondition() {
-        setParamNvl();
-    }
-
-    /**
-     * 검색조건들을 쿼리스트링으로 변환합니다.
-     * @return 리다이렉트에 사용하는 쿼리스트링
-     */
-    public String getQueryParamString(int page) {
-        return String.format(
-                "?page=%s&fromDate=%s&toDate=%s&search=%s&searchCategory=%s",
-                page, fromDate, toDate, search , searchCategory);
-    }
-
-    public String getQueryParamString() {
-        return getQueryParamString(page);
-    }
-
-    /**
-     * queryParameter로 넘어오는 파라미터의 null값을 체크합니다.
-     */
-    private void setParamNvl() {
-        fromDate = StringUtil.nvl(fromDate);
-        toDate = StringUtil.nvl(toDate);
-        search = StringUtil.nvl(search);
-        searchCategory = StringUtil.nvl(searchCategory);
-    }
 
     /**
      * 검색조건 페이징처리를 위한 값을 설정합니다.

@@ -28,6 +28,10 @@ export const validWriter = (writer) => {
  * 영문/숫자/특수문자를 포함 하여야 합니다.
  */
 export const validPassword = (password) => {
+  if (password.length === 0) {
+    return '비밀번호를 입력해주세요.';
+  }
+
   const lengthCondition = password.length >= 4 && password.length < 16;
 
   const pwdRex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/;

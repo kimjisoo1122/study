@@ -131,11 +131,11 @@
 </template>
 
 <script>
-import CategoryOption from "@/components/board/CategoryOption.vue";
+import CategoryOption from "@/components/CategoryOption.vue";
 import BoardFile from "@/components/board/BoardFile.vue";
 import FileInput from "@/components/FileInput.vue";
 import {updateBoard} from "@/api/boardService";
-import {validCategory, validConfirm, validContent, validPassword, validTitle, validWriter} from "@/util/validUtil";
+import {validCategory, validContent, validPassword, validTitle, validWriter} from "@/util/validUtil";
 
 export default {
   name: "BoardUpdate",
@@ -188,9 +188,9 @@ export default {
      * 업데이트를 처리합니다.
      */
     submitUpdate() {
-      // if (!this.validForm()) {
-      //   return false;
-      // }
+      if (!this.validForm()) {
+        return false;
+      }
 
       const formData = this.createFormData();
 
@@ -235,6 +235,7 @@ export default {
     validForm() {
       this.errorFields.categoryId = validCategory(this.categoryId);
       this.errorFields.writer = validWriter(this.writer);
+      this.errorFields.password = validPassword(this.password);
       this.errorFields.title = validTitle(this.title);
       this.errorFields.content = validContent(this.content);
 

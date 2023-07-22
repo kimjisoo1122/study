@@ -1,7 +1,7 @@
 package com.study.controller;
 
 import com.study.api.ResponseDto;
-import com.study.api.ResponseStatus;
+import com.study.api.ResponseApiStatus;
 import com.study.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +24,10 @@ public class CategoryController {
      * @return categories 카테고리목록
      */
     @GetMapping("/api/categories")
-    public ResponseEntity<ResponseDto> getCategories() {
+    public ResponseEntity<ResponseDto> findCategoryList() {
         ResponseDto response = new ResponseDto();
-        response.setStatus(ResponseStatus.SUCCESS);
-        response.setData(Map.of("categories", categoryService.findAll()));
+        response.setStatus(ResponseApiStatus.SUCCESS);
+        response.setData(Map.of("categories", categoryService.findCategoryList()));
 
         return ResponseEntity.ok(response);
     }

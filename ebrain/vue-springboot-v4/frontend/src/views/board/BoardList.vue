@@ -1,8 +1,6 @@
 <!-- 게시글목록 라우터뷰 입니다. -->
 <template>
 
-  <div class="board-list-container">
-
     <!-- 게시글 검색조건 -->
     <BoardSearch :condition="condition"/>
 
@@ -27,8 +25,6 @@
           <button class="board-register-button">등록</button>
         </router-link>
     </div>
-
-  </div>
 
 </template>
 

@@ -13,6 +13,8 @@ export const registerReply = (replyDto) => {
         return reply;
       })
       .catch(({response: {data: {errorMessage}}}) => {
-        new Error(errorMessage);
+        throw {
+          message: errorMessage
+        }
       });
 }

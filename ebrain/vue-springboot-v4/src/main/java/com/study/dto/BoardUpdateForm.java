@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -49,20 +48,4 @@ public class BoardUpdateForm {
 
     private List<MultipartFile> files; // 첨부파일
     private Long[] deleteFiles; // 삭제파일
-
-    /**
-     * 게시글에 맞는 포맷된 형식의 생성일시 반환합니다.
-     * @return yyyy.MM.dd HH:mm 포맷의 생성일시
-     */
-    public String getFormattedCreateDate() {
-        return createDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-    }
-
-    /**
-     * 게시글에 맞는 포맷된 형식의 수정일시를 반환합니다.
-     * @return yyyy.MM.dd HH:mm 포맷의 수정일시
-     */
-    public String getFormattedUpdateDate() {
-        return updateDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-    }
 }

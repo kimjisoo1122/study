@@ -10,7 +10,6 @@ export const getCategories = () => {
         return formatCategories(categories);
       })
       .catch(({response: {data: {errorMessage}}}) => {
-        console.error(errorMessage);
         throw new Error(errorMessage);
       });
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 @Data
 public class ResponseDto {
 
-    private ResponseStatus status; // API 응답상태
+    private ResponseApiStatus status; // API 응답상태
     private String errorMessage = ""; // 응답실패 : 예외 메시지
     private Map<String, Object> data = new HashMap<>(); // 응답 데이터
 }

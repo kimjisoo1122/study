@@ -1,7 +1,7 @@
 package com.study.controller;
 
 import com.study.api.ResponseDto;
-import com.study.api.ResponseStatus;
+import com.study.api.ResponseApiStatus;
 import com.study.dto.ReplyDto;
 import com.study.service.ReplyService;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +30,11 @@ public class ReplyController {
      * @return reply 등록된 댓글
      */
     @PostMapping
-    public ResponseEntity<ResponseDto> registerReply(
+    public ResponseEntity<ResponseDto> register(
             @RequestBody ReplyDto replyDto) {
 
         ResponseDto response = new ResponseDto();
-        response.setStatus(ResponseStatus.SUCCESS);
+        response.setStatus(ResponseApiStatus.SUCCESS);
         response.setData(Map.of("reply", replyService.register(replyDto)));
 
         return ResponseEntity

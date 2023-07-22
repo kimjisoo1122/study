@@ -1,7 +1,7 @@
 package com.study.service;
 
 import com.study.dto.ReplyDto;
-import com.study.mapper.ReplyMapper;
+import com.study.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +12,10 @@ import java.util.List;
  * 댓글의 비즈니스로직을 처리하는 서비스 입니다.
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReplyService {
 
-    private final ReplyMapper replyMapper;
+    private final ReplyRepository replyRepository;
 
     /**
      * 게시글의 댓글을 등록한 후
@@ -24,10 +23,11 @@ public class ReplyService {
      * @param replyDto 댓글정보 (boardId (게시글번호), replyContent (댓글내용)
      * @return ReplyDto 등록된 댓글객체
      */
+    @Transactional
     public ReplyDto register(ReplyDto replyDto) {
-        replyMapper.insert(replyDto);
+        replyRepository.insert(replyDto);
         Long replyId = replyDto.getReplyId();
-        return replyMapper.selectById(replyId);
+        return replyRepository.selectByReplyId(replyId);
     }
 
     /**
@@ -35,9 +35,8 @@ public class ReplyService {
      * @param replyId 댓글번호
      * @return ReplyDto 댓글정보
      */
-    @Transactional(readOnly = true)
-    public ReplyDto findById(Long replyId) {
-        return replyMapper.selectById(replyId);
+    public ReplyDto findByReplyId(Long replyId) {
+        return replyRepository.selectByReplyId(replyId);
     }
 
     /**
@@ -45,8 +44,7 @@ public class ReplyService {
      * @param boardId 게시글 번호
      * @return List<ReplyDto> 게시글 댓글정보
      */
-    @Transactional(readOnly = true)
-    public List<ReplyDto> findByBoardId(Long boardId) {
-        return replyMapper.selectByBoardId(boardId);
+    public List<ReplyDto> findAllByBoardId(Long boardId) {
+        return replyRepository.selectByBoardId(boardId);
     }
 }

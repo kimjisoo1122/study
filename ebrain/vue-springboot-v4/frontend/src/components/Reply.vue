@@ -66,8 +66,8 @@ export default {
               this.$emit('registerReply', reply);
               this.replyContent = '';
             })
-            .catch(errorMessage => {
-              console.error(errorMessage);
+            .catch(({message}) => {
+              console.error(message);
             });
       }
     },

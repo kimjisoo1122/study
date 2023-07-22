@@ -16,7 +16,7 @@
     </insert>
 
     <!-- 댓글을 조회합니다. -->
-    <select id="selectById"
+    <select id="selectByReplyId"
             parameterType="long"
             resultType="ReplyDto">
         SELECT
